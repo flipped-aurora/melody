@@ -1,10 +1,16 @@
-package config
+package viper
 
 import (
 	"github.com/spf13/viper"
+	"melody/config"
 	"reflect"
 	"unsafe"
 )
+
+//ViperParser extends viper
+type ViperParser struct {
+	viper *viper.Viper
+}
 
 //New return new parser extends viper
 func New() ViperParser {
@@ -13,18 +19,11 @@ func New() ViperParser {
 	}
 }
 
-//ViperParser extends viper
-type ViperParser struct {
-	viper *viper.Viper
-}
-
-
-
 //Parse to parse config file
-func (p ViperParser) Parse(configFile string) (ServiceConfig, error) {
+func (p ViperParser) Parse(configFile string) (config.ServiceConfig, error) {
 	p.viper.SetConfigFile(configFile)
 	p.viper.AutomaticEnv()
-	var cfg ServiceConfig
+	var cfg config.ServiceConfig
 
 	if err := p.viper.ReadInConfig(); err != nil {
 		return cfg, checkErr(err, configFile)
@@ -35,7 +34,7 @@ func (p ViperParser) Parse(configFile string) (ServiceConfig, error) {
 	}
 
 	if err := cfg.Init(); err != nil {
-		return cfg, CheckErr(err, configFile)
+		return cfg, config.CheckErr(err, configFile)
 	}
 
 	return cfg, nil
@@ -55,6 +54,6 @@ func checkErr(err error, configFile string) error {
 
 		return checkErr(subErr, configFile)
 	default:
-		return CheckErr(err, configFile)
+		return config.CheckErr(err, configFile)
 	}
 }
