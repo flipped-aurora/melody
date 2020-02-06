@@ -9,14 +9,14 @@ import (
 )
 
 var (
-	cfgFile string
-	debug   bool
-	port    int
-	parser  config.Parser
-	run     Executor
-	rootCmd = &cobra.Command{
+	cfgFilePath string
+	debug       bool
+	port        int
+	parser      config.Parser
+	run         Executor
+	rootCmd     = &cobra.Command{
 		Use:   "melody",
-		Short: "melody to help you to sort out your complex api.",
+		Short: "melody help you to sort out your complex api.",
 	}
 	runCmd = &cobra.Command{
 		Use:     "run ",
@@ -30,7 +30,7 @@ var (
 func init() {
 	logo, _ := base64.StdEncoding.DecodeString(encodedLogo)
 	rootCmd.SetHelpTemplate(string(logo) + "\nVersion:" + core.MelodyVersion + "\n\n" + rootCmd.HelpTemplate())
-	rootCmd.PersistentFlags().StringVarP(&cfgFile, "config", "c", "", "Path of the melody.json")
+	rootCmd.PersistentFlags().StringVarP(&cfgFilePath, "config", "c", "", "Path of the melody.json")
 	rootCmd.PersistentFlags().BoolVarP(&debug, "debug", "d", false, "Enable the Melody debug")
 	rootCmd.AddCommand(runCmd)
 	runCmd.PersistentFlags().IntVarP(&port, "port", "p", 7777, "Listening port for Melody server")

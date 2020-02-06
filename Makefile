@@ -1,8 +1,7 @@
 # this is Makefile about melody in golang.
-
 run:
-	@echo "Run project ..."
+	@echo "Run  ..."
 	@go run .
 build:
-	@echo "Build project ..."
+	@echo "Build  ..."
 	@go build .

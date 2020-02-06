@@ -1,0 +1,49 @@
+{
+  "version": 2,
+  "extra_config": {
+
+	"melody_gologging": {
+	  "level": "DEBUG",
+	  "prefix": "[GRANT]",
+	  "syslog": true,
+	  "stdout": true,
+	  "format": "default"
+	}
+  },
+  "timeout": "3000ms",
+  "cache_ttl": "300s",
+  "output_encoding": "json",
+  "port": 8080,
+  "endpoints": [
+	{
+	  "endpoint": "/roles_pages",
+	  "method": "GET",
+	  "extra_config": {},
+	  "output_encoding": "json",
+	  "concurrent_calls": 1,
+	  "headers_to_pass": [
+		"*"
+	  ],
+	  "backend": [
+		{
+		  "url_pattern": "/page",
+		  "encoding": "json",
+		  "extra_config": {},
+		  "method": "GET",
+		  "host": [
+			"127.0.0.1:8001"
+		  ]
+		},
+		{
+		  "url_pattern": "/roles",
+		  "encoding": "json",
+		  "extra_config": {},
+		  "method": "GET",
+		  "host": [
+			"127.0.0.1:8001"
+		  ]
+		}
+	  ]
+	}
+  ]
+}

@@ -5,7 +5,7 @@ import (
 	"log"
 	"melody/cmd"
 	"melody/config"
-	"melody/melody-ce"
+	"melody/core/melody"
 	"os"
 	"os/signal"
 	"syscall"
