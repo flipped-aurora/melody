@@ -1,6 +1,7 @@
 ## 关于Melody中Middleware的命名与结构体格式
 
 ### melody-xxxxx
+- Describe: xxx
 - Namespace: `melody_xxxxx`
 - Struct:
 ```
@@ -15,6 +16,7 @@
 
 
 ### 1.melody-logstash
+- Describe: 包含serviceName的logger
 - Namespace: `melody_logstash`
 - Struct:
 ```
@@ -26,6 +28,7 @@
 - Status: 基本实现
 
 ### 2.melody-gologging
+- Describe: Base 基础logger middleware
 - Namespace: `melody_gologging`
 - Struct:
 ```
@@ -38,4 +41,4 @@
 }
 ```
 - Level: [ServiceConfig, Backend, Endpoint]
-- Status: xxxx
+- Status: 基本实现
