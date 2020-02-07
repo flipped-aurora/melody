@@ -44,8 +44,13 @@
 - Status: 基本实现
 
 ### 3.melody-viper
-- Describe: Parser by viper
-- Namespace: -
-- Struct:-
-- Level: 作为默认Parser
+- Describe: 基于config中parser实现的viper parser
+- Namespace: `melody_parser`
+- Struct:
+```
+"melody_viper": {
+    ...
+}
+```
+- Level: [ServiceConfig]
 - Status: 基本实现

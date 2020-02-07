@@ -4,8 +4,8 @@ import (
 	"context"
 	"log"
 	"melody/cmd"
-	"melody/config"
 	"melody/core/melody"
+	viper "melody/middleware/melody-viper"
 	"os"
 	"os/signal"
 	"syscall"
@@ -26,6 +26,6 @@ func main() {
 		}
 	}()
 
-	cfg := config.New()
+	cfg := viper.New()
 	cmd.Execute(cfg, melody.NewExecutor(ctx))
 }
