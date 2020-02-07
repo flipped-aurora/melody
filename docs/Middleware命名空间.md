@@ -54,3 +54,17 @@
 ```
 - Level: [ServiceConfig]
 - Status: 基本实现
+
+### 4.melody-gelf
+- Describe: 与graylog集成
+- Namespace: `melody_gelf`
+- Struct:
+```
+"melody_gelf": {
+    "addr": "*:12201",
+    "enable_tcp": fasle
+}
+```
+- Level: [ServiceConfig]
+- Status: 完成
+

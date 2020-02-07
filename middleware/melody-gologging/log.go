@@ -154,4 +154,8 @@ func GetConfig(extraConfig config.ExtraConfig) interface{} {
 	return cfg
 }
 
+func UpdateFormatSelector(f func(io.Writer) string) {
+	defaultFormatterSelector = f
+}
+
 

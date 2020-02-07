@@ -1,13 +1,16 @@
 {
   "version": 2,
   "extra_config": {
-
 	"melody_gologging": {
 	  "level": "DEBUG",
 	  "prefix": "[GRANT]",
 	  "syslog": true,
 	  "stdout": true,
 	  "format": "default"
+	},
+	"melody_gelf": {
+	  "addr": "127.0.0.1:12201",
+	  "tcp_enable": false
 	}
   },
   "timeout": "3000ms",
