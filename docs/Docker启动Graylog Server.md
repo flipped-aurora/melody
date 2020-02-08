@@ -5,6 +5,12 @@
 
 ### 配置docker-compose 文件
 
+找个地方
+```
+vim graylog.yml
+```
+直接拷贝如
+
 ```yaml
 version: '2'
 services:
