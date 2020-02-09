@@ -11,8 +11,9 @@ const (
 )
 
 var (
-	hostPattern    = regexp.MustCompile(`(https?://)?([a-zA-Z0-9\._\-]+)(:[0-9]{2,6})?/?`)
-	errInvalidHost = errors.New("invalid host")
+	endpointURLKeysPattern = regexp.MustCompile(`/\{([a-zA-Z\-_0-9]+)\}`)
+	hostPattern            = regexp.MustCompile(`(https?://)?([a-zA-Z0-9\._\-]+)(:[0-9]{2,6})?/?`)
+	errInvalidHost         = errors.New("invalid host")
 )
 
 //URIParser defines all method that uri needed
@@ -21,6 +22,10 @@ type URIParser interface {
 	CleanHost(string) string
 	CleanPath(string) string
 	GetEndpointPath(string, []string) string
+}
+
+func NewURIParser() URIParser {
+	return URI(RoutingPattern)
 }
 
 //URI to implement URIParser

@@ -56,9 +56,14 @@ func NewExecutor(ctx context.Context) cmd.Executor {
 
 		logger.Info("Melody server listening on port:", cfg.Port, "🎁")
 
-		//TODO Start Reporter (目前还不知道这在干什么)
+		//TODO 3.Start Reporter (暂时不做)
 
-		//TODO 加载插件
+		//TODO 4.加载插件 (暂时不做)
+
+		//TODO 5.注册etcd服务发现
+
+		//TODO 6.创建Metrics监控
+
 		//TODO ...
 	}
 }
