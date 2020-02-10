@@ -27,7 +27,7 @@
 	  "headers_to_pass": [
 		"*"
 	  ],
-	  "backend": [
+	  "backends": [
 		{
 		  "url_pattern": "/page",
 		  "encoding": "json",

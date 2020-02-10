@@ -60,7 +60,7 @@ func NewLogger(extra config.ExtraConfig, ws ...io.Writer) (logging.Logger, error
 			}
 		}
 	}
-	logger ,err := gologging.NewLogger(extra, ws...)
+	logger, err := gologging.NewLogger(extra, ws...)
 	if err != nil {
 		return nil, err
 	}

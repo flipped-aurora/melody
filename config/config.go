@@ -1,9 +1,11 @@
 package config
 
 import (
+	"errors"
 	"fmt"
 	"melody/encoding"
 	"regexp"
+	"strings"
 	"time"
 )
 
@@ -16,9 +18,10 @@ const (
 )
 
 var (
-	RoutingPattern       = ColonRouterPatternBuilder
-	debugPattern         = "^[^/]|/__debug(/.*)?$"
-	simpleURLKeysPattern = regexp.MustCompile(`\{([a-zA-Z\-_0-9]+)\}`)
+	RoutingPattern         = ColonRouterPatternBuilder
+	debugPattern           = "^[^/]|/__debug(/.*)?$"
+	simpleURLKeysPattern   = regexp.MustCompile(`\{([a-zA-Z\-_0-9]+)\}`)
+	errInvalidNoOpEncoding = errors.New("can not use NoOp encoding with more than one backends connected to the same endpoint")
 )
 
 //ServiceConfig contains all config in melody server.
@@ -29,8 +32,8 @@ type ServiceConfig struct {
 	Host        []string          `mapstructure:"host"`
 	Endpoints   []*EndpointConfig `mapstructure:"endpoints"`
 
-	OutputEncoding string `mapstructure:"output_encoding"`
-	CacheTTL time.Duration `mapstructure:"cache_ttl"`
+	OutputEncoding string        `mapstructure:"output_encoding"`
+	CacheTTL       time.Duration `mapstructure:"cache_ttl"`
 
 	MaxIdleConnsPerHost int `mapstructure:"max_idle_connections_per_host"`
 
@@ -64,6 +67,42 @@ type EndpointConfig struct {
 }
 
 type Backend struct {
+	// the name of the group the response should be moved to. If empty, the response is
+	// not changed
+	Group string `mapstructure:"group"`
+	// HTTP method of the request to send to the backend
+	Method string `mapstructure:"method"`
+	// Set of hosts of the API
+	Host []string `mapstructure:"host"`
+	// False if the hostname should be sanitized
+	HostSanitizationDisabled bool `mapstructure:"disable_host_sanitize"`
+	// URL pattern to use to locate the resource to be consumed
+	URLPattern string `mapstructure:"url_pattern"`
+	// set of response fields to remove. If empty, the filter id not used
+	Blacklist []string `mapstructure:"blacklist"`
+	// set of response fields to allow. If empty, the filter id not used
+	Whitelist []string `mapstructure:"whitelist"`
+	// map of response fields to be renamed and their new names
+	Mapping map[string]string `mapstructure:"mapping"`
+	// the encoding format
+	Encoding string `mapstructure:"encoding"`
+	// the response to process is a collection
+	IsCollection bool `mapstructure:"is_collection"`
+	// name of the field to extract to the root. If empty, the formater will do nothing
+	Target string `mapstructure:"target"`
+	// name of the service discovery driver to use
+	//SD string `mapstructure:"sd"`
+
+	// list of keys to be replaced in the URLPattern
+	URLKeys []string
+	// number of concurrent calls this endpoint must send to the API
+	ConcurrentCalls int
+	// timeout of this backend
+	Timeout time.Duration
+	// decoder to use in order to parse the received response from the API
+	Decoder encoding.Decoder `json:"-"`
+	// Backend Extra configuration for customized behaviours
+	ExtraConfig ExtraConfig `mapstructure:"extra_config"`
 }
 
 //Extra config for melody
@@ -153,11 +192,20 @@ func (s *ServiceConfig) initEndpoints() error {
 		// 初始化一些全局默认值
 		s.initDefaultEndpoints(i)
 
-		//TODO NOOP encode (目前不知道noop什么意思)
+		//判断encode为NOOP时，backends是否大于1
+		if e.OutputEncoding == encoding.NOOP && len(e.Backends) > 1 {
+			return errInvalidNoOpEncoding
+		}
 
 		e.ExtraConfig.sanitize()
 
-		//TODO 初始化 Endpoints下的Backends （*）
+		for j, b := range e.Backends {
+			s.initDefaultBackends(i, j)
+
+			//TODO 初始化、解析Backends的url以及对应的参数 （*）
+
+			b.ExtraConfig.sanitize()
+		}
 	}
 
 	return nil
@@ -211,6 +259,28 @@ func (s *ServiceConfig) initDefaultEndpoints(i int) {
 			cur.OutputEncoding = encoding.JSON
 		}
 	}
+}
+
+func (s *ServiceConfig) initDefaultBackends(e, b int) {
+	endpoint := s.Endpoints[e]
+	backend := endpoint.Backends[b]
+	if len(backend.Host) == 0 {
+		backend.Host = s.Host
+	}
+
+	if !backend.HostSanitizationDisabled {
+		backend.Host = s.uriParser.CleanHosts(backend.Host)
+	}
+
+	if backend.Method == "" {
+		backend.Method = endpoint.Method
+	}
+
+	backend.Timeout = endpoint.Timeout
+	backend.ConcurrentCalls = endpoint.ConcurrentCalls
+
+	//根据配置的encoding， 加载对应的Decoder
+	backend.Decoder = encoding.Get(strings.ToLower(backend.Encoding))(backend.IsCollection)
 }
 
 func (e *EndpointConfig) validate() error {

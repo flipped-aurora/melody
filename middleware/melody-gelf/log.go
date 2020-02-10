@@ -11,18 +11,16 @@ import (
 const Namespace = "melody_gelf"
 
 var (
-	tcpWriter = gelf.NewTCPWriter
-	udpWriter = gelf.NewUDPWriter
-	ErrorConfig = fmt.Errorf("not found extra config about melody-gelf module")
+	tcpWriter        = gelf.NewTCPWriter
+	udpWriter        = gelf.NewUDPWriter
+	ErrorConfig      = fmt.Errorf("not found extra config about melody-gelf module")
 	ErrorMissAddress = errors.New("miss gelf address to send log")
 )
 
 type Config struct {
-	Addr string
+	Addr      string
 	TCPEnable bool
 }
-
-
 
 func NewWriter(cfg config.ExtraConfig) (io.Writer, error) {
 	g, ok := GetConfig(cfg).(Config)
@@ -68,6 +66,3 @@ func GetConfig(cfg config.ExtraConfig) interface{} {
 		TCPEnable: enable.(bool),
 	}
 }
-
-
-

@@ -75,7 +75,6 @@ func NewLogger(config config.ExtraConfig, ws ...io.Writer) (logging.Logger, erro
 	module := "MELODY"
 	logger := oplogging.MustGetLogger(module)
 
-
 	if cfg.StdOut {
 		ws = append(ws, os.Stdout)
 	}
@@ -116,7 +115,7 @@ func NewLogger(config config.ExtraConfig, ws ...io.Writer) (logging.Logger, erro
 
 	oplogging.SetBackend(backends...)
 
-	return Logger{logger:logger}, nil
+	return Logger{logger: logger}, nil
 }
 
 //GetConfig put extra config into config struct
@@ -157,5 +156,3 @@ func GetConfig(extraConfig config.ExtraConfig) interface{} {
 func UpdateFormatSelector(f func(io.Writer) string) {
 	defaultFormatterSelector = f
 }
-
-
