@@ -17,6 +17,8 @@ func main() {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
+	melody.RegisterEncoders()
+
 	go func() {
 		select {
 		case sig := <-sigs:

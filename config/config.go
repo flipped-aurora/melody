@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"melody/encoding"
 	"regexp"
+	"sort"
 	"strings"
 	"time"
 )
@@ -20,6 +21,7 @@ const (
 var (
 	RoutingPattern         = ColonRouterPatternBuilder
 	debugPattern           = "^[^/]|/__debug(/.*)?$"
+	sequentialParamsPattern = regexp.MustCompile(`^resp[\d]+_.*$`)
 	simpleURLKeysPattern   = regexp.MustCompile(`\{([a-zA-Z\-_0-9]+)\}`)
 	errInvalidNoOpEncoding = errors.New("can not use NoOp encoding with more than one backends connected to the same endpoint")
 )
@@ -202,7 +204,8 @@ func (s *ServiceConfig) initEndpoints() error {
 		for j, b := range e.Backends {
 			s.initDefaultBackends(i, j)
 
-			//TODO 初始化、解析Backends的url以及对应的参数 （*）
+			// 初始化、解析Backends的url以及对应的参数 （*）
+			s.initBackendsURLMappings(i, j, inputParamsSet)
 
 			b.ExtraConfig.sanitize()
 		}
@@ -283,6 +286,56 @@ func (s *ServiceConfig) initDefaultBackends(e, b int) {
 	backend.Decoder = encoding.Get(strings.ToLower(backend.Encoding))(backend.IsCollection)
 }
 
+func (s *ServiceConfig) initBackendsURLMappings(e, b int, inputSet map[string]interface{}) error {
+	backend := s.Endpoints[e].Backends[b]
+	backend.URLPattern = s.uriParser.CleanPath(backend.URLPattern)
+
+	outputParams, outputParamsSize := uniqueOutput(s.getPlaceHoldersFromEndpointUrl(backend.URLPattern, simpleURLKeysPattern))
+
+	inputParams := convertToSlice(inputSet)
+
+	if outputParamsSize > len(inputParams) {
+		return &WrongNumberOfParamsError{
+			Endpoint:     s.Endpoints[e].Endpoint,
+			Method:       s.Endpoints[e].Method,
+			Backend:      b,
+			InputParams:  inputParams,
+			OutputParams: outputParams,
+		}
+	}
+
+	backend.URLKeys = []string{}
+	for _, param := range outputParams {
+		if !sequentialParamsPattern.MatchString(param){
+			if _, ok := inputSet[param]; !ok {
+				return &UndefinedOutputParamError{
+					Endpoint:     s.Endpoints[e].Endpoint,
+					Method:       s.Endpoints[e].Method,
+					Backend:      b,
+					InputParams:  inputParams,
+					OutputParams: outputParams,
+					Param:        param,
+				}
+			}
+		}
+		key := strings.Title(param)
+		backend.URLPattern = strings.Replace(backend.URLPattern, "{"+param+"}", "{{."+key+"}}", -1)
+		backend.URLKeys = append(backend.URLKeys, key)
+	}
+
+	return nil
+}
+
+func convertToSlice(inputSet map[string]interface{}) []string {
+	var inputParams []string
+	for key := range inputSet {
+		inputParams = append(inputParams, key)
+	}
+
+	sort.Strings(inputParams)
+	return inputParams
+}
+
 func (e *EndpointConfig) validate() error {
 	matched, err := regexp.MatchString(debugPattern, e.Endpoint)
 	if err != nil {
@@ -308,4 +361,66 @@ func (e *EndpointConfig) validate() error {
 	}
 
 	return nil
+}
+
+func uniqueOutput(output []string) ([]string, int) {
+	sort.Strings(output)
+	j := 0
+	outputSetSize := 0
+	for i := 1; i < len(output); i++ {
+		if output[j] == output[i] {
+			continue
+		}
+		if !sequentialParamsPattern.MatchString(output[j]) {
+			outputSetSize++
+		}
+		j++
+		output[j] = output[i]
+	}
+	if j == len(output) {
+		return output, outputSetSize
+	}
+	return output[:j+1], outputSetSize
+}
+
+type WrongNumberOfParamsError struct {
+	Endpoint     string
+	Method       string
+	Backend      int
+	InputParams  []string
+	OutputParams []string
+}
+
+// Error returns a string representation of the WrongNumberOfParamsError
+func (w *WrongNumberOfParamsError) Error() string {
+	return fmt.Sprintf(
+		"input and output params do not match. endpoint: %s %s, backend: %d. input: %v, output: %v",
+		w.Method,
+		w.Endpoint,
+		w.Backend,
+		w.InputParams,
+		w.OutputParams,
+	)
+}
+
+type UndefinedOutputParamError struct {
+	Endpoint     string
+	Method       string
+	Backend      int
+	InputParams  []string
+	OutputParams []string
+	Param        string
+}
+
+// Error returns a string representation of the UndefinedOutputParamError
+func (u *UndefinedOutputParamError) Error() string {
+	return fmt.Sprintf(
+		"Undefined output param '%s'! endpoint: %s %s, backend: %d. input: %v, output: %v",
+		u.Param,
+		u.Method,
+		u.Endpoint,
+		u.Backend,
+		u.InputParams,
+		u.OutputParams,
+	)
 }
