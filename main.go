@@ -28,6 +28,6 @@ func main() {
 		}
 	}()
 
-	cfg := viper.New()
-	cmd.Execute(cfg, melody.NewExecutor(ctx))
+	parser := viper.New()
+	cmd.Execute(parser, melody.NewExecutor(ctx))
 }
