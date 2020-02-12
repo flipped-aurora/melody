@@ -18,6 +18,16 @@ var (
 		Use:   "melody",
 		Short: "melody help you to sort out your complex api.",
 	}
+
+	//添加校验配置文件
+	checkCmd = &cobra.Command{
+		Use:     "check",
+		Short:   "check that the config",
+		Long:    "Validates that the active configuration file has a valid syntax to run the service.\nChange the configuration file by using the --config flag",
+		Run:     checkFunc,
+		Aliases: []string{"validate"},
+		Example: "melody check -d -c config.json",
+	}
 	runCmd = &cobra.Command{
 		Use:     "run ",
 		Short:   "run the Melody server",
@@ -29,10 +39,11 @@ var (
 
 func init() {
 	logo, _ := base64.StdEncoding.DecodeString(encodedLogo)
-	rootCmd.SetHelpTemplate(string(logo) + "\nVersion:" + core.MelodyVersion + "\n\n" + rootCmd.HelpTemplate())
+	rootCmd.SetHelpTemplate("\n"+string(logo) + "\nVersion:" + core.MelodyVersion + "\n\n" + rootCmd.HelpTemplate())
 	rootCmd.PersistentFlags().StringVarP(&cfgFilePath, "config", "c", "", "Path of the melody.json")
 	rootCmd.PersistentFlags().BoolVarP(&debug, "debug", "d", false, "Enable the Melody debug")
 	rootCmd.AddCommand(runCmd)
+	rootCmd.AddCommand(checkCmd)
 	runCmd.PersistentFlags().IntVarP(&port, "port", "p", 7777, "Listening port for Melody server")
 }
 
