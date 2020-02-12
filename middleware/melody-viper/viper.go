@@ -19,7 +19,7 @@ func New() ViperParser {
 	}
 }
 
-//Parse to parse config file
+//实现 config 中 parser 接口
 func (p ViperParser) Parse(configFile string) (config.ServiceConfig, error) {
 	p.viper.SetConfigFile(configFile)
 	p.viper.AutomaticEnv()

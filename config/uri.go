@@ -54,6 +54,7 @@ func (U URI) CleanHost(host string) string {
 	return strings.Join(keys, "")
 }
 
+// 确保 path 前面有 /
 func (U URI) CleanPath(path string) string {
 	return "/" + strings.TrimPrefix(path, "/")
 }

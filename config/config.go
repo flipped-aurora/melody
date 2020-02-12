@@ -16,26 +16,27 @@ const (
 	defaultPort                = 8080
 	defaultMaxIdleConnsPreHost = 250
 	defaultTimeout             = 2 * time.Second
+	CurrVersion                = 2
 )
 
 var (
-	RoutingPattern         = ColonRouterPatternBuilder
-	debugPattern           = "^[^/]|/__debug(/.*)?$"
+	RoutingPattern          = ColonRouterPatternBuilder
+	debugPattern            = "^[^/]|/__debug(/.*)?$"
 	sequentialParamsPattern = regexp.MustCompile(`^resp[\d]+_.*$`)
-	simpleURLKeysPattern   = regexp.MustCompile(`\{([a-zA-Z\-_0-9]+)\}`)
-	errInvalidNoOpEncoding = errors.New("can not use NoOp encoding with more than one backends connected to the same endpoint")
+	simpleURLKeysPattern    = regexp.MustCompile(`\{([a-zA-Z\-_0-9]+)\}`)
+	errInvalidNoOpEncoding  = errors.New("can not use NoOp encoding with more than one backends connected to the same endpoint")
 )
 
 //ServiceConfig contains all config in melody server.
 type ServiceConfig struct {
-	ExtraConfig ExtraConfig       `mapstructure:"extra_config"`
-	Port        int               `mapstructure:"port"`
-	Timeout     time.Duration     `mapstructure:"timeout"`
-	Host        []string          `mapstructure:"host"`
-	Endpoints   []*EndpointConfig `mapstructure:"endpoints"`
-
-	OutputEncoding string        `mapstructure:"output_encoding"`
-	CacheTTL       time.Duration `mapstructure:"cache_ttl"`
+	ExtraConfig    ExtraConfig       `mapstructure:"extra_config"`
+	Port           int               `mapstructure:"port"`
+	Timeout        time.Duration     `mapstructure:"timeout"`
+	Host           []string          `mapstructure:"host"`
+	Endpoints      []*EndpointConfig `mapstructure:"endpoints"`
+	Version        int               `mapstructure:"version"`
+	OutputEncoding string            `mapstructure:"output_encoding"`
+	CacheTTL       time.Duration     `mapstructure:"cache_ttl"`
 
 	MaxIdleConnsPerHost int `mapstructure:"max_idle_connections_per_host"`
 
@@ -147,8 +148,13 @@ func (s *ServiceConfig) Init() error {
 	// 初始化URIParser
 	s.uriParser = NewURIParser()
 
-	//TODO 判断版本一致
-
+	// 判断版本号
+	if s.Version != CurrVersion {
+		return &UnsupportedVersionError{
+			Have: s.Version,
+			Want: CurrVersion,
+		}
+	}
 	// 初始化全局参数
 	s.initGlobalParams()
 
@@ -306,7 +312,7 @@ func (s *ServiceConfig) initBackendsURLMappings(e, b int, inputSet map[string]in
 
 	backend.URLKeys = []string{}
 	for _, param := range outputParams {
-		if !sequentialParamsPattern.MatchString(param){
+		if !sequentialParamsPattern.MatchString(param) {
 			if _, ok := inputSet[param]; !ok {
 				return &UndefinedOutputParamError{
 					Endpoint:     s.Endpoints[e].Endpoint,
@@ -423,4 +429,13 @@ func (u *UndefinedOutputParamError) Error() string {
 		u.InputParams,
 		u.OutputParams,
 	)
+}
+
+type UnsupportedVersionError struct {
+	Have int
+	Want int
+}
+
+func (u *UnsupportedVersionError) Error() string {
+	return fmt.Sprintf("Unsupported version: %d (want: %d)", u.Have, u.Want)
 }
