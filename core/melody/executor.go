@@ -34,6 +34,8 @@ func NewExecutor(ctx context.Context) cmd.Executor {
 		// 2.初始化Logger
 
 		// 2.1 是否启用logstash
+		// Logstash 是开源的服务器端数据处理管道，能够同时从多个来源采集数据，转换数据，然后将数据发送到您最喜欢的“存储库”中。
+		// 所以没有logstash就没有下面其他logger
 		logger, enableLogstashError := logstash.NewLogger(cfg.ExtraConfig, writers...)
 
 		if enableLogstashError != nil {
