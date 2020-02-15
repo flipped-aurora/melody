@@ -52,7 +52,7 @@ type EndpointConfig struct {
 	// HTTP method of the endpoint (GET, POST, PUT, etc)
 	Method string `mapstructure:"method"`
 	// 此端点连接的后端的集合
-	Backends []*Backend `mapstructure:"backend"`
+	Backends []*Backend `mapstructure:"backends"`
 	// 此端点的并发调用数
 	ConcurrentCalls int `mapstructure:"concurrent_calls"`
 	// 此端点的超时时间

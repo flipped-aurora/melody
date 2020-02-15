@@ -67,7 +67,7 @@ func TestConfig_initBackendURLMappings_tooManyOutput(t *testing.T) {
 	endpoint := EndpointConfig{
 		Method:   "GET",
 		Endpoint: "/some/{tupu}",
-		Backends:  []*Backend{&backend},
+		Backends: []*Backend{&backend},
 	}
 	subject := ServiceConfig{Endpoints: []*EndpointConfig{&endpoint}, uriParser: NewURIParser()}
 
@@ -110,7 +110,7 @@ func TestConfig_init(t *testing.T) {
 		Method:         "post",
 		Timeout:        1500 * time.Millisecond,
 		CacheTTL:       6 * time.Hour,
-		Backends:        []*Backend{&supuBackend},
+		Backends:       []*Backend{&supuBackend},
 		OutputEncoding: "some_render",
 	}
 
@@ -123,7 +123,7 @@ func TestConfig_init(t *testing.T) {
 		Endpoint: "/github",
 		Timeout:  1500 * time.Millisecond,
 		CacheTTL: 6 * time.Hour,
-		Backends:  []*Backend{&githubBackend},
+		Backends: []*Backend{&githubBackend},
 	}
 
 	userBackend := Backend{
@@ -144,10 +144,11 @@ func TestConfig_init(t *testing.T) {
 	}
 	userEndpoint := EndpointConfig{
 		Endpoint: "/users/{user}",
-		Backends:  []*Backend{&userBackend, &rssBackend, &postBackend},
+		Backends: []*Backend{&userBackend, &rssBackend, &postBackend},
 	}
 
 	subject := ServiceConfig{
+		Version:   2,
 		Timeout:   5 * time.Second,
 		CacheTTL:  30 * time.Minute,
 		Host:      []string{"http://127.0.0.1:8080"},
@@ -192,7 +193,7 @@ func TestConfig_init_NoBackends(t *testing.T) {
 		Method:         "post",
 		Timeout:        1500 * time.Millisecond,
 		CacheTTL:       6 * time.Hour,
-		Backends:        []*Backend{},
+		Backends:       []*Backend{},
 		OutputEncoding: "some_render",
 	}
 
@@ -200,12 +201,12 @@ func TestConfig_init_NoBackends(t *testing.T) {
 		Endpoint: "/github",
 		Timeout:  1500 * time.Millisecond,
 		CacheTTL: 6 * time.Hour,
-		Backends:  []*Backend{},
+		Backends: []*Backend{},
 	}
 
 	userEndpoint := EndpointConfig{
 		Endpoint: "/users/{user}",
-		Backends:  []*Backend{},
+		Backends: []*Backend{},
 	}
 
 	subject := ServiceConfig{

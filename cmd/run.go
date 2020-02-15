@@ -5,10 +5,7 @@ import (
 	"os"
 )
 
-import "fmt"
-
 func runFunc(cmd *cobra.Command, args []string) {
-	fmt.Println("config file:", cfgFilePath, "is debug :", debug, "port is :", port)
 	if cfgFilePath == "" {
 		cmd.Println("Please provide the path to your melody config file ")
 	}

@@ -19,7 +19,7 @@ func checkFunc(cmd *cobra.Command, args []string) {
 	if debug {
 
 		cmd.Printf("Parsed configuration: CacheTTL: %s, Port: %d\n", v.CacheTTL.String(), v.Port)
-		// TO DO-------------------------------------
+		// TODO
 
 	}
 	//如果错误

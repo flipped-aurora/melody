@@ -9,6 +9,7 @@ import (
 	gelf "melody/middleware/melody-gelf"
 	gologging "melody/middleware/melody-gologging"
 	logstash "melody/middleware/melody-logstash"
+	metrics "melody/middleware/melody-metrics/gin"
 	"os"
 )
 
@@ -62,9 +63,14 @@ func NewExecutor(ctx context.Context) cmd.Executor {
 
 		//TODO 5.注册etcd服务发现
 
-		//TODO 6.创建Metrics监控
-
-		//TODO ...
+		// 6.创建Metrics监控
+		_ = metrics.New(ctx, cfg.ExtraConfig, logger)
+		//TODO 7. 集成influxdd
+		//TODO 8. 集成opencensus
+		//TODO 9. 集成bloomFilter
+		//TODO 10. 集成JWT，注册RejecterFactory
+		//TODO 11. Set up melody Router
+		select{}
 	}
 }
 
