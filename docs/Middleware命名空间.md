@@ -68,3 +68,21 @@
 - Level: [ServiceConfig]
 - Status: 完成
 
+
+### 5.melody-metrics
+- Describe: 系统的运行数据检测、统计
+- Namespace: `melody_metrics`
+- Struct:
+```
+"melody_metrics": {
+    proxy_disable     bool
+    router_disabled   bool
+    backend_disabled  bool
+    endpoint_disabled bool
+    collection_time   time.Duration
+    listen_address       string
+}
+```
+- Level: [ServiceConfig]
+- Status: 基本实现
+
