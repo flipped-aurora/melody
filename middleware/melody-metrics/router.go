@@ -16,7 +16,7 @@ func NewRouterMetrics(parent *metrics.Registry) *RouterMetrics {
 	r := metrics.NewPrefixedChildRegistry(*parent, "router.")
 
 	return &RouterMetrics{
-		ProxyMetrics:      ProxyMetrics{register:r},
+		ProxyMetrics:      ProxyMetrics{register: r},
 		connected:         metrics.NewRegisteredCounter("connected", r),
 		disconnected:      metrics.NewRegisteredCounter("disconnected", r),
 		connectedTotal:    metrics.NewRegisteredCounter("connected-total", r),

@@ -9,7 +9,7 @@
 	  "format": "default"
 	},
 	"melody_metrics": {
-	  "collection_time": "60s",
+	  "collection_time": "2s",
 	  "proxy_disabled": false,
 	  "router_disabled": false,
 	  "backend_disabled": false,

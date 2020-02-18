@@ -2,19 +2,20 @@ package metrics
 
 import (
 	"context"
-	"github.com/rcrowley/go-metrics"
 	"melody/config"
 	"melody/logging"
 	"time"
+
+	"github.com/rcrowley/go-metrics"
 )
 
 const (
-	Namespace = "melody_metrics"
+	Namespace         = "melody_metrics"
 	DefaultListenAddr = ":8090"
 )
 
 var (
-	percentiles   = []float64{0.1, 0.25, 0.5, 0.75, 0.9, 0.95, 0.99}
+	percentiles = []float64{0.1, 0.25, 0.5, 0.75, 0.9, 0.95, 0.99}
 )
 
 type Config struct {
@@ -38,7 +39,6 @@ type Metrics struct {
 	latestSnapshot Stats
 }
 
-
 func New(ctx context.Context, e config.ExtraConfig, logger logging.Logger) *Metrics {
 	registry := metrics.NewPrefixedRegistry("melody.")
 
@@ -50,12 +50,12 @@ func New(ctx context.Context, e config.ExtraConfig, logger logging.Logger) *Metr
 	if metricsConfig == nil {
 		registry = NewNullRegistry()
 		return &Metrics{
-			Proxy:          &ProxyMetrics{},
-			Router:         &RouterMetrics{},
-			Registry:       &registry,
+			Proxy:    &ProxyMetrics{},
+			Router:   &RouterMetrics{},
+			Registry: &registry,
 		}
 	}
-	
+
 	m := Metrics{
 		Config:         metricsConfig,
 		Proxy:          NewProxyMetrics(&registry),
@@ -80,7 +80,7 @@ func (m *Metrics) processMetrics(ctx context.Context, duration time.Duration, lo
 
 		for {
 			select {
-			case <- ticket.C:
+			case <-ticket.C:
 				metrics.CaptureDebugGCStatsOnce(r)
 				metrics.CaptureRuntimeMemStatsOnce(r)
 				m.Router.Aggregate()
@@ -164,8 +164,7 @@ func getBool(temp map[string]interface{}, s string) bool {
 	return false
 }
 
-
-type NullRegistry struct {}
+type NullRegistry struct{}
 
 func (n *NullRegistry) Each(func(string, interface{})) {}
 
@@ -190,6 +189,3 @@ func (n *NullRegistry) RunHealthchecks() {}
 func (n *NullRegistry) Unregister(string) {}
 
 func (n *NullRegistry) UnregisterAll() {}
-
-
-

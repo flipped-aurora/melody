@@ -2,13 +2,15 @@ package gin
 
 import (
 	"context"
-	"github.com/gin-gonic/gin"
-	"github.com/rcrowley/go-metrics/exp"
 	"melody/config"
 	"melody/logging"
 	metrics "melody/middleware/melody-metrics"
 	"net/http"
+	"os"
 	"time"
+
+	"github.com/gin-gonic/gin"
+	"github.com/rcrowley/go-metrics/exp"
 )
 
 type Metrics struct {
@@ -25,21 +27,22 @@ func New(c context.Context, e config.ExtraConfig, logger logging.Logger) *Metric
 
 func (m *Metrics) RunEndpoint(c context.Context, engine *gin.Engine, logger logging.Logger) {
 	server := &http.Server{
-		Addr:              m.Config.ListenAddr,
-		Handler:           engine,
+		Addr:    m.Config.ListenAddr,
+		Handler: engine,
 	}
 
 	go func() {
 		logger.Debug("Metrics server listening in", m.Config.ListenAddr)
-		logger.Error(server.ListenAndServe())
+		logger.Info(server.ListenAndServe())
 	}()
 
 	go func() {
-		<- c.Done()
+		<-c.Done()
 		logger.Info("shutting down the stats handler")
 		ctx, cancel := context.WithTimeout(c, time.Second)
 		server.Shutdown(ctx)
 		cancel()
+		os.Exit(1)
 	}()
 }
 
