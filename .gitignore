@@ -5,6 +5,7 @@
 *.iml
  
 ## Directory-based project format:
+.vscode
 .idea/
 # if you remove the above rule, at least ignore the following:
  
