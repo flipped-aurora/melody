@@ -6,7 +6,10 @@ import (
 	"errors"
 	"fmt"
 	"melody/config"
+	"net"
 	"net/http"
+	"sync"
+	"time"
 )
 
 var (
@@ -29,9 +32,50 @@ var (
 		tls.TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305,
 		tls.TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305,
 	}
-	errorPublicKey  = errors.New("public key not defined")
-	errorPrivateKey = errors.New("private key not defined")
+	errorPublicKey      = errors.New("public key not defined")
+	errorPrivateKey     = errors.New("private key not defined")
+	errorInternalError  = errors.New("internal server error")
+	onceTransportConfig sync.Once
 )
+
+const (
+	// HeaderCompleteResponseValue 是响应完成时CompleteResponseHeader的值
+	HeaderCompleteResponseValue = "true"
+	// HeaderIncompleteResponseValue 是响应不完整时CompleteResponseHeader的值
+	HeaderIncompleteResponseValue = "false"
+)
+
+// ToHTTPError 将错误转换为HTTP状态码
+type ToHTTPError func(error) int
+
+// DefaultToHTTPError 是一个错误码转换处理方法
+// 它总是返回一个内部服务器错误500
+func DefaultToHTTPError(_ error) int {
+	return http.StatusInternalServerError
+}
+
+// InitHTTPDefaultTransport 确保在每次执行时只配置一次缺省HTTP传输
+func InitHTTPDefaultTransport(cfg config.ServiceConfig) {
+	onceTransportConfig.Do(func() {
+		http.DefaultTransport = &http.Transport{
+			Proxy: http.ProxyFromEnvironment,
+			DialContext: (&net.Dialer{
+				Timeout:       cfg.DialerTimeout,
+				KeepAlive:     cfg.DialerKeepAlive,
+				FallbackDelay: cfg.DialerFallbackDelay,
+				DualStack:     true,
+			}).DialContext,
+			DisableCompression:    cfg.DisableCompression,
+			DisableKeepAlives:     cfg.DisableKeepAlives,
+			MaxIdleConns:          cfg.MaxIdleConns,
+			MaxIdleConnsPerHost:   cfg.MaxIdleConnsPerHost,
+			IdleConnTimeout:       cfg.IdleConnTimeout,
+			ResponseHeaderTimeout: cfg.ResponseHeaderTimeout,
+			ExpectContinueTimeout: cfg.ExpectContinueTimeout,
+			TLSHandshakeTimeout:   10 * time.Second,
+		}
+	})
+}
 
 // RunServer 作为默认运行http.Server的函数实现
 // 如果需要的话，将配置TLS层

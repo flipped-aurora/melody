@@ -38,16 +38,26 @@ type ServiceConfig struct {
 	OutputEncoding string            `mapstructure:"output_encoding"`
 	CacheTTL       time.Duration     `mapstructure:"cache_ttl"`
 
-	ReadTimeout         time.Duration `mapstructure:"read_timeout"`
-	WriteTimeout        time.Duration `mapstructure:"write_timeout"`
-	ReaderHeaderTimeout time.Duration `mapstructure:"read_header_timeout"`
-	IdleTimeout         time.Duration `mapstructure:"idle_timeout"`
+	ReadTimeout           time.Duration `mapstructure:"read_timeout"`
+	WriteTimeout          time.Duration `mapstructure:"write_timeout"`
+	ReaderHeaderTimeout   time.Duration `mapstructure:"read_header_timeout"`
+	IdleTimeout           time.Duration `mapstructure:"idle_timeout"`
+	IdleConnTimeout       time.Duration `mapstructure:"idle_connection_timeout"`
+	ResponseHeaderTimeout time.Duration `mapstructure:"response_header_timeout"`
+	ExpectContinueTimeout time.Duration `mapstructure:"expect_continue_timeout"`
+	DialerTimeout         time.Duration `mapstructure:"dialer_timeout"`
+	DialerFallbackDelay   time.Duration `mapstructure:"dialer_fallback_delay"`
+	DialerKeepAlive       time.Duration `mapstructure:"dialer_keep_alive"`
 
 	TLS *TLS `mapstructure:"tls"`
 
+	MaxIdleConns        int `mapstructure:"max_idle_connections"`
 	MaxIdleConnsPerHost int `mapstructure:"max_idle_connections_per_host"`
 
-	DisableStrictREST bool `mapstructure:"disable_rest"`
+	DisableCompression bool `mapstructure:"disable_compression"`
+	DisableKeepAlives  bool `mapstructure:"disable_keep_alives"`
+	DisableStrictREST  bool `mapstructure:"disable_rest"`
+
 	//melody is in debug model
 	Debug     bool
 	uriParser URIParser
