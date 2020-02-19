@@ -38,6 +38,13 @@ type ServiceConfig struct {
 	OutputEncoding string            `mapstructure:"output_encoding"`
 	CacheTTL       time.Duration     `mapstructure:"cache_ttl"`
 
+	ReadTimeout         time.Duration `mapstructure:"read_timeout"`
+	WriteTimeout        time.Duration `mapstructure:"write_timeout"`
+	ReaderHeaderTimeout time.Duration `mapstructure:"read_header_timeout"`
+	IdleTimeout         time.Duration `mapstructure:"idle_timeout"`
+
+	TLS *TLS `mapstructure:"tls"`
+
 	MaxIdleConnsPerHost int `mapstructure:"max_idle_connections_per_host"`
 
 	DisableStrictREST bool `mapstructure:"disable_rest"`
@@ -106,6 +113,18 @@ type Backend struct {
 	Decoder encoding.Decoder `json:"-"`
 	// Backend Extra configuration for customized behaviours
 	ExtraConfig ExtraConfig `mapstructure:"extra_config"`
+}
+
+// TLS 包含了TLS的配置信息
+type TLS struct {
+	IsDisabled               bool     `mapstructure:"disabled"`
+	PublicKey                string   `mapstructure:"public_key"`
+	PrivateKey               string   `mapstructure:"private_key"`
+	MinVersion               string   `mapstructure:"min_version"`
+	MaxVersion               string   `mapstructure:"max_version"`
+	CurvePreferences         []uint16 `mapstructure:"curve_preferences"`
+	PreferServerCipherSuites bool     `mapstructure:"prefer_server_cipher_suites"`
+	CipherSuites             []uint16 `mapstructure:"cipher_suites"`
 }
 
 //Extra config for melody

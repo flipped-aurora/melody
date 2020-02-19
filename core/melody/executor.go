@@ -10,6 +10,9 @@ import (
 	gologging "melody/middleware/melody-gologging"
 	logstash "melody/middleware/melody-logstash"
 	metrics "melody/middleware/melody-metrics/gin"
+	melodyrouter "melody/router"
+	router "melody/router/gin"
+	server "melody/transport/http/server/plugin"
 	"os"
 )
 
@@ -72,7 +75,14 @@ func NewExecutor(ctx context.Context) cmd.Executor {
 		//TODO 9. 集成bloomFilter
 		//TODO 10. 集成JWT，注册RejecterFactory
 		//TODO 11. Set up melody Router
-		select {}
+		_ = router.NewFactory(router.Config{
+			Engine:         nil,
+			ProxyFactory:   nil,
+			HandlerFactory: nil,
+			MiddleWares:    nil,
+			Logger:         logger,
+			RunServer:      router.RunServerFunc(server.New(logger, melodyrouter.DefaultRunServer)),
+		})
 	}
 }
 
