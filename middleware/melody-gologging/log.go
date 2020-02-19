@@ -3,6 +3,7 @@ package gologging
 import (
 	"fmt"
 	"io"
+	"log/syslog"
 	"melody/config"
 	"melody/logging"
 	"os"
@@ -79,14 +80,14 @@ func NewLogger(config config.ExtraConfig, ws ...io.Writer) (logging.Logger, erro
 		ws = append(ws, os.Stdout)
 	}
 
-	// if cfg.Syslog {
-	// 	w, err := syslog.New(syslog.LOG_CRIT, cfg.Prefix)
-	// 	if err != nil {
-	// 		return nil, err
-	// 	}
+	if cfg.Syslog {
+		w, err := syslog.New(syslog.LOG_CRIT, cfg.Prefix)
+		if err != nil {
+			return nil, err
+		}
 
-	// 	ws = append(ws, w)
-	// }
+		ws = append(ws, w)
+	}
 
 	switch cfg.Format {
 	case "logstash":
