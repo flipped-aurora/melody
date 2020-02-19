@@ -3,9 +3,8 @@ package etcd
 import (
 	"context"
 	"fmt"
+	"melody/config"
 	"time"
-
-	"github.com/devopsfaith/krakend/config"
 )
 
 // Namespace is the key to use to store and access the custom config data

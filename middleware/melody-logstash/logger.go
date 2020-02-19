@@ -70,7 +70,7 @@ func NewLogger(extra config.ExtraConfig, ws ...io.Writer) (logging.Logger, error
 	}, nil
 }
 
-// Logger is a wrapper over a github.com/devopsfaith/krakend/logging logger
+// Logger is a wrapper over a /melody/logging logger
 type Logger struct {
 	logger      logging.Logger
 	serviceName string
