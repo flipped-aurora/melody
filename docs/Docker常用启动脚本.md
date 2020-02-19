@@ -1,4 +1,5 @@
-## 以Docker方式启动Graylog Server
+
+# 1. 与Graylog集成
 
 > 由于环境依赖 Mongo和Elasticsearch，所以建议Docker方式在本地启动
 
@@ -95,3 +96,30 @@ docker run -d \
 ```
 
 
+# 2. metrics模块与InfluxDB集成，并在Grafana展示
+
+### 2.1. 启动influxDB container
+```shell
+> docker run -d -p 8086:8086 \
+	  -e INFLUXDB_DB=melody \
+	  -e INFLUXDB_USER=melody -e INFLUXDB_USER_PASSWORD=melody \
+	  -e INFLUXDB_ADMIN_USER=admin -e INFLUXDB_ADMIN_PASSWORD=admin \
+	  -it --name=influx \
+	  influxdb
+```
+### 2.2. 启动Grafana
+```shell
+> docker run \
+  -d \
+  -p 3000:3000 \
+  --name=grafana \
+  grafana/grafana
+```
+
+grafana admin : localhost:3000
+
+在连接influxDB时，ip地址不是localhost或者127，应该是influxDB所在docker的ip地址， 查看方式
+```shell
+> docker exec -it influx influx
+> cat /etc/hosts
+```

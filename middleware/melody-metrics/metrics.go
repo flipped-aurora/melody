@@ -10,7 +10,9 @@ import (
 )
 
 const (
-	Namespace         = "melody_metrics"
+	// Namespace 标识是否开启metrics
+	Namespace = "melody_metrics"
+	// DefaultListenAddr metrics服务默认监听的端口
 	DefaultListenAddr = ":8090"
 )
 
@@ -18,6 +20,7 @@ var (
 	percentiles = []float64{0.1, 0.25, 0.5, 0.75, 0.9, 0.95, 0.99}
 )
 
+// Config metrics 服务默认配置
 type Config struct {
 	ProxyDisable     bool
 	RouterDisabled   bool
@@ -27,6 +30,7 @@ type Config struct {
 	EndpointDisabled bool
 }
 
+// Metrics metrics结构对象
 type Metrics struct {
 	// 为Config提供的计数器
 	Config *Config
@@ -39,6 +43,7 @@ type Metrics struct {
 	latestSnapshot Stats
 }
 
+// New 返回一个metrics的运行实例
 func New(ctx context.Context, e config.ExtraConfig, logger logging.Logger) *Metrics {
 	registry := metrics.NewPrefixedRegistry("melody.")
 
@@ -92,6 +97,7 @@ func (m *Metrics) processMetrics(ctx context.Context, duration time.Duration, lo
 	}()
 }
 
+// TakeSnapshot 制作一个上下文瞬间
 func (m *Metrics) TakeSnapshot() Stats {
 	sta := NewStats()
 
@@ -117,10 +123,12 @@ func (m *Metrics) TakeSnapshot() Stats {
 	return sta
 }
 
+// NewNullRegistry 返回一个Null registry
 func NewNullRegistry() metrics.Registry {
 	return &NullRegistry{}
 }
 
+// GetConfig 从ExtraConfig中提取metrics的配置
 func GetConfig(e config.ExtraConfig) interface{} {
 	v, ok := e[Namespace]
 	if !ok {

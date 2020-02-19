@@ -72,10 +72,11 @@ func NewExecutor(ctx context.Context) cmd.Executor {
 		//TODO 9. 集成bloomFilter
 		//TODO 10. 集成JWT，注册RejecterFactory
 		//TODO 11. Set up melody Router
-		select{}
+		select {}
 	}
 }
 
+// GelfWriter 封装了io.Writer，作为gelf writer
 type GelfWriter struct {
 	io.Writer
 }
