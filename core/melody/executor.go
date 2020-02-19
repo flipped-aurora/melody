@@ -67,12 +67,16 @@ func NewExecutor(ctx context.Context) cmd.Executor {
 		//TODO 4.加载插件 (暂时不做)
 
 		//TODO 5.注册etcd服务发现
-
+		_ = RegisterSubscriberFactories(ctx, cfg, logger)
 		// 6.创建Metrics监控
 		_ = metrics.New(ctx, cfg.ExtraConfig, logger)
 		//TODO 7. 集成influxdd
 		//TODO 8. 集成opencensus
 		//TODO 9. 集成bloomFilter
+		//		——, err := bloomfilter.Register(ctx, "melody-bf", cfg, logger, reg)
+		//		if err != nil {
+		//			logger.Warning("bloomFilter:", err.Error())
+		//		}
 		//TODO 10. 集成JWT，注册RejecterFactory
 		//TODO 11. Set up melody Router
 		_ = router.NewFactory(router.Config{
