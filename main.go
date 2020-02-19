@@ -17,8 +17,6 @@ func main() {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
-	melody.RegisterEncoders()
-
 	go func() {
 		select {
 		case sig := <-sigs:
@@ -27,6 +25,8 @@ func main() {
 		case <-ctx.Done():
 		}
 	}()
+
+	melody.RegisterEncoders()
 
 	parser := viper.New()
 	cmd.Execute(parser, melody.NewExecutor(ctx))

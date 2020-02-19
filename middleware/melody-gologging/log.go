@@ -2,12 +2,13 @@ package gologging
 
 import (
 	"fmt"
-	oplogging "github.com/op/go-logging"
 	"io"
 	"log/syslog"
 	"melody/config"
 	"melody/logging"
 	"os"
+
+	oplogging "github.com/op/go-logging"
 )
 
 const (
@@ -55,7 +56,7 @@ func (l Logger) Warning(v ...interface{}) {
 }
 
 func (l Logger) Error(v ...interface{}) {
-	l.Error(v)
+	l.logger.Error(v)
 }
 
 func (l Logger) Critical(v ...interface{}) {
