@@ -20,8 +20,8 @@ func RegisterSubscriberFactories(ctx context.Context, cfg config.ServiceConfig, 
 	if err != nil {
 		logger.Warning("building the etcd client:", err.Error())
 	}
-	sd.RegisterSubscriberFactory("etcd", etcd.SubscriberFactory(ctx, etcdClient))
-
+	register := sd.GetRegister()
+	register.Register("etcd", etcd.SubscriberFactory(ctx, etcdClient))
 	// register the dns service discovery
 	dnssrv.Register()
 
