@@ -80,7 +80,7 @@ func NewExecutor(ctx context.Context) cmd.Executor {
 		//TODO 10. 集成JWT，注册RejecterFactory
 		//TODO 11. Set up melody Router
 		_ = router.NewFactory(router.Config{
-			Engine:         nil,
+			Engine:         NewEngine(cfg, logger, gelfWriter),
 			ProxyFactory:   nil,
 			HandlerFactory: nil,
 			MiddleWares:    nil,

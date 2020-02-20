@@ -1,6 +1,6 @@
-## 关于Melody中Middleware的命名与结构体格式
+# 关于Melody中Middleware的命名与结构体格式
 
-### melody-xxxxx
+## melody-xxxxx
 - Describe: xxx
 - Namespace: `melody_xxxxx`
 - Struct:
@@ -15,7 +15,7 @@
 ---
 
 
-### 1.melody-logstash
+## 1.melody-logstash
 - Describe: 包含serviceName的logger
 - Namespace: `melody_logstash`
 - Struct:
@@ -27,7 +27,7 @@
 - Level: ServiceConfig
 - Status: 基本实现
 
-### 2.melody-gologging
+## 2.melody-gologging
 - Describe: Base 基础logger middleware
 - Namespace: `melody_gologging`
 - Struct:
@@ -43,7 +43,7 @@
 - Level: [ServiceConfig, Backend, Endpoint]
 - Status: 基本实现
 
-### 3.melody-viper
+## 3.melody-viper
 - Describe: 基于config中parser实现的viper parser
 - Namespace: `melody_parser`
 - Struct:
@@ -55,7 +55,7 @@
 - Level: [ServiceConfig]
 - Status: 基本实现
 
-### 4.melody-gelf
+## 4.melody-gelf
 - Describe: 与graylog集成
 - Namespace: `melody_gelf`
 - Struct:
@@ -69,7 +69,7 @@
 - Status: 完成
 
 
-### 5.melody-metrics
+## 5.melody-metrics
 - Describe: 系统的运行数据检测、统计
 - Namespace: `melody_metrics`
 - Struct:
@@ -81,6 +81,24 @@
     endpoint_disabled bool
     collection_time   time.Duration
     listen_address       string
+}
+```
+- Level: [ServiceConfig]
+- Status: 基本实现
+
+
+## 6.melody-cors
+- Describe: 跨域处理
+- Namespace: `melody_cors`
+- Struct:
+```
+"melody_cors": {
+    allow_origins     []string
+    allow_methods     []string
+    allow_headers     []string
+    expose_headers    []string
+    allow_credentials bool
+    max_age           time.Duration
 }
 ```
 - Level: [ServiceConfig]
