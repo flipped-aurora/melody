@@ -80,7 +80,7 @@ func NewClient(ctx context.Context, machines []string, options ClientOptions) (C
 		}
 		transport = &http.Transport{
 			TLSClientConfig: tlsCfg,
-			Dial: func(network, address string) (net.Conn, error) {
+			DialContext: func(ctx context.Context, network, address string) (net.Conn, error) {
 				return (&net.Dialer{
 					Timeout:   options.DialTimeout,
 					KeepAlive: options.DialKeepAlive,
@@ -99,7 +99,7 @@ func NewClient(ctx context.Context, machines []string, options ClientOptions) (C
 	}
 
 	return &client{
-		keysAPI: etcd.NewKeysAPI(ce),
+		keysAPI: etcd.NewKeysAPI(ce), // NewKeysAPI不知道是啥意思
 		ctx:     ctx,
 	}, nil
 }
