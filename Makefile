@@ -1,6 +1,9 @@
 # this is Makefile about melody in golang.
 all: test build
 
+clean:
+	go mod tidy
+
 run:
 	@echo "Run  ..."
 	@go run .

@@ -104,3 +104,34 @@
 - Level: [ServiceConfig]
 - Status: 基本实现
 
+
+## 7.melody-httpsecure
+- Describe: http 安全相关的一些拦截、过滤、处理
+- Namespace: `melody_httpsecure`
+- Struct:
+```
+"melody_httpsecure": {
+    "allowed_hosts": [
+      "host.known.com:443"
+    ],
+    "ssl_proxy_headers": {
+      "X-Forwarded-Proto": "https"
+    },
+    "ssl_redirect": true,
+    "ssl_host": "ssl.host.domain",
+    "ssl_port": "443",
+    "ssl_certificate": "/path/to/cert",
+    "ssl_private_key": "/path/to/key",
+    "sts_seconds": 300,
+    "sts_include_subdomains": true,
+    "frame_deny": true,
+    "custom_frame_options_value": "ALLOW-FROM https://example.com",
+    "hpkp_public_key": "pin-sha256=\"base64==\"; max-age=expireTime [; includeSubDomains][; report-uri=\"reportURI\"]",
+    "content_type_nosniff": true,
+    "browser_xss_filter": true,
+    "content_security_policy": "default-src 'self';"
+  }
+```
+- Level: [ServiceConfig]
+- Status: 基本实现， 某些字段还不清楚
+

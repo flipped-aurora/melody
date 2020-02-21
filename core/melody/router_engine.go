@@ -6,6 +6,7 @@ import (
 	"melody/logging"
 
 	cors "melody/middleware/melody-cors/gin"
+	httpsecure "melody/middleware/melody-httpsecure/gin"
 
 	"github.com/gin-gonic/gin"
 )
@@ -26,7 +27,10 @@ func NewEngine(cfg config.ServiceConfig, logger logging.Logger, gelf io.Writer) 
 	if mw := cors.New(cfg.ExtraConfig); mw != nil {
 		engine.Use(mw)
 	}
-	//TODO http secure
+	//http secure middleware
+	if err := httpsecure.Register(cfg.ExtraConfig, engine); err != nil {
+		logger.Warning(err)
+	}
 	//TODO lua register
 	//TODO botdetector register
 	return engine
