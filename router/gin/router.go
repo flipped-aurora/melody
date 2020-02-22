@@ -54,3 +54,11 @@ func (f factory) NewWithContext(ctx context.Context) router.Router {
 func (r ginRouter) Run(config config.ServiceConfig) {
 
 }
+
+func (r ginRouter) registerMelodyEndpoints(endpoints []*config.EndpointConfig) {
+
+}
+
+func (r ginRouter) registerMelodyEndpoint(method, path string, handler gin.HandlerFunc, totBackends int) {
+
+}
