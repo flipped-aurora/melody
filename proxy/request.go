@@ -14,5 +14,5 @@ type Request struct {
 	Path    string
 	Body    io.ReadCloser
 	Params  map[string]string
-	Headers map[string]string
+	Headers map[string][]string
 }

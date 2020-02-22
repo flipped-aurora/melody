@@ -18,7 +18,7 @@ type RunServerFunc func(context.Context, config.ServiceConfig, http.Handler) err
 type Config struct {
 	Engine         *gin.Engine
 	MiddleWares    []gin.HandlerFunc
-	HandlerFactory HandleFactory
+	HandlerFactory HandlerFactory
 	ProxyFactory   proxy.Proxy
 	Logger         logging.Logger
 	RunServer      RunServerFunc

@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"melody/config"
+	"melody/core"
 	"net"
 	"net/http"
 	"sync"
@@ -34,15 +35,20 @@ var (
 	}
 	errorPublicKey      = errors.New("public key not defined")
 	errorPrivateKey     = errors.New("private key not defined")
-	errorInternalError  = errors.New("internal server error")
+	ErrorInternalError  = errors.New("internal server error")
 	onceTransportConfig sync.Once
+	// HeadersToSend 默认放行的请求头
+	HeadersToSend = []string{"Content-Type"}
+	// UserAgentHeaderValue 添加该请求头表示通过melody去代理了此次请求
+	UserAgentHeaderValue = []string{core.MelodyUserAgent}
 )
 
 const (
-	// HeaderCompleteResponseValue 是响应完成时CompleteResponseHeader的值
+	// HeaderCompleteResponseValue 响应完整时CompleteResponseHeader的值
 	HeaderCompleteResponseValue = "true"
-	// HeaderIncompleteResponseValue 是响应不完整时CompleteResponseHeader的值
+	// HeaderIncompleteResponseValue 响应不完整时CompleteResponseHeader的值
 	HeaderIncompleteResponseValue = "false"
+	HeaderCompleteKey = "X-Melody-Complete"
 )
 
 // ToHTTPError 将错误转换为HTTP状态码

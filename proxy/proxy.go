@@ -12,7 +12,7 @@ type Proxy func(context.Context, *Request) (*Response, error)
 
 // Metadata 包含了response header 和 response code
 type Metadata struct {
-	Headers    map[string]interface{}
+	Headers    map[string][]string
 	StatusCode int
 }
 
@@ -21,4 +21,5 @@ type Response struct {
 	Data       map[string]interface{}
 	IsComplete bool
 	Io         io.Reader
+	Metadata   Metadata
 }

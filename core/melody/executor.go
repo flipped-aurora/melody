@@ -14,6 +14,8 @@ import (
 	router "melody/router/gin"
 	server "melody/transport/http/server/plugin"
 	"os"
+
+	"github.com/gin-gonic/gin"
 )
 
 //NewExecutor return an new executor
@@ -81,9 +83,11 @@ func NewExecutor(ctx context.Context) cmd.Executor {
 		//TODO 11. Set up melody Router
 		_ = router.NewFactory(router.Config{
 			Engine:         NewEngine(cfg, logger, gelfWriter),
-			ProxyFactory:   nil,
-			HandlerFactory: nil,
-			MiddleWares:    nil,
+			ProxyFactory:   nil, //TODO Create ProxyFactory
+			// 目前为基础的HandlerFactory
+			//TODO 根据配置叠加不同的HandlerFactory
+			HandlerFactory: router.EndpointHandler,
+			MiddleWares:    []gin.HandlerFunc{},
 			Logger:         logger,
 			RunServer:      router.RunServerFunc(server.New(logger, melodyrouter.DefaultRunServer)),
 		})
