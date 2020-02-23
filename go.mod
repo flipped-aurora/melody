@@ -6,6 +6,7 @@ require (
 	github.com/PuerkitoBio/goquery v1.5.1 // indirect
 	github.com/clbanning/mxj v1.8.4
 	github.com/coreos/etcd v3.3.13+incompatible
+	github.com/devopsfaith/flatmap v0.0.0-20190628155411-90b768d6668b
 	github.com/gin-gonic/gin v1.5.0
 	github.com/go-contrib/uuid v1.2.0
 	github.com/golang/groupcache v0.0.0-20200121045136-8c9f03a8e57e // indirect
