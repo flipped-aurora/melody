@@ -17,7 +17,7 @@ func NewJSONDecoder(isCollection bool) func(io.Reader, *map[string]interface{}) 
 	return nil
 }
 
-func JSONCollectionDecoder() Decoder {
+func JSONDecoder() Decoder {
 	return func(reader io.Reader, i *map[string]interface{}) error {
 		d := json.NewDecoder(reader)
 		d.UseNumber()
@@ -25,7 +25,7 @@ func JSONCollectionDecoder() Decoder {
 	}
 }
 
-func JSONDecoder() Decoder {
+func JSONCollectionDecoder() Decoder {
 	return func(reader io.Reader, i *map[string]interface{}) error {
 		var collection []interface{}
 		d := json.NewDecoder(reader)

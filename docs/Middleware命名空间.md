@@ -135,3 +135,52 @@
 - Level: [ServiceConfig]
 - Status: 基本实现， 某些字段还不清楚
 
+
+## 8.melody-http
+- Describe: http请求过程中的一些处理
+- Namespace: `melody_http`
+- Struct:
+```
+"melody_http": {
+    "return_error_details": "backend_a"<string>
+}
+```
+- Example:
+
+config:
+```
+"backend": [
+        {
+            "host": ["http://127.0.0.1:8081"],
+            "url_pattern": "/foo",
+            "extra_config": {
+                "melody_http": {
+                    "return_error_details": "backend_a"
+                }
+            }
+        },
+        {
+            "host": ["http://127.0.0.1:8081"],
+            "url_pattern": "/bar",
+            "extra_config": {
+                "melody_http": {
+                    "return_error_details": "backend_b"
+                }
+            }
+        }
+    ]
+```
+b服务挂掉了
+
+response:
+```
+{
+    "error_backend_b": {
+        "http_status_code": 404,
+        "http_body": "404 page not found\\n"
+    },
+    "foo": 42
+}
+```
+- Level: [BackendConfig]
+- Status: 基本实现
