@@ -33,6 +33,6 @@ func (u *Untyped) Clone() map[string]interface{} {
 	for k, v := range u.data {
 		clone[k] = v
 	}
-
+	u.mutex.RUnlock()
 	return clone
 }
