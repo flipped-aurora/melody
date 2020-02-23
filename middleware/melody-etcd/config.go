@@ -8,7 +8,7 @@ import (
 )
 
 // Namespace is the key to use to store and access the custom config data
-const Namespace = "melody-etcd"
+const Namespace = "melody_etcd"
 
 var (
 	// ErrNoConfig is the error to be returned when there is no config with the etcd namespace
