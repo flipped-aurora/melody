@@ -21,6 +21,7 @@ func SubscriberFactory(ctx context.Context, c Client) sd.SubscriberFactory {
 		}
 		subscribersMutex.Lock()
 		defer subscribersMutex.Unlock()
+		// 为什么只拿 backend 中的第一个 host
 		if sf, ok := subscribers[cfg.Host[0]]; ok {
 			return sf
 		}
@@ -56,10 +57,12 @@ func NewSubscriber(ctx context.Context, c Client, prefix string) (*Subscriber, e
 		mutex:  &sync.RWMutex{},
 	}
 
+	// 获取 key 为 s.prefix 的所有value
 	instances, err := s.client.GetEntries(s.prefix)
 	if err != nil {
 		return nil, err
 	}
+	// 更新缓存中的 value
 	*(s.cache) = sd.FixedSubscriber(instances)
 
 	go s.loop()
@@ -76,6 +79,7 @@ func (s Subscriber) Hosts() ([]string, error) {
 
 func (s *Subscriber) loop() {
 	ch := make(chan struct{})
+	// 监听 key 为 s.prefix 的 value，一旦 value 改变，则给 ch 这个 chan 发送消息，引起缓存更新
 	go s.client.WatchPrefix(s.prefix, ch)
 	for {
 		select {
