@@ -103,12 +103,10 @@ func TestNewSubscriber(t *testing.T) {
 			return *lastSet, nil
 		},
 		watchPrefix: func(prefix string, ch chan struct{}) {
-			for {
-				<-time.After(100 * time.Millisecond)
-				*lastSet = expectedHosts
-				*shouldFail = false
-				ch <- struct{}{}
-			}
+			<-time.After(100 * time.Millisecond)
+			*lastSet = expectedHosts
+			*shouldFail = false
+			ch <- struct{}{}
 		},
 	}
 	sb, err := NewSubscriber(ctx, c, "something")
