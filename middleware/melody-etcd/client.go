@@ -99,7 +99,7 @@ func NewClient(ctx context.Context, machines []string, options ClientOptions) (C
 	}
 
 	return &client{
-		keysAPI: etcd.NewKeysAPI(ce), // NewKeysAPI不知道是啥意思
+		keysAPI: etcd.NewKeysAPI(ce),
 		ctx:     ctx,
 	}, nil
 }
