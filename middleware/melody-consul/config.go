@@ -12,7 +12,7 @@ type Config struct {
 }
 
 // Namespace is the key to use to store and access the custom config data
-const Namespace = "github_com/letgoapp/krakend-consul"
+const Namespace = "melody_consul"
 
 var (
 	// ErrNoConfig is the error to be returned when there is no config with the consul namespace
@@ -25,7 +25,7 @@ var (
 
 func parse(e config.ExtraConfig, port int) (Config, error) {
 	cfg := Config{
-		Name: "krakend",
+		Name: "melody",
 		Port: port,
 	}
 	v, ok := e[Namespace]
