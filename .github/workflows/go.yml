@@ -26,6 +26,4 @@ jobs:
         fi
 
     - name: Test and Build
-      run: 
-        - make all
-        - go build -v .
+      run: make all
