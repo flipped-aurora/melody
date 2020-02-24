@@ -125,8 +125,6 @@ func TestNewSubscriber(t *testing.T) {
 		t.Errorf("Wrong initial number of hosts: %d\n", len(hs))
 		return
 	}
-	<-time.After(100 * time.Millisecond)
-	*shouldFail = true
 	<-time.After(400 * time.Millisecond)
 	hs, err = sb.Hosts()
 	if err != nil {
