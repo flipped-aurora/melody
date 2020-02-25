@@ -1,4 +1,4 @@
-![melody-icon](http://picture.zyuhn.top/myblog/promise/20200224203158-686460.png)
+![melody-logo](http://picture.zyuhn.top/myblog/promise/20200225230039-719078.png)
 
 ## **The Melody API Gateway**
 
