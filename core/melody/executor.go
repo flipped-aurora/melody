@@ -83,10 +83,11 @@ func NewExecutor(ctx context.Context) cmd.Executor {
 		//TODO 11. Set up melody Router
 		_ = router.NewFactory(router.Config{
 			Engine:         NewEngine(cfg, logger, gelfWriter),
-			ProxyFactory:   nil, //TODO Create ProxyFactory
+			//TODO Create ProxyFactory
+			ProxyFactory:   nil,
 			// 目前为基础的HandlerFactory
 			//TODO 根据配置叠加不同的HandlerFactory
-			HandlerFactory: router.EndpointHandler,
+			HandlerFactory: NewHandlerFactory(logger),
 			MiddleWares:    []gin.HandlerFunc{},
 			Logger:         logger,
 			RunServer:      router.RunServerFunc(server.New(logger, melodyrouter.DefaultRunServer)),
