@@ -22,11 +22,12 @@ func RegisterSubscriberFactories(ctx context.Context, cfg config.ServiceConfig, 
 	}
 	register := sd.GetRegister()
 	register.Register("etcd", etcd.SubscriberFactory(ctx, etcdClient))
-	// register.Get("etcd")(backend) 会得到此backend中以第一个host为prefix的key的所有value的一个slice etcdClient.GetEntries(host[0])
+	// register.Get("etcd")(backend) 会得到此backend中以第一个host为prefix的key的所有value的一个slice
+	// etcdClient.GetEntries(host[0])
 
 	// register the dns service discovery
 	// 同上 register.Get("dns")(backend)
-	dnssrv.Register()
+	register.Register("dns", dnssrv.SubscriberFactory)
 
 	return func(name string, port int) {
 		if err := consul.Register(ctx, cfg.ExtraConfig, port, name, logger); err != nil {
