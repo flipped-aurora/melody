@@ -184,3 +184,53 @@ response:
 ```
 - Level: [BackendConfig]
 - Status: 基本实现
+
+
+## 9.melody-etcd
+- Describe: 创建一个ectd client，注册到sd中
+- Namespace: `melody_etcd`
+- Struct:
+```
+"melody_xxxx": {
+    "machines": [
+        "http://127.0.0.1:8080",
+        "http://127.0.0.1:8081",
+        "http://127.0.0.1:8082",
+        "http://127.0.0.1:8083"
+    ],
+    "dial_timeout": "5s",
+    "dial_keepalive": "30s",
+    "header_timeout": "1s",
+    "cert": "/https/cert",
+    "key": "/https/privateKey",
+    "cacert": "/https/CaCert"
+}
+```
+- Level: [ServiceConfig]
+- Status: 还有个TODO
+
+
+## 10.melody-consul
+- Describe: custom的服务发现
+- Namespace: `sd`
+- Struct:
+```
+backend: [{
+    "sd": "custom"
+}}
+```
+- Level: [Backend]
+- Status: 刚开始
+
+
+## 11.melody-dns srv
+- Describe: 从 dns srv 中查找对应的host的ip
+- Namespace: `sd`
+- Struct:
+```
+backend: [{
+    "sd": "dns"
+}}
+```
+- Level: [Backend]
+- Status: 基本完成
