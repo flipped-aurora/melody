@@ -194,6 +194,13 @@ response:
 "melody_proxy": {
     // 表示开启链式请求
     "sequential": true
+    // 静态数据插入
+    "static": {
+        "strategy": ["always"/"success"/"errored"/"complete"/"imcomplete"],
+        "data": {
+            "key": value
+        }
+    }
 }
 ```
 - Level: [Endpoint]
@@ -247,3 +254,5 @@ backend: [{
 ```
 - Level: [Backend]
 - Status: 基本完成
+
+
