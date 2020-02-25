@@ -71,8 +71,8 @@ func NewExecutor(ctx context.Context) cmd.Executor {
 		//TODO 5.注册etcd服务发现
 		_ = RegisterSubscriberFactories(ctx, cfg, logger)
 		// 6.创建Metrics监控
-		_ = metrics.New(ctx, cfg.ExtraConfig, logger)
-		//TODO 7. 集成influxdd
+		metrics := metrics.New(ctx, cfg.ExtraConfig, logger)
+		//TODO 7. 集成influxdb
 		//TODO 8. 集成opencensus
 		//TODO 9. 集成bloomFilter
 		//		——, err := bloomfilter.Register(ctx, "melody-bf", cfg, logger, reg)
@@ -83,10 +83,7 @@ func NewExecutor(ctx context.Context) cmd.Executor {
 		//TODO 11. Set up melody Router
 		_ = router.NewFactory(router.Config{
 			Engine:         NewEngine(cfg, logger, gelfWriter),
-			//TODO Create ProxyFactory
-			ProxyFactory:   nil,
-			// 目前为基础的HandlerFactory
-			//TODO 根据配置叠加不同的HandlerFactory
+			ProxyFactory:   NewProxyFactory(logger, NewBackendFactoryWithContext(ctx, logger, metrics)),
 			HandlerFactory: NewHandlerFactory(logger),
 			MiddleWares:    []gin.HandlerFunc{},
 			Logger:         logger,

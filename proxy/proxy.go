@@ -2,8 +2,23 @@ package proxy
 
 import (
 	"context"
+	"errors"
 	"io"
 	"melody/config"
+)
+
+// Namespace to be used in extra config
+const Namespace = "melody_proxy"
+
+var (
+	// ErrNoBackends is the error returned when an endpoint has no backends defined
+	ErrNoBackends = errors.New("all endpoints must have at least one backend")
+	// ErrTooManyBackends is the error returned when an endpoint has too many backends defined
+	ErrTooManyBackends = errors.New("too many backends for this proxy")
+	// ErrTooManyProxies is the error returned when a middleware has too many proxies defined
+	ErrTooManyProxies = errors.New("too many proxies for this proxy middleware")
+	// ErrNotEnoughProxies is the error returned when an endpoint has not enough proxies defined
+	ErrNotEnoughProxies = errors.New("not enough proxies for this endpoint")
 )
 
 // Proxy 定义了代理
@@ -25,6 +40,15 @@ type Response struct {
 	IsComplete bool
 	Io         io.Reader
 	Metadata   Metadata
+}
+
+type Middleware func(...Proxy) Proxy
+
+func EmptyMiddleware(next ...Proxy) Proxy {
+	if len(next) > 1 {
+		panic(ErrTooManyProxies)
+	}
+	return next[0]
 }
 
 type readCloserWrapper struct {
@@ -49,4 +73,6 @@ func NewReadCloserWrapper(ctx context.Context, reader io.ReadCloser) io.Reader {
 	go wrapper.closeWhenCancel()
 	return wrapper
 }
+
+func NoopProxy(_ context.Context, _ *Request) (*Response, error) { return nil, nil }
 

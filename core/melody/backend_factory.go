@@ -4,7 +4,7 @@ import (
 	"context"
 	"melody/config"
 	"melody/logging"
-	metrics "melody/middleware/melody-metrics"
+	metrics "melody/middleware/melody-metrics/gin"
 	"melody/proxy"
 	"melody/transport/http/client"
 )

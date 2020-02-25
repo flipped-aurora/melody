@@ -97,6 +97,21 @@ func NewHTTPProxyDetailed(remote *config.Backend, re client.HTTPRequestExecutor,
 	}
 }
 
+func NewRequestBuilderMiddleware(backend *config.Backend) Middleware {
+	return func(proxy ...Proxy) Proxy {
+		if len(proxy) > 1 {
+			panic(ErrTooManyProxies)
+		}
+
+		return func(ctx context.Context, request *Request) (response *Response, e error) {
+			r := request.Clone()
+			r.GeneratePath(backend.URLPattern)
+			r.Method = backend.Method
+			return proxy[0](ctx, &r)
+		}
+	}
+}
+
 type responseError interface {
 	Error() string
 	Name() string

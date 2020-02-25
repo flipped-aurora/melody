@@ -19,7 +19,7 @@ type Config struct {
 	Engine         *gin.Engine
 	MiddleWares    []gin.HandlerFunc
 	HandlerFactory HandlerFactory
-	ProxyFactory   proxy.Proxy
+	ProxyFactory   proxy.Factory
 	Logger         logging.Logger
 	RunServer      RunServerFunc
 }

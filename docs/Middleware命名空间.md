@@ -184,3 +184,17 @@ response:
 ```
 - Level: [BackendConfig]
 - Status: 基本实现
+
+
+## 9.melody-proxy
+- Describe: 代理时的一些配置
+- Namespace: `melody_proxy`
+- Struct:
+```
+"melody_proxy": {
+    // 表示开启链式请求
+    "sequential": true
+}
+```
+- Level: [Endpoint]
+- Status: 基本实现
