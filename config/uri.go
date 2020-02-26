@@ -61,8 +61,12 @@ func (U URI) CleanPath(path string) string {
 
 func (U URI) GetEndpointPath(path string, params []string) string {
 	endPoint := path
-	if U == BracketsRouterPatternBuilder {
-
+	if U == ColonRouterPatternBuilder {
+		for p := range params {
+			parts := strings.Split(endPoint, "?")
+			parts[0] = strings.Replace(parts[0], "{"+params[p]+"}", ":"+params[p], -1)
+			endPoint = strings.Join(parts, "?")
+		}
 	}
 
 	return endPoint

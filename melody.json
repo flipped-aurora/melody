@@ -12,35 +12,58 @@
   "timeout": "3000ms",
   "cache_ttl": "300s",
   "output_encoding": "json",
-  "port": 8080,
-  "endpoints": [{
-    "endpoint": "/roles",
-    "method": "GET",
-    "extra_config": {},
-    "output_encoding": "json",
-    "concurrent_calls": 1,
-    "backends": [
+  "port": 8088,
+  "endpoints": [
       {
-        "url_pattern": "/roles",
-        "encoding": "json",
-        "extra_config": {},
-        "method": "GET",
-        "host": [
-          "127.0.0.1:8001"
-        ],
-        "disable_host_sanitize": false
-      },
-      {
-        "url_pattern": "/pages",
-        "encoding": "json",
-        "extra_config": {},
-        "method": "GET",
-        "host": [
-          "127.0.0.1:8001"
-        ],
-        "disable_host_sanitize": false,
-        "group": "new_data"
-      }
-    ]
-  }]
+      "endpoint": "/user/info/{id}/{name}",
+      "method": "GET",
+      "extra_config": {},
+      "output_encoding": "json",
+      "concurrent_calls": 1,
+      "backends": [
+        {
+          "url_pattern": "/roles",
+          "encoding": "json",
+          "extra_config": {},
+          "method": "GET",
+          "host": [
+            "127.0.0.1:8001"
+          ],
+          "disable_host_sanitize": false,
+          "group": "roles_info"
+        },
+        {
+          "url_pattern": "/person/{id}/{name}",
+          "encoding": "json",
+          "extra_config": {},
+          "method": "GET",
+          "host": [
+            "127.0.0.1:8001"
+          ],
+          "disable_host_sanitize": false,
+          "group": "person_info"
+        }
+      ]
+    },
+    {
+      "endpoint": "/roles",
+      "method": "GET",
+      "extra_config": {},
+      "output_encoding": "json",
+      "concurrent_calls": 1,
+      "backends": [
+        {
+          "url_pattern": "/roles",
+          "encoding": "json",
+          "extra_config": {},
+          "method": "GET",
+          "host": [
+            "127.0.0.1:8001"
+          ],
+          "disable_host_sanitize": false,
+          "group": "roles_info"
+        }
+      ]
+    }
+  ]
 }
