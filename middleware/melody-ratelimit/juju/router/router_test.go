@@ -10,7 +10,7 @@ import (
 func TestConfigGetter(t *testing.T) {
 	serializedCfg := []byte(`{
 		"melody_ratelimit_juju_router": {
-			"maxRate":10,
+			"maxRate":10
 		}
 	}`)
 	var dat config.ExtraConfig
