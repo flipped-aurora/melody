@@ -7,7 +7,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"io/ioutil"
 	"melody/config"
 	"melody/logging"
 	"melody/proxy"
@@ -133,7 +132,7 @@ func TestDefaultFactory_ko(t *testing.T) {
 
 	serviceCfg := config.ServiceConfig{
 		Debug: true,
-		Port:  8073,
+		Port:  8080,
 		Endpoints: []*config.EndpointConfig{
 			{
 				Endpoint: "/ignored",
@@ -149,7 +148,7 @@ func TestDefaultFactory_ko(t *testing.T) {
 			},
 			{
 				Endpoint: "/also-ignored",
-				Method:   "PUT",
+				Method:   "PUTt",
 				Backends: []*config.Backend{
 					{},
 					{},
@@ -167,7 +166,7 @@ func TestDefaultFactory_ko(t *testing.T) {
 		{"GET", "empty"},
 		{"PUT", "also-ignored"},
 	} {
-		req, _ := http.NewRequest(subject[0], fmt.Sprintf("http://127.0.0.1:8073/%s", subject[1]), nil)
+		req, _ := http.NewRequest(subject[0], fmt.Sprintf("http://127.0.0.1:8080/%s", subject[1]), nil)
 		req.Header.Set("Content-Type", "application/json")
 		checkResponseIs404(t, req)
 	}
@@ -249,23 +248,17 @@ func TestRunServer_ko(t *testing.T) {
 }
 
 func checkResponseIs404(t *testing.T, req *http.Request) {
-	expectedBody := "404 page not found"
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
 		t.Error("Making the request:", err.Error())
 		return
 	}
 	defer resp.Body.Close()
-	body, ioerr := ioutil.ReadAll(resp.Body)
-	if ioerr != nil {
-		t.Error("Reading the response:", ioerr.Error())
-		return
-	}
-	content := string(body)
+
 	if resp.Header.Get("Cache-Control") != "" {
 		t.Error(req.URL.String(), "Cache-Control error:", resp.Header.Get("Cache-Control"))
 	}
-	if resp.Header.Get(router.HeaderCompleteKey) != router.HeaderCompleteResponseValue {
+	if resp.Header.Get(router.HeaderCompleteKey) != router.HeaderInCompleteResponseValue {
 		t.Error(req.URL.String(), router.HeaderCompleteKey, "error:", resp.Header.Get(router.HeaderCompleteKey))
 	}
 	if resp.Header.Get("Content-Type") != "text/plain" {
@@ -276,9 +269,6 @@ func checkResponseIs404(t *testing.T, req *http.Request) {
 	}
 	if resp.StatusCode != http.StatusNotFound {
 		t.Error(req.URL.String(), "Unexpected status code:", resp.StatusCode)
-	}
-	if content != expectedBody {
-		t.Error(req.URL.String(), "Unexpected body:", content, "expected:", expectedBody)
 	}
 }
 
