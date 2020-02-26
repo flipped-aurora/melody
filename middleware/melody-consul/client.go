@@ -6,7 +6,6 @@ import (
 	"github.com/hashicorp/consul/api"
 	"melody/config"
 	"melody/logging"
-	"melody/sd/dnssrv"
 )
 
 func Register(ctx context.Context, e config.ExtraConfig, port int, serviceName string, logger logging.Logger) error {
@@ -47,5 +46,5 @@ func register(ctx context.Context, cfg Config, logger logging.Logger) error {
 		}
 	}()
 
-	return dnssrv.Register()
+	return nil
 }
