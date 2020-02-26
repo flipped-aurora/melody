@@ -29,6 +29,7 @@ require (
 	github.com/unrolled/secure v1.0.7
 	github.com/valyala/fastrand v1.0.0
 	go.opencensus.io v0.22.3
+	golang.org/x/crypto v0.0.0-20191011191535-87dc89f01550 // indirect
 	golang.org/x/sys v0.0.0-20200219091948-cb0a6d8edb6c // indirect
 	golang.org/x/time v0.0.0-20191024005414-555d28b269f0 // indirect
 	google.golang.org/genproto v0.0.0-20200218151345-dad8c97a84f5 // indirect
