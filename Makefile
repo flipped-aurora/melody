@@ -18,7 +18,7 @@ benchmark:
 
 build:
 	@echo "Build ..."
-	go build ./...
+	@go build
 	@echo "You can use melody now!"
 
 coveralls: all
