@@ -36,7 +36,7 @@ show_cover_report() {
 
 push_to_coveralls() {
     echo "Pushing coverage statistics to coveralls.io"
-    $GOPATH/bin/goveralls -coverprofile="$profile"
+    $GOPATH/bin/goveralls -coverprofile="$profile" -repotoken="o4RsPgcCBCApE0hpTyIK5T5SGqM625l5H"
 }
 
 generate_cover_data $(go list ./... | grep -v /examples/)
