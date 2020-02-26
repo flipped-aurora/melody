@@ -1,4 +1,4 @@
-![melody-logo](<http://picture.zyuhn.top/min-melody-logo.png>)
+![melody-logo](<https://github.com/granty1/melody/blob/master/docs/img/melody.png>)
 
 # **Melody API Gateway**
 High Quality API Getaway with middlewares - help you to sort out your complex api
