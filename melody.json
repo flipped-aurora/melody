@@ -1,6 +1,9 @@
 {
   "version": 2,
   "extra_config": {
+    "melody_http_server_handler": {
+      "name": ["plugin_gologging"]
+    },
     "melody_gologging": {
       "level": "DEBUG",
       "prefix": "[Grant]",
@@ -62,6 +65,27 @@
           ],
           "disable_host_sanitize": false,
           "group": "roles_info"
+        }
+      ]
+    },
+    {
+      "endpoint": "/get-person",
+      "method": "GET",
+      "extra_config": {
+        "melody_ratelimit_juju_router": {
+          "maxRate": 1
+        }
+      },
+      "output_encoding": "json",
+      "backends": [
+        {
+          "url_pattern": "/person",
+          "encoding": "json",
+          "extra_config": {},
+          "method": "GET",
+          "host": [
+            "127.0.0.1:8080"
+          ]
         }
       ]
     }
