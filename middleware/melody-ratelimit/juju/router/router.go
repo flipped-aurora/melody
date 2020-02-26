@@ -1,24 +1,3 @@
-/*
-Package router provides several rate-limit routers using the github.com/juju/ratelimit lib.
-
-Sample endpoint extra config
-
-	...
-	"extra_config": {
-		...
-		"github.com/devopsfaith/krakend-ratelimit/rate/router": {
-			"maxRate": 2000,
-			"strategy": "header",
-			"clientMaxRate": 100,
-			"key": "X-Private-Token",
-		},
-		...
-	},
-	...
-
-The ratelimit package provides an efficient token bucket implementation. See https://github.com/juju/ratelimit
-and http://en.wikipedia.org/wiki/Token_bucket for more details.
-*/
 package router
 
 import (
@@ -27,10 +6,10 @@ import (
 	"melody/config"
 )
 
-// Namespace is the key to use to store and access the custom config data for the router
+// Namespace 命名空间是用来存储和访问路由器自定义配置数据
 const Namespace = "melody_ratelimit_juju_router"
 
-// Config is the custom config struct containing the params for the router middlewares
+// Config 是包含路由器中间件参数的自定义配置结构
 type Config struct {
 	MaxRate       int64
 	Strategy      string
@@ -38,11 +17,10 @@ type Config struct {
 	Key           string
 }
 
-// ZeroCfg is the zero value for the Config struct
+// ZeroCfg ZeroCfg 是Config struct的零值
 var ZeroCfg = Config{}
 
-// ConfigGetter implements the config.ConfigGetter interface. It parses the extra config for the
-// rate adapter and returns a ZeroCfg if something goes wrong.
+// ConfigGetter 实现config.ConfigGetter接口。它解析速率适配器的extra config，如果出了问题，则返回一个ZeroCfg。
 func ConfigGetter(e config.ExtraConfig) interface{} {
 	v, ok := e[Namespace]
 	if !ok {

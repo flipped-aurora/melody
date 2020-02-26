@@ -17,11 +17,10 @@ import (
 	"melody/middleware/melody-ratelimit/juju/router"
 )
 
-// HandlerFactory is the out-of-the-box basic ratelimit handler factory using the default krakend endpoint
-// handler for the gin router
+// HandlerFactory 是一个立即可使用的基本ratelimit处理程序工厂，它使用默认的melody endpoint handler来处理gin路由器
 var HandlerFactory = NewRateLimiterMw(melodygin.EndpointHandler)
 
-// NewRateLimiterMw builds a rate limiting wrapper over the received handler factory.
+// NewRateLimiterMw 在接收的HandlerFactory上构建一个速率限制包装。
 func NewRateLimiterMw(next melodygin.HandlerFactory) melodygin.HandlerFactory {
 	return func(remote *config.EndpointConfig, p proxy.Proxy) gin.HandlerFunc {
 		handlerFunc := next(remote, p)
@@ -46,10 +45,10 @@ func NewRateLimiterMw(next melodygin.HandlerFactory) melodygin.HandlerFactory {
 	}
 }
 
-// EndpointMw is a function that decorates the received handlerFunc with some rateliming logic
+// EndpointMw 是一个函数，它用一些速率限制逻辑装饰接收的handlerFunc
 type EndpointMw func(gin.HandlerFunc) gin.HandlerFunc
 
-// NewEndpointRateLimiterMw creates a simple ratelimiter for a given handlerFunc
+// NewEndpointRateLimiterMw 为给定的 handlerFunc 创建一个简单的速率限制器
 func NewEndpointRateLimiterMw(tb juju.Limiter) EndpointMw {
 	return func(next gin.HandlerFunc) gin.HandlerFunc {
 		return func(c *gin.Context) {
@@ -67,7 +66,7 @@ func NewHeaderLimiterMw(header string, maxRate float64, capacity int64) Endpoint
 	return NewTokenLimiterMw(HeaderTokenExtractor(header), juju.NewMemoryStore(maxRate, capacity))
 }
 
-// NewHeaderLimiterMw creates a token ratelimiter using the IP of the request as a token
+// NewIpLimiterMw creates a token ratelimiter
 func NewIpLimiterMw(maxRate float64, capacity int64) EndpointMw {
 	return NewTokenLimiterMw(IPTokenExtractor, juju.NewMemoryStore(maxRate, capacity))
 }

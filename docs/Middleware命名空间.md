@@ -255,4 +255,40 @@ backend: [{
 - Level: [Backend]
 - Status: 基本完成
 
+## 13.melody-ratelimit juju-router
+- Describe: endpoint层流量限制
+- Namespace: `melody_ratelimit_juju_router`
+- Struct:
+```
+	...
+	"extra_config": {
+		...
+		""melody_ratelimit_juju_router": {
+			"maxRate": 2000,
+			"strategy": "header",
+			"clientMaxRate": 100,
+			"key": "X-Private-Token",
+		},
+		...
+	},
+	...
 
+```
+
+## 14.melody-ratelimit juju-router juju-proxy
+- Describe: backend层流量限制
+- Namespace: `melody_ratelimit_juju_proxy`
+- Struct:
+```
+	...
+	"extra_config": {
+		...
+		"melody-ratelimit_rate_proxy": {
+			"maxRate": 100,
+			"capacity": 100
+		},
+		...
+	},
+	...
+
+```

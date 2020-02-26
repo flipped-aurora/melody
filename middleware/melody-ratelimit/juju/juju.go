@@ -1,9 +1,3 @@
-/*
-Package juju provides a set of rate-limit proxy and router middlewares using the github.com/juju/ratelimit lib.
-
-The juju package provides an efficient token bucket implementation. See https://github.com/juju/ratelimit
-and http://en.wikipedia.org/wiki/Token_bucket for more details.
-*/
 package juju
 
 import (
@@ -14,22 +8,22 @@ import (
 	melodyrate "melody/middleware/melody-ratelimit"
 )
 
-// NewLimiter creates a new Limiter
+// NewLimiter 创建了一个新的 Limiter
 func NewLimiter(maxRate float64, capacity int64) Limiter {
 	return Limiter{ratelimit.NewBucketWithRate(maxRate, capacity)}
 }
 
-// Limiter is a simple wrapper over the ratelimit.Bucket struct
+// Limiter 是对 ratelimit.Bucket struct 的简单包装
 type Limiter struct {
 	limiter *ratelimit.Bucket
 }
 
-// Allow checks if its possible to extract 1 token from the bucket
+// Allow 检查是否可以从 bucket 中提取一个token
 func (l Limiter) Allow() bool {
 	return l.limiter.TakeAvailable(1) > 0
 }
 
-// NewLimiterStore returns a LimiterStore using the received backend for persistence
+// NewLimiterStore 使用接收的后端返回一个用于持久性的LimiterStore
 func NewLimiterStore(maxRate float64, capacity int64, backend melodyrate.Backend) melodyrate.LimiterStore {
 	f := func() interface{} { return NewLimiter(maxRate, capacity) }
 	return func(t string) melodyrate.Limiter {
@@ -37,7 +31,7 @@ func NewLimiterStore(maxRate float64, capacity int64, backend melodyrate.Backend
 	}
 }
 
-// NewMemoryStore returns a LimiterStore using the memory backend
+// NewMemoryStore 使用内存后端返回一个 LimiterStore
 func NewMemoryStore(maxRate float64, capacity int64) melodyrate.LimiterStore {
 	return NewLimiterStore(maxRate, capacity, melodyrate.DefaultShardedMemoryBackend(context.Background()))
 }

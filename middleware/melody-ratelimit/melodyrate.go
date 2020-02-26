@@ -92,6 +92,7 @@ func (b *ShardedMemoryBackend) del(key ...string) {
 	}
 }
 
+// NewMemoryBackend 返回一个 MemoryBackend
 func NewMemoryBackend(ctx context.Context, ttl time.Duration) *MemoryBackend {
 	m := &MemoryBackend{
 		data:       map[string]interface{}{},
@@ -104,7 +105,7 @@ func NewMemoryBackend(ctx context.Context, ttl time.Duration) *MemoryBackend {
 	return m
 }
 
-// memoryback通过包装一个sync.Map实现Backend interface
+// MemoryBackend 通过包装一个sync.Map实现Backend interface
 type MemoryBackend struct {
 	data       map[string]interface{}
 	lastAccess map[string]time.Time
@@ -169,7 +170,7 @@ func (m *MemoryBackend) Load(key string, f func() interface{}) interface{} {
 	return v
 }
 
-// Store implements the Backend interface
+// Store 实现 Backend 接口
 func (m *MemoryBackend) Store(key string, v interface{}) error {
 	m.mu.Lock()
 	m.lastAccess[key] = now()

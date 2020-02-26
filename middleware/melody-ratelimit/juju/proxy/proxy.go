@@ -1,37 +1,3 @@
-/*
-Package proxy provides a rate-limit proxy middleware using the github.com/juju/ratelimit lib.
-
-Sample backend extra config
-
-	...
-	"extra_config": {
-		...
-		"melody-ratelimit_rate_proxy": {
-			"maxRate": 100,
-			"capacity": 100
-		},
-		...
-	},
-	...
-
-Adding the middleware to your proxy stack
-
-	import juju "melody/middleware/melody-ratelimit/juju/proxy"
-
-	...
-
-	var p proxy.Proxy
-	var backend *config.Backend
-
-	...
-
-	p = juju.NewMiddleware(backend)(p)
-
-	...
-
-The ratelimit package provides an efficient token bucket implementation. See https://github.com/juju/ratelimit
-and http://en.wikipedia.org/wiki/Token_bucket for more details.
-*/
 package proxy
 
 import (
