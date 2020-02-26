@@ -21,8 +21,9 @@ type staticConfig struct {
 	Match    func(*Response, error) bool
 }
 
+// NewStaticDataMiddleware 定义了插入静态数据中间件
 func NewStaticDataMiddleware(endpoint *config.EndpointConfig) Middleware {
-	v, ok := getStaticConfig(endpoint.ExtraConfig);
+	v, ok := getStaticConfig(endpoint.ExtraConfig)
 	if !ok {
 		return EmptyMiddleware
 	}

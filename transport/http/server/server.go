@@ -115,7 +115,7 @@ func RunServer(ctx context.Context, cfg config.ServiceConfig, handler http.Handl
 // NewServer 返回一个默认的http.Server实例
 func NewServer(cfg config.ServiceConfig, handler http.Handler) *http.Server {
 	return &http.Server{
-		Addr:              fmt.Sprintf("%d", cfg.Port),
+		Addr:              fmt.Sprintf(":%d", cfg.Port),
 		Handler:           handler,
 		ReadTimeout:       cfg.ReadTimeout,
 		WriteTimeout:      cfg.WriteTimeout,

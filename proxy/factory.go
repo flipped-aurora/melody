@@ -75,4 +75,3 @@ func (d defaultFactory) NewMulti(endpointConfig *config.EndpointConfig) (p Proxy
 	p = NewMergeDataMiddleware(endpointConfig)(backendProxies...)
 	return
 }
-

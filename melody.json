@@ -1,98 +1,46 @@
 {
   "version": 2,
   "extra_config": {
-    "melody_etcd": {
-      "machines": [
-        "http://127.0.0.1:8080",
-        "http://127.0.0.1:8081",
-        "http://127.0.0.1:8082",
-        "http://127.0.0.1:8083"
-      ],
-      "dial_timeout": "5s",
-      "dial_keepalive": "30s",
-      "header_timeout": "1s"
-    },
     "melody_gologging": {
-      "level": "ERROR",
-      "prefix": "[Karl]",
+      "level": "DEBUG",
+      "prefix": "[Grant]",
       "syslog": false,
       "stdout": true,
-      "format": "logstash"
-    },
-    "melody_logstash": {
-      "enabled": true
+      "format": "default"
     }
   },
   "timeout": "3000ms",
   "cache_ttl": "300s",
   "output_encoding": "json",
-  "port": 8888,
-  "endpoints": [
-    {
-      "endpoint": "/users_roles",
-      "method": "GET",
-      "extra_config": {
-        "github.com/devopsfaith/krakend/proxy": {
-          "sequential": false
-        }
+  "port": 8080,
+  "endpoints": [{
+    "endpoint": "/roles",
+    "method": "GET",
+    "extra_config": {},
+    "output_encoding": "json",
+    "concurrent_calls": 1,
+    "backends": [
+      {
+        "url_pattern": "/roles",
+        "encoding": "json",
+        "extra_config": {},
+        "method": "GET",
+        "host": [
+          "127.0.0.1:8001"
+        ],
+        "disable_host_sanitize": false
       },
-      "output_encoding": "json",
-      "concurrent_calls": 1,
-      "backends": [
-        {
-          "url_pattern": "/gin-cli/user/list",
-          "encoding": "json",
-          "sd": "etcd",
-          "extra_config": {},
-          "method": "GET",
-          "host": [
-            "http://127.0.0.1:8080",
-            "http://127.0.0.1:8081",
-            "http://127.0.0.1:8082",
-            "http://127.0.0.1:8083"
-          ],
-          "disable_host_sanitize": true,
-          "target": "",
-          "is_collection": false
-        },
-        {
-          "url_pattern": "/gin-cli/system/roles",
-          "encoding": "json",
-          "sd": "etcd",
-          "extra_config": {},
-          "method": "GET",
-          "host": [
-            "http://127.0.0.1:8080",
-            "http://127.0.0.1:8081",
-            "http://127.0.0.1:8083",
-            "http://127.0.0.1:8082"
-          ],
-          "disable_host_sanitize": true
-        }
-      ]
-    },
-    {
-      "endpoint": "/login",
-      "method": "POST",
-      "extra_config": {},
-      "output_encoding": "json",
-      "concurrent_calls": 1,
-      "backends": [
-        {
-          "url_pattern": "/gin-cli/auth/login",
-          "encoding": "json",
-          "sd": "etcd",
-          "extra_config": {},
-          "method": "POST",
-          "host": [
-            "http://127.0.0.1:8083",
-            "http://127.0.0.1:8082",
-            "http://127.0.0.1:8081",
-            "http://127.0.0.1:8080"
-          ],
-          "disable_host_sanitize": true
-        }
-      ]
-    }
-  ]
+      {
+        "url_pattern": "/pages",
+        "encoding": "json",
+        "extra_config": {},
+        "method": "GET",
+        "host": [
+          "127.0.0.1:8001"
+        ],
+        "disable_host_sanitize": false,
+        "group": "new_data"
+      }
+    ]
+  }]
 }

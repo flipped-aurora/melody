@@ -21,6 +21,7 @@ var (
 	UserAgentHeaderValue = http.UserAgentHeaderValue
 	ErrorInternalError = http.ErrorInternalError
 	DefaultToHTTPError = http.DefaultToHTTPError
+	InitHTTPDefaultTransport = http.InitHTTPDefaultTransport
 )
 
 // Router 暴露出去的接口
@@ -37,4 +38,3 @@ type Factory interface {
 	NewWithContext(context.Context) Router
 }
 
-//(¬‿¬)
