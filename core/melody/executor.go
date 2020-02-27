@@ -66,7 +66,10 @@ func NewExecutor(ctx context.Context) cmd.Executor {
 
 		//TODO 3.Start Reporter (暂时不做)
 
-		//TODO 4.加载插件 (暂时不做)
+		//TODO 4.加载插件 (暂时不做,加了点头)
+		if cfg.Plugin != nil {
+			LoadPlugins(cfg.Plugin.Folder, cfg.Plugin.Pattern, logger)
+		}
 
 		//TODO 5.注册etcd服务发现
 		_ = RegisterSubscriberFactories(ctx, cfg, logger)

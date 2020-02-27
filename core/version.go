@@ -4,7 +4,7 @@ import "fmt"
 
 const (
 	// MelodyVersion export the project version.
-	MelodyVersion = "0.0.1"
+	MelodyVersion = "1.0.0"
 	// MelodyHeaderKey
 	MelodyHeaderKey = "X-Melody"
 	//

@@ -1,7 +1,17 @@
 package plugin
 
-import "melody/register"
+import (
+	"context"
+	"melody/register"
+	"net/http"
+)
 
 var serverRegister = register.NewSpaces()
 
-// TODO add serverRegister
+// RegisterHandler ...
+func RegisterHandler(
+	name string,
+	handler func(context.Context, map[string]interface{}, http.Handler) (http.Handler, error),
+) {
+	serverRegister.Register(Namespace, name, handler)
+}

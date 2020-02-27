@@ -39,7 +39,7 @@ var (
 
 func init() {
 	logo, _ := base64.StdEncoding.DecodeString(encodedLogo)
-	rootCmd.SetHelpTemplate("\n"+string(logo) + "\nVersion:" + core.MelodyVersion + "\n\n" + rootCmd.HelpTemplate())
+	rootCmd.SetHelpTemplate("\n" + string(logo) + "\nVersion:" + core.MelodyVersion + "\n\n" + rootCmd.HelpTemplate())
 	rootCmd.PersistentFlags().StringVarP(&cfgFilePath, "config", "c", "", "Path of the melody.json")
 	rootCmd.PersistentFlags().BoolVarP(&debug, "debug", "d", false, "Enable the Melody debug")
 	rootCmd.AddCommand(runCmd)

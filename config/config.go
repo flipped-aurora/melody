@@ -58,6 +58,9 @@ type ServiceConfig struct {
 	DisableKeepAlives  bool `mapstructure:"disable_keep_alives"`
 	DisableStrictREST  bool `mapstructure:"disable_rest"`
 
+	// Plugin定义了插件加载器的配置
+	Plugin *Plugin `mapstructure:"plugin"`
+
 	//melody is in debug model
 	Debug     bool
 	uriParser URIParser
@@ -122,6 +125,12 @@ type Backend struct {
 	Decoder encoding.Decoder `json:"-"`
 	// Backend Extra configuration for customized behaviours
 	ExtraConfig ExtraConfig `mapstructure:"extra_config"`
+}
+
+// Plugin 包含 Plugin 模块所需的配置
+type Plugin struct {
+	Folder  string `mapstructure:"folder"`
+	Pattern string `mapstructure:"pattern"`
 }
 
 // TLS 包含了TLS的配置信息
