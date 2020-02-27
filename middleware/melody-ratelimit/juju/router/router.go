@@ -7,7 +7,7 @@ import (
 )
 
 // Namespace 命名空间是用来存储和访问路由器自定义配置数据
-const Namespace = "melody_ratelimit_juju_router"
+const Namespace = "melody_ratelimit_router"
 
 // Config 是包含路由器中间件参数的自定义配置结构
 type Config struct {

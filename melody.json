@@ -72,7 +72,7 @@
       "endpoint": "/get-person",
       "method": "GET",
       "extra_config": {
-        "melody_ratelimit_juju_router": {
+        "melody_ratelimit_router": {
           "maxRate": 1
         }
       },

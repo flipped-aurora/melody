@@ -11,7 +11,7 @@ import (
 )
 
 // Namespace is the key to use to store and access the custom config data for the proxy
-const Namespace = "melody_ratelimit_juju_proxy"
+const Namespace = "melody_ratelimit_proxy"
 
 // Config is the custom config struct containing the params for the limiter
 type Config struct {
