@@ -5,6 +5,7 @@ import (
 	"context"
 	"io/ioutil"
 	"melody/config"
+	"melody/core"
 	"melody/encoding"
 	"melody/proxy"
 	"net/http"
@@ -58,7 +59,7 @@ func TestRender_Negotiated_ok(t *testing.T) {
 		if w.Result().Header.Get("Content-Type") != testData[2] {
 			t.Error(testData[0], "Content-Type error:", w.Result().Header.Get("Content-Type"))
 		}
-		if w.Result().Header.Get("X-Melody") != "Version 0.0.1" {
+		if w.Result().Header.Get("X-Melody") != core.MelodyHeaderValue {
 			t.Error(testData[0], "X-Melody error:", w.Result().Header.Get("X-Melody"))
 		}
 		if w.Result().StatusCode != http.StatusOK {
@@ -102,7 +103,7 @@ func TestRender_Negotiated_noData(t *testing.T) {
 		if w.Result().Header.Get("Content-Type") != testData[2] {
 			t.Error(testData[0], "Content-Type error:", w.Result().Header.Get("Content-Type"))
 		}
-		if w.Result().Header.Get("X-Melody") != "Version 0.0.1" {
+		if w.Result().Header.Get("X-Melody") != core.MelodyHeaderValue {
 			t.Error(testData[0], "X-Melody error:", w.Result().Header.Get("X-Melody"))
 		}
 		if w.Result().StatusCode != http.StatusOK {
@@ -144,7 +145,7 @@ func TestRender_Negotiated_noResponse(t *testing.T) {
 		if w.Result().Header.Get("Content-Type") != testData[2] {
 			t.Error(testData[0], "Content-Type error:", w.Result().Header.Get("Content-Type"))
 		}
-		if w.Result().Header.Get("X-Melody") != "Version 0.0.1" {
+		if w.Result().Header.Get("X-Melody") != core.MelodyHeaderValue {
 			t.Error(testData[0], "X-Melody error:", w.Result().Header.Get("X-Melody"))
 		}
 		if w.Result().StatusCode != http.StatusOK {
@@ -194,7 +195,7 @@ func TestRender_unknown(t *testing.T) {
 		if w.Result().Header.Get("Content-Type") != expectedHeader {
 			t.Error(testData[0], "Content-Type error:", w.Result().Header.Get("Content-Type"))
 		}
-		if w.Result().Header.Get("X-Melody") != "Version 0.0.1" {
+		if w.Result().Header.Get("X-Melody") != core.MelodyHeaderValue {
 			t.Error(testData[0], "X-Melody error:", w.Result().Header.Get("X-Melody"))
 		}
 		if w.Result().StatusCode != http.StatusOK {
@@ -252,7 +253,7 @@ func TestRender_string(t *testing.T) {
 		if w.Result().Header.Get("Content-Type") != expectedHeader {
 			t.Error(testData[0], "Content-Type error:", w.Result().Header.Get("Content-Type"))
 		}
-		if w.Result().Header.Get("X-Melody") != "Version 0.0.1" {
+		if w.Result().Header.Get("X-Melody") != core.MelodyHeaderValue {
 			t.Error(testData[0], "X-Melody error:", w.Result().Header.Get("X-Melody"))
 		}
 		if w.Result().StatusCode != http.StatusOK {
@@ -314,7 +315,7 @@ func TestRender_string_noData(t *testing.T) {
 		if w.Result().Header.Get("Content-Type") != expectedHeader {
 			t.Error(k, "Content-Type error:", w.Result().Header.Get("Content-Type"))
 		}
-		if w.Result().Header.Get("X-Melody") != "Version 0.0.1" {
+		if w.Result().Header.Get("X-Melody") != core.MelodyHeaderValue {
 			t.Error(k, "X-Melody error:", w.Result().Header.Get("X-Melody"))
 		}
 		if w.Result().StatusCode != http.StatusOK {
@@ -397,7 +398,7 @@ func TestRender_noop(t *testing.T) {
 	if w.Result().Header.Get("Content-Type") != expectedHeader {
 		t.Error("Content-Type error:", w.Result().Header.Get("Content-Type"))
 	}
-	if w.Result().Header.Get("X-Melody") != "Version 0.0.1" {
+	if w.Result().Header.Get("X-Melody") != core.MelodyHeaderValue {
 		t.Error("X-Melody error:", w.Result().Header.Get("X-Melody"))
 	}
 	if w.Result().StatusCode != http.StatusOK {
@@ -436,7 +437,7 @@ func TestRender_noop_nilResponse(t *testing.T) {
 	if w.Result().Header.Get("Content-Type") != "" {
 		t.Error("Content-Type error:", w.Result().Header.Get("Content-Type"))
 	}
-	if w.Result().Header.Get("X-Melody") != "Version 0.0.1" {
+	if w.Result().Header.Get("X-Melody") != core.MelodyHeaderValue {
 		t.Error("X-Melody error:", w.Result().Header.Get("X-Melody"))
 	}
 	if w.Result().StatusCode != http.StatusInternalServerError {

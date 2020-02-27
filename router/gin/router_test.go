@@ -8,6 +8,7 @@ import (
 	"errors"
 	"fmt"
 	"melody/config"
+	"melody/core"
 	"melody/logging"
 	"melody/proxy"
 	"melody/router"
@@ -105,7 +106,7 @@ func TestDefaultFactory_ok(t *testing.T) {
 		if resp.Header.Get("Content-Type") != "application/json; charset=utf-8" {
 			t.Error("Content-Type error:", resp.Header.Get("Content-Type"))
 		}
-		if resp.Header.Get("X-Melody") != "Version 0.0.1" {
+		if resp.Header.Get("X-Melody") != core.MelodyHeaderValue {
 			t.Error("X-Melody error:", resp.Header.Get("X-Melody"))
 		}
 		if resp.StatusCode != http.StatusOK {
