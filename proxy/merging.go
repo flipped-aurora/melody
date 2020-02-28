@@ -2,7 +2,10 @@ package proxy
 
 import (
 	"context"
+	"fmt"
 	"melody/config"
+	"regexp"
+	"strconv"
 	"strings"
 	"time"
 )
@@ -15,7 +18,7 @@ const (
 
 var responseCombiners = initResponseCombiners()
 
-
+var sequentialLastParamKeyRegexp = regexp.MustCompile(`\{\{\.Resp(\d+)_([\d\w-_\.]+)\}\}`)
 
 // ResponseCombiner 将多个proxy.Response 整合成一个
 type ResponseCombiner func(int, []*Response) *Response
@@ -52,8 +55,102 @@ func NewMergeDataMiddleware(config *config.EndpointConfig) Middleware {
 			// 并行合并请求
 			return parallelMerge(serviceTimeOut, combiner, proxy...)
 		}
-		// TODO **链式合并请求
-		return nil
+		// 链式合并请求
+		patterns := make([]string, len(config.Backends))
+		for i, v := range config.Backends {
+			patterns[i] = v.URLPattern
+		}
+
+		return sequentialMerge(patterns, serviceTimeOut, combiner, proxy...)
+	}
+}
+
+func sequentialMerge(patterns []string, timeout time.Duration, combiner ResponseCombiner, proxy ...Proxy) Proxy {
+	return func(ctx context.Context, request *Request) (response *Response, err error) {
+		localCtx, cancel := context.WithTimeout(ctx, timeout)
+
+		responses := make([]*Response, len(proxy))
+		out := make(chan *Response, 1)
+		errChan := make(chan error, 1)
+
+		acc := newIncrementalMergeAccumulator(len(proxy), combiner)
+
+	Loop:
+		for i, nextProxy := range proxy {
+			if i > 0 {
+				for _, match := range sequentialLastParamKeyRegexp.FindAllStringSubmatch(patterns[i], -1) {
+					if len(match) > 1 {
+
+						// 第几个backend的下标
+						index, err := strconv.Atoi(match[1])
+						// 下标不是数字 || 下标大于当前下标 || 下标对应的backend的response为nil
+						if err != nil || index >= i || responses[index] == nil {
+							continue
+						}
+
+						key := "Resp" + match[1] + "_" + match[2]
+
+						var v interface{}
+						var ok bool
+
+						data := responses[index].Data
+						keys := strings.Split(match[2], ".")
+						if len(keys) > 1 {
+							for _, k := range keys[:len(keys)-1] {
+								v, ok = data[k]
+								if !ok {
+									break
+								}
+								switch clean := v.(type) {
+								case map[string]interface{}:
+									data = clean
+								default:
+									break
+								}
+							}
+						}
+						// 从index对应的backend的response中拿出参数
+						v, ok = data[keys[len(keys)-1]]
+						if !ok {
+							continue
+						}
+
+						switch t := v.(type) {
+						case string:
+							request.Params[key] = t
+						case int:
+							request.Params[key] = strconv.Itoa(t)
+						case float64:
+							request.Params[key] = strconv.FormatFloat(t, 'E', -1, 32)
+						case bool:
+							request.Params[key] = strconv.FormatBool(t)
+						default:
+							request.Params[key] = fmt.Sprintf("%v", v)
+						}
+					}
+				}
+			}
+			requestPart(localCtx, nextProxy, request, out, errChan)
+			select {
+			case err := <-errChan:
+				if i == 0 {
+					cancel()
+					return nil, err
+				}
+				acc.Merge(nil, err)
+				break Loop
+			case response := <- out:
+				acc.Merge(response, nil)
+				if !response.IsComplete {
+					break Loop
+				}
+				responses[i] = response
+			}
+
+		}
+		result, err := acc.Result()
+		cancel()
+		return result, err
 	}
 }
 

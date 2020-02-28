@@ -15,9 +15,9 @@
   "timeout": "3000ms",
   "cache_ttl": "300s",
   "output_encoding": "json",
-  "port": 8088,
+  "port": 8080,
   "endpoints": [
-      {
+    {
       "endpoint": "/user/info/{id}/{name}",
       "method": "GET",
       "extra_config": {},
@@ -85,6 +85,92 @@
           "method": "GET",
           "host": [
             "127.0.0.1:8080"
+          ]
+        }
+      ]
+    },
+    {
+      "endpoint": "/findone/{name}",
+      "method": "GET",
+      "extra_config": {
+        "melody_proxy": {
+          "sequential": true
+        }
+      },
+      "output_encoding": "json",
+      "concurrent_calls": 1,
+      "backends": [
+        {
+          "url_pattern": "/user/{name}",
+          "encoding": "json",
+          "sd": "static",
+          "extra_config": {},
+          "method": "GET",
+          "host": [
+            "127.0.0.1:8001"
+          ]
+        },
+        {
+          "url_pattern": "/role/{resp0_roleId}",
+          "encoding": "json",
+          "sd": "static",
+          "extra_config": {},
+          "method": "GET",
+          "group": "role_info",
+          "host": [
+            "127.0.0.1:8001"
+          ]
+        }
+      ]
+    },
+    {
+      "endpoint": "/static",
+      "method": "GET",
+      "extra_config": {
+        "melody_proxy": {
+          "sequential": true,
+          "static": {
+            "strategy": ["success"],
+            "data": {
+              "static": [
+                {
+                  "static1": 1
+                },
+                {
+                  "static2": true
+                },
+                {
+                  "static3": "hello"
+                }
+              ]
+            }
+          }
+
+        }
+      },
+      "output_encoding": "json",
+      "concurrent_calls": 1,
+      "backends": [
+        {
+          "url_pattern": "roles",
+          "encoding": "json",
+          "sd": "static",
+          "extra_config": {},
+          "group": "roles",
+          "method": "GET",
+          "host": [
+            "127.0.0.1:8001"
+          ]
+        },
+        {
+          "url_pattern": "/role/static",
+          "encoding": "json",
+          "sd": "static",
+          "extra_config": {},
+          "method": "GET",
+          "group": "static_data",
+          "host": [
+            "127.0.0.1:7777"
           ]
         }
       ]
