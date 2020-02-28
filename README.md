@@ -17,7 +17,7 @@ Melody 1.0
 
 ## Build Requirements
 
-Golang 1.11
+Golang 1.11+
 
 
 
@@ -25,11 +25,11 @@ Golang 1.11
 
 Linux or Mac :
 ```
-    make build
+make build
 ```
 Windows :
 ```
-	go build .
+go build .
 ```
 
 
@@ -39,7 +39,6 @@ Windows :
   melody [command]
 
 
-
 ## Available Commands:
 
 | command | *description*          |
@@ -47,8 +46,6 @@ Windows :
 | check   | Check that the config  |
 | run     | Run the Melody server  |
 | help    | Help about any command |
-
-
 
 
 ## Flags:
