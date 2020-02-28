@@ -6,7 +6,7 @@ package bf
 
 import "math"
 
-type Bloomfilter interface {
+type BloomFilter interface {
 	Add([]byte)
 	Check([]byte) bool
 	Union(interface{}) (float64, error)
@@ -21,7 +21,7 @@ type Config struct {
 	HashName string
 }
 
-// EmptyConfig configuration used for first empty `previous` bloomfilter in the sliding three bloomfilters
+// 给 sliding bf 的 previous 用的
 var EmptyConfig = Config{
 	N: 2,
 	P: .5,

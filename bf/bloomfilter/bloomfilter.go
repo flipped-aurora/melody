@@ -93,7 +93,7 @@ func (b *BloomFilter) hashFactoryNameK(hashName string) []bf.Hash {
 	return bf.HashFactoryNames[hashName](b.k)
 }
 
-type SerializibleBloomfilter struct {
+type SerializableBloomFilter struct {
 	BS       bitset.Bitset
 	M        uint
 	K        uint
@@ -104,7 +104,7 @@ type SerializibleBloomfilter struct {
 // MarshalBinary 序列化
 func (b *BloomFilter) MarshalBinary() ([]byte, error) {
 	buf := new(bytes.Buffer)
-	err := gob.NewEncoder(buf).Encode(&SerializibleBloomfilter{
+	err := gob.NewEncoder(buf).Encode(&SerializableBloomFilter{
 		BS:       b.bs,
 		M:        b.m,
 		K:        b.k,
@@ -120,7 +120,7 @@ func (b *BloomFilter) MarshalBinary() ([]byte, error) {
 func (b *BloomFilter) UnmarshalBinary(data []byte) error {
 	//unzip data
 	buf := bytes.NewBuffer(data)
-	target := SerializibleBloomfilter{}
+	target := SerializableBloomFilter{}
 
 	if err := gob.NewDecoder(buf).Decode(&target); err != nil {
 		return err

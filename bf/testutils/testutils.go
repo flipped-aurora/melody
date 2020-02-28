@@ -26,7 +26,7 @@ var (
 	}
 )
 
-func CallSet(t *testing.T, set bf.Bloomfilter) {
+func CallSet(t *testing.T, set bf.BloomFilter) {
 	set.Add([]byte{1, 2, 3})
 	if !set.Check([]byte{1, 2, 3}) {
 		t.Error("failed check")
@@ -37,7 +37,7 @@ func CallSet(t *testing.T, set bf.Bloomfilter) {
 	}
 }
 
-func CallSetUnion(t *testing.T, set1, set2 bf.Bloomfilter) {
+func CallSetUnion(t *testing.T, set1, set2 bf.BloomFilter) {
 	elem := []byte{1, 2, 3}
 	set1.Add(elem)
 	if !set1.Check(elem) {
