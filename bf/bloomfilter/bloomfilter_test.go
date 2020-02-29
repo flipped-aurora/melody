@@ -9,18 +9,18 @@ import (
 	"testing"
 )
 
-func TestBloomfilter(t *testing.T) {
+func TestBloomFilter(t *testing.T) {
 	testutils.CallSet(t, New(testutils.TestCfg))
 }
 
-func TestBloomfilter_Union_ok(t *testing.T) {
+func TestBloomFilter_Union_ok(t *testing.T) {
 	set1 := New(testutils.TestCfg)
 	set2 := New(testutils.TestCfg)
 
 	testutils.CallSetUnion(t, set1, set2)
 }
 
-func TestBloomfilter_Union_koIncorrectType(t *testing.T) {
+func TestBloomFilter_Union_koIncorrectType(t *testing.T) {
 	set1 := New(testutils.TestCfg)
 	set2 := 24
 
@@ -29,7 +29,7 @@ func TestBloomfilter_Union_koIncorrectType(t *testing.T) {
 	}
 }
 
-func TestBloomfilter_Union_koDifferentM(t *testing.T) {
+func TestBloomFilter_Union_koDifferentM(t *testing.T) {
 	set1 := New(testutils.TestCfg)
 	set2 := New(testutils.TestCfg)
 	set2.m = 111
@@ -38,7 +38,7 @@ func TestBloomfilter_Union_koDifferentM(t *testing.T) {
 	}
 }
 
-func TestBloomfilter_Union_koDifferentK(t *testing.T) {
+func TestBloomFilter_Union_koDifferentK(t *testing.T) {
 	set1 := New(testutils.TestCfg)
 	set2 := New(testutils.TestCfg)
 	set2.k = 111
@@ -47,7 +47,7 @@ func TestBloomfilter_Union_koDifferentK(t *testing.T) {
 	}
 }
 
-func TestBloomfilter_gobEncoder(t *testing.T) {
+func TestBloomFilter_gobEncoder(t *testing.T) {
 	bf1 := New(testutils.TestCfg)
 	bf1.Add([]byte("casa"))
 	bf1.Add([]byte("grrrrr"))
