@@ -6,6 +6,7 @@ import (
 	"melody/cmd"
 	"melody/config"
 	"melody/logging"
+	bloomfilter "melody/middleware/melody-bloomfilter"
 	gelf "melody/middleware/melody-gelf"
 	gologging "melody/middleware/melody-gologging"
 	logstash "melody/middleware/melody-logstash"
@@ -71,22 +72,24 @@ func NewExecutor(ctx context.Context) cmd.Executor {
 			LoadPlugins(cfg.Plugin.Folder, cfg.Plugin.Pattern, logger)
 		}
 
-		//TODO 5.注册etcd服务发现
-		_ = RegisterSubscriberFactories(ctx, cfg, logger)
+		// 5.注册etcd, dns srv,并返回func to register consul
+		reg := RegisterSubscriberFactories(ctx, cfg, logger)
 		// 6.创建Metrics监控
-		metrics := metrics.New(ctx, cfg.ExtraConfig, logger)
+		m := metrics.New(ctx, cfg.ExtraConfig, logger)
 		//TODO 7. 集成influxdb
 		//TODO 8. 集成opencensus
-		//TODO 9. 集成bloomFilter
-		//		——, err := bloomfilter.Register(ctx, "melody-bf", cfg, logger, reg)
-		//		if err != nil {
-		//			logger.Warning("bloomFilter:", err.Error())
-		//		}
+
+		// 9. 集成bloomFilter
+		_, err = bloomfilter.Register(ctx, "melody-bf", cfg, logger, reg)
+		if err != nil {
+			logger.Warning("bloomFilter:", err.Error())
+		}
+
 		//TODO 10. 集成JWT，注册RejecterFactory
 		//TODO 11. Set up melody Router
 		routerFactory := router.NewFactory(router.Config{
 			Engine:         NewEngine(cfg, logger, gelfWriter),
-			ProxyFactory:   NewProxyFactory(logger, NewBackendFactoryWithContext(ctx, logger, metrics)),
+			ProxyFactory:   NewProxyFactory(logger, NewBackendFactoryWithContext(ctx, logger, m)),
 			HandlerFactory: NewHandlerFactory(logger),
 			MiddleWares:    []gin.HandlerFunc{},
 			Logger:         logger,
