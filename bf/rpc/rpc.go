@@ -39,7 +39,7 @@ func New(ctx context.Context, cfg Config) *BloomFilter {
 
 	bf = rotate.New(ctx, cfg.Config)
 
-	return new(BloomFilter)
+	return new(BloomFilter) // TODO why use Get
 }
 
 // Add 函数的 input

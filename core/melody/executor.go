@@ -86,6 +86,19 @@ func NewExecutor(ctx context.Context) cmd.Executor {
 		}
 
 		//TODO 10. 集成JWT，注册RejecterFactory
+
+		//tokenRejecterFactory := jose.ChainedRejecterFactory([]jose.RejecterFactory{
+		//	jose.RejecterFactoryFunc(func(_ logging.Logger, _ *config.EndpointConfig) jose.Rejecter {
+		//		return jose.RejecterFunc(rejecter.RejectToken)
+		//	}),
+		//	jose.RejecterFactoryFunc(func(l logging.Logger, cfg *config.EndpointConfig) jose.Rejecter {
+		//		if r := cel.NewRejecter(l, cfg); r != nil {
+		//			return r
+		//		}
+		//		return jose.FixedRejecter(false)
+		//	}),
+		//})
+
 		//TODO 11. Set up melody Router
 		routerFactory := router.NewFactory(router.Config{
 			Engine:         NewEngine(cfg, logger, gelfWriter),
