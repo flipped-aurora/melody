@@ -23,7 +23,7 @@ var (
 	RoutingPattern          = ColonRouterPatternBuilder
 	debugPattern            = "^[^/]|/__debug(/.*)?$"
 	sequentialParamsPattern = regexp.MustCompile(`^resp[\d]+_.*$`)
-	simpleURLKeysPattern    = regexp.MustCompile(`\{([a-zA-Z\-_0-9]+)\}`)
+	simpleURLKeysPattern    = regexp.MustCompile(`\{([a-zA-Z\-_0-9\.]+)\}`)
 	errInvalidNoOpEncoding  = errors.New("can not use NoOp encoding with more than one backends connected to the same endpoint")
 )
 
@@ -268,8 +268,8 @@ func (s *ServiceConfig) paramExtractionPattern() *regexp.Regexp {
 	return endpointURLKeysPattern
 }
 
-func (s *ServiceConfig) getPlaceHoldersFromEndpointUrl(endpoint string, pattern *regexp.Regexp) []string {
-	matches := pattern.FindAllStringSubmatch(endpoint, -1)
+func (s *ServiceConfig) getPlaceHoldersFromEndpointUrl(backend string, pattern *regexp.Regexp) []string {
+	matches := pattern.FindAllStringSubmatch(backend, -1)
 	params := make([]string, len(matches))
 
 	for i, v := range matches {
@@ -361,7 +361,7 @@ func (s *ServiceConfig) initBackendsURLMappings(e, b int, inputSet map[string]in
 				}
 			}
 		}
-		key := strings.Title(param)
+		key := strings.Title(param[:1]) + param[1:]
 		backend.URLPattern = strings.Replace(backend.URLPattern, "{"+param+"}", "{{."+key+"}}", -1)
 		backend.URLKeys = append(backend.URLKeys, key)
 	}

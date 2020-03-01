@@ -102,6 +102,7 @@
       "backends": [
         {
           "url_pattern": "/user/{name}",
+          "group": "base_info",
           "encoding": "json",
           "sd": "static",
           "extra_config": {},
@@ -111,7 +112,7 @@
           ]
         },
         {
-          "url_pattern": "/role/{resp0_roleId}",
+          "url_pattern": "/role/{resp0_base_info.role_id}",
           "encoding": "json",
           "sd": "static",
           "extra_config": {},
