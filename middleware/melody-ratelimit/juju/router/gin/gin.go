@@ -61,28 +61,28 @@ func NewEndpointRateLimiterMw(tb juju.Limiter) EndpointMw {
 	}
 }
 
-// NewHeaderLimiterMw creates a token ratelimiter using the value of a header as a token
+// NewHeaderLimiterMw 使用标头的值作为标记创建一个令牌速率限制器
 func NewHeaderLimiterMw(header string, maxRate float64, capacity int64) EndpointMw {
 	return NewTokenLimiterMw(HeaderTokenExtractor(header), juju.NewMemoryStore(maxRate, capacity))
 }
 
-// NewIpLimiterMw creates a token ratelimiter
+// NewIpLimiterMw 创建一个令牌速率限制器
 func NewIpLimiterMw(maxRate float64, capacity int64) EndpointMw {
 	return NewTokenLimiterMw(IPTokenExtractor, juju.NewMemoryStore(maxRate, capacity))
 }
 
-// TokenExtractor defines the interface of the functions to use in order to extract a token for each request
+// TokenExtractor 定义了用于为每个请求提取令牌的函数的接口
 type TokenExtractor func(*gin.Context) string
 
-// IPTokenExtractor extracts the IP of the request
+// IPTokenExtractor 提取请求的IP
 func IPTokenExtractor(c *gin.Context) string { return strings.Split(c.ClientIP(), ":")[0] }
 
-// HeaderTokenExtractor returns a TokenExtractor that looks for the value of the designed header
+// HeaderTokenExtractor 返回一个TokenExtractor，该TokenExtractor查找设计的头文件的值
 func HeaderTokenExtractor(header string) TokenExtractor {
 	return func(c *gin.Context) string { return c.Request.Header.Get(header) }
 }
 
-// NewTokenLimiterMw returns a token based ratelimiting endpoint middleware with the received TokenExtractor and LimiterStore
+// NewTokenLimiterMw 返回一个基于令牌的ratelimiting端点中间件，带有接收到的令牌提取器和LimiterStore
 func NewTokenLimiterMw(tokenExtractor TokenExtractor, limiterStore melodyrate.LimiterStore) EndpointMw {
 	return func(next gin.HandlerFunc) gin.HandlerFunc {
 		return func(c *gin.Context) {
