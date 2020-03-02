@@ -16,7 +16,7 @@ var (
 	run         Executor
 	rootCmd     = &cobra.Command{
 		Use:   "melody",
-		Short: "melody help you to sort out your complex api.",
+		Short: "Melody help you to sort out your complex api",
 	}
 
 	//添加校验配置文件
@@ -35,6 +35,21 @@ var (
 		Run:     runFunc,
 		Example: "melody run -d -c melody.json",
 	}
+	graphCmd = &cobra.Command{
+		Use:     "graph",
+		Short:   "generate graph of melody server",
+		Long:    `Generate a simple example diagram according to service config
+But your computer needs graphviz, you can install this software by
+
+  brew install graphviz
+
+and you can generate png with command
+
+  ./melody graph -c melody.json | dot -Tpng -o config.png`,
+		Run:     graphFunc,
+		Aliases: []string{"validate"},
+		Example: "melody check -d -c config.json",
+	}
 )
 
 func init() {
@@ -44,6 +59,7 @@ func init() {
 	rootCmd.PersistentFlags().BoolVarP(&debug, "debug", "d", false, "Enable the Melody debug")
 	rootCmd.AddCommand(runCmd)
 	rootCmd.AddCommand(checkCmd)
+	rootCmd.AddCommand(graphCmd)
 	runCmd.PersistentFlags().IntVarP(&port, "port", "p", 7777, "Listening port for Melody server")
 }
 

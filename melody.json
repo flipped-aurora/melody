@@ -22,7 +22,7 @@
       "method": "GET",
       "extra_config": {},
       "output_encoding": "json",
-      "concurrent_calls": 1,
+      "concurrent_calls": 10,
       "backends": [
         {
           "url_pattern": "/roles",
