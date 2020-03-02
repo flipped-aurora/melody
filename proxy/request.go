@@ -30,6 +30,34 @@ func (r *Request) Clone() Request {
 	}
 }
 
+// CloneRequest 返回一个请求副本
+func CloneRequest(r *Request) *Request {
+	clone := r.Clone()
+	clone.Headers = CloneRequestHeaders(r.Headers)
+	clone.Params = CloneRequestParams(r.Params)
+	return &clone
+}
+
+// CloneRequestHeaders 返回一个接收到的请求头的副本
+func CloneRequestHeaders(headers map[string][]string) map[string][]string {
+	m := make(map[string][]string, len(headers))
+	for k, vs := range headers {
+		tmp := make([]string, len(vs))
+		copy(tmp, vs)
+		m[k] = tmp
+	}
+	return m
+}
+
+// CloneRequestParams 返回接收到的请求参数的副本
+func CloneRequestParams(params map[string]string) map[string]string {
+	m := make(map[string]string, len(params))
+	for k, v := range params {
+		m[k] = v
+	}
+	return m
+}
+
 func (r *Request) GeneratePath(URLPattern string) {
 	if len(r.Params) == 0 {
 		r.Path = URLPattern

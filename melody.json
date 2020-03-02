@@ -15,7 +15,7 @@
   "timeout": "3000ms",
   "cache_ttl": "300s",
   "output_encoding": "json",
-  "port": 8080,
+  "port": 8000,
   "endpoints": [
     {
       "endpoint": "/user/info/{id}/{name}",
@@ -81,8 +81,24 @@
         {
           "url_pattern": "/person",
           "encoding": "json",
-          "extra_config": {},
+          "extra_config": {
+
+          },
           "method": "GET",
+          "host": [
+            "127.0.0.1:8080"
+          ]
+        },
+        {
+          "url_pattern": "/person/2",
+          "encoding": "json",
+          "extra_config": {
+            "melody_proxy": {
+              "shadow": true
+            }
+          },
+          "method": "GET",
+          "group": "aaa",
           "host": [
             "127.0.0.1:8080"
           ]

@@ -275,7 +275,7 @@ backend: [{
 
 ```
 - Level: [Endpoint]
-- Status: 刚开始
+- Status: 完成
 
 ## 14.melody-ratelimit juju-proxy
 - Describe: backend层流量限制
@@ -295,4 +295,25 @@ backend: [{
 
 ```
 - Level: [Backend]
-- Status: 刚开始
+- Status: 将要完成
+
+
+## 15.melody_proxy shadow
+- Describe: 按照正常情况请求后端，但屏蔽该backend的数据回应
+- Namespace: `melody_ratelimit_proxy`
+- Struct:
+```
+	...
+	"extra_config": {
+		...
+        "melody_proxy": {
+            "shadow": true
+        }
+		...
+	},
+	...
+
+```
+- Level: [Backend]
+- Status: 完成
+
