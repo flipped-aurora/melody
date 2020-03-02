@@ -26,7 +26,7 @@ func writeToDot(writer io.Writer, config config.ServiceConfig, cmd *cobra.Comman
 	t := template.New("dot")
 	var buf bytes.Buffer
 	if err := template.Must(t.Parse(tmplGraph)).Execute(&buf, config); err != nil {
-		cmd.Printf("ERROR convert data to dot error:", err)
+		cmd.Println("ERROR convert data to dot error:", err)
 	}
 	buf.WriteTo(writer)
 }
