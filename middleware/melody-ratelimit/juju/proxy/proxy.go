@@ -10,23 +10,23 @@ import (
 	"melody/middleware/melody-ratelimit/juju"
 )
 
-// Namespace is the key to use to store and access the custom config data for the proxy
+// Namespace 命名空间
 const Namespace = "melody_ratelimit_proxy"
 
-// Config is the custom config struct containing the params for the limiter
+// Config 是包含限定符参数的自定义配置结构
 type Config struct {
 	MaxRate  float64
 	Capacity int64
 }
 
-// BackendFactory adds a ratelimiting middleware wrapping the internal factory
+// BackendFactory 添加了一个包装内部工厂的速率限制中间件
 func BackendFactory(next proxy.BackendFactory) proxy.BackendFactory {
 	return func(cfg *config.Backend) proxy.Proxy {
 		return NewMiddleware(cfg)(next(cfg))
 	}
 }
 
-// NewMiddleware builds a middleware based on the extra config params or fallbacks to the next proxy
+// NewMiddleware 基于对下一个代理的额外配置参数或回退构建中间件
 func NewMiddleware(remote *config.Backend) proxy.Middleware {
 	cfg := ConfigGetter(remote.ExtraConfig).(Config)
 	if cfg == ZeroCfg || cfg.MaxRate <= 0 {
@@ -46,11 +46,10 @@ func NewMiddleware(remote *config.Backend) proxy.Middleware {
 	}
 }
 
-// ZeroCfg is the zero value for the Config struct
+// ZeroCfg 是配置结构的空值
 var ZeroCfg = Config{}
 
-// ConfigGetter implements the config.ConfigGetter interface. It parses the extra config for the
-// rate adapter and returns a ZeroCfg if something goes wrong.
+//ConfigGetter 实现config.ConfigGetter接口。它解析速率适配器的额外配置，如果出了问题，则返回一个ZeroCfg。
 func ConfigGetter(e config.ExtraConfig) interface{} {
 	v, ok := e[Namespace]
 	if !ok {
