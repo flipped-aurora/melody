@@ -186,8 +186,8 @@ response:
 - Status: 基本实现
 
 
-## 9.melody-proxy
-- Describe: 代理时的一些配置
+## 9.melody-proxy(Endpoint)
+- Describe: 代理时的一些配置，针对Endpoint层请求
 - Namespace: `melody_proxy`
 - Struct:
 ```
@@ -298,20 +298,33 @@ backend: [{
 - Status: 将要完成
 
 
-## 15.melody_proxy shadow
-- Describe: 按照正常情况请求后端，但屏蔽该backend的数据回应
-- Namespace: `melody_ratelimit_proxy`
+## 15.melody_proxy(backend)
+- Describe: 作用于backend层的proxy，针对单个请求、响应
+- Namespace: `melody_proxy`
 - Struct:
 ```
-	...
-	"extra_config": {
-		...
-        "melody_proxy": {
-            "shadow": true
-        }
-		...
-	},
-	...
+"extra_config": {
+    "melody_proxy": {
+        // 按照正常情况请求后端，但屏蔽该backend的数据回应
+        "shadow": true,
+        // 针对单个banckend的response为数组的move、del操作
+        "flatmap_filter": [
+            {
+              "type": "move",
+              "args": [
+                "data.0.name",
+                "data.0.id"
+              ]
+            },
+            {
+              "type": "del",
+              "args": [
+                "data.0.name"
+              ]
+            }
+        ]
+    }
+},
 
 ```
 - Level: [Backend]
