@@ -7,3 +7,16 @@ package jose
 //JSON Web Encryption (JWE)：JSON Web加密（RFC7516），定义加密JWT的过程；
 //JSON Web Algorithm（JWA）：JSON Web算法（RFC7518），定义用于数字签名或加密的算法列表；
 //JSON Web Key (JWK)：JSON Web密钥（RFC7517），定义加密密钥和密钥集的表示方式；
+
+//import (
+//	"github.com/auth0-community/go-auth0"
+//	jose "gopkg.in/square/go-jose.v2"
+//	"gopkg.in/square/go-jose.v2/jwt"
+//	"net/http"
+//)
+//
+//type ExtractorFactory func(string) func(r *http.Request) (*jwt.JSONWebToken, error)
+//
+//func NewValidator(signatureConfig *SigntureConfig)  {
+//
+//}
