@@ -1,5 +1,5 @@
 {
-  "version": 2,
+  "version": 1,
   "extra_config": {
     "melody_http_server_handler": {
       "name": ["plugin_gologging"]

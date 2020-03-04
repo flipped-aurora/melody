@@ -16,7 +16,7 @@ const (
 	defaultPort                = 8080
 	defaultMaxIdleConnsPreHost = 250
 	defaultTimeout             = 2 * time.Second
-	CurrVersion                = 2
+	CurrVersion                = 1
 )
 
 var (
