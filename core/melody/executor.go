@@ -88,7 +88,7 @@ func NewExecutor(ctx context.Context) cmd.Executor {
 
 		//TODO 10. 集成JWT，注册RejecterFactory
 
-		_ := jose.ChainedRejecterFactory([]jose.RejecterFactory{
+		_ = jose.ChainedRejecterFactory([]jose.RejecterFactory{
 			jose.RejecterFactoryFunc(func(_ logging.Logger, _ *config.EndpointConfig) jose.Rejecter {
 				return jose.RejecterFunc(rejecter.RejectToken)
 			}),
