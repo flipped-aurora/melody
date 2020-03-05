@@ -11,6 +11,11 @@ type Factory interface {
 	New(cfg *config.EndpointConfig) (Proxy, error)
 }
 
+type FactoryFunc func(*config.EndpointConfig) (Proxy, error)
+
+// New implements the Factory interface
+func (f FactoryFunc) New(cfg *config.EndpointConfig) (Proxy, error) { return f(cfg) }
+
 type defaultFactory struct {
 	backendFactory    BackendFactory
 	logger            logging.Logger

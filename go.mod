@@ -35,6 +35,7 @@ require (
 	github.com/tmthrgd/go-popcount v0.0.0-20190904054823-afb1ace8b04f // indirect
 	github.com/unrolled/secure v1.0.7
 	github.com/valyala/fastrand v1.0.0
+	github.com/xeipuuv/gojsonschema v1.2.0
 	go.opencensus.io v0.22.3
 	golang.org/x/crypto v0.0.0-20191011191535-87dc89f01550 // indirect
 	golang.org/x/sys v0.0.0-20200219091948-cb0a6d8edb6c // indirect
