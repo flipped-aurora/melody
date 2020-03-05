@@ -6,11 +6,17 @@ import (
 	"strings"
 )
 
+const flatmapKey = "flatmap_filter"
+
 type EntityFormatter interface {
 	Format(Response) Response
 }
 
 type propertyFilter func(*Response)
+
+type EntityFormatterFunc func(Response) Response
+
+func (e EntityFormatterFunc) Format(entity Response) Response { return e(entity) }
 
 type entityFormatter struct {
 	Target         string
@@ -59,6 +65,9 @@ func NewEntityFormatter(remote *config.Backend) EntityFormatter {
 	}
 	 */
 	//TODO 创建flatMapFormatter对象
+	if entityFormatter := newFlatmapFormatter(remote); entityFormatter != nil {
+		return entityFormatter
+	}
 	/**
 	2. 返回结果为key : 对象
 	{
@@ -73,7 +82,7 @@ func NewEntityFormatter(remote *config.Backend) EntityFormatter {
 	}
 
 	mappings := make(map[string]string, len(remote.Mapping))
-	for k, v := range mappings {
+	for k, v := range remote.Mapping {
 		mappings[k] = v
 	}
 
@@ -83,6 +92,49 @@ func NewEntityFormatter(remote *config.Backend) EntityFormatter {
 		PropertyFilter: propertyFilter,
 		Mapping:        mappings,
 	}
+}
+
+func newFlatmapFormatter(remote *config.Backend) EntityFormatter {
+	if v, ok := remote.ExtraConfig[Namespace]; ok {
+		if e, ok := v.(map[string]interface{}); ok {
+			if a, ok := e[flatmapKey].([]interface{}); ok {
+				if len(a) == 0 {
+					return nil
+				}
+				options := []flatmapOp{}
+				for _, o := range a {
+					m, ok := o.(map[string]interface{})
+					if !ok {
+						continue
+					}
+					op := flatmapOp{}
+					if t, ok := m["type"].(string); ok {
+						op.Type = t
+					} else {
+						continue
+					}
+					if args, ok := m["args"].([]interface{}); ok {
+						op.Args = make([][]string, len(args))
+						for k, arg := range args {
+							if t, ok := arg.(string); ok {
+								op.Args[k] = strings.Split(t, ".")
+							}
+						}
+					}
+					options = append(options, op)
+				}
+				if len(options) == 0 {
+					return nil
+				}
+				return &flatmapFormatter{
+					Target: remote.Target,
+					Prefix: remote.Group,
+					Ops:    options,
+				}
+			}
+		}
+	}
+	return nil
 }
 
 func newWhitelistingFilter(whitelist []string) propertyFilter {
@@ -211,7 +263,7 @@ func extractTarget(target string, entity *Response) {
 }
 
 func (f flatmapFormatter) processOps(entity *Response) {
-	tree, err := tree.New(&entity)
+	tree, err := tree.New(entity.Data)
 	if err != nil {
 		return
 	}

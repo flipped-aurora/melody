@@ -9,6 +9,7 @@ import (
 	bloomfilter "melody/middleware/melody-bloomfilter"
 	gelf "melody/middleware/melody-gelf"
 	gologging "melody/middleware/melody-gologging"
+	jose "melody/middleware/melody-jose"
 	logstash "melody/middleware/melody-logstash"
 	metrics "melody/middleware/melody-metrics/gin"
 	melodyrouter "melody/router"
@@ -80,30 +81,29 @@ func NewExecutor(ctx context.Context) cmd.Executor {
 		//TODO 8. 集成opencensus
 
 		// 9. 集成bloomFilter
-		_, err = bloomfilter.Register(ctx, "melody-bf", cfg, logger, reg)
+		rejecter, err := bloomfilter.Register(ctx, "melody-bf", cfg, logger, reg)
 		if err != nil {
 			logger.Warning("bloomFilter:", err.Error())
 		}
 
-		//TODO 10. 集成JWT，注册RejecterFactory
-
-		//tokenRejecterFactory := jose.ChainedRejecterFactory([]jose.RejecterFactory{
-		//	jose.RejecterFactoryFunc(func(_ logging.Logger, _ *config.EndpointConfig) jose.Rejecter {
-		//		return jose.RejecterFunc(rejecter.RejectToken)
-		//	}),
-		//	jose.RejecterFactoryFunc(func(l logging.Logger, cfg *config.EndpointConfig) jose.Rejecter {
-		//		if r := cel.NewRejecter(l, cfg); r != nil {
-		//			return r
-		//		}
-		//		return jose.FixedRejecter(false)
-		//	}),
-		//})
+		// 10. 集成JWT，注册RejecterFactory
+		tokenRejecterFactory := jose.ChainedRejecterFactory([]jose.RejecterFactory{
+			jose.RejecterFactoryFunc(func(_ logging.Logger, _ *config.EndpointConfig) jose.Rejecter {
+				return jose.RejecterFunc(rejecter.RejectToken)
+			}),
+			//jose.RejecterFactoryFunc(func(l logging.Logger, cfg *config.EndpointConfig) jose.Rejecter {
+			//	if r := cel.NewRejecter(l, cfg); r != nil {
+			//		return r
+			//	}
+			//	return jose.FixedRejecter(false)
+			//}),
+		})
 
 		//TODO 11. Set up melody Router
 		routerFactory := router.NewFactory(router.Config{
 			Engine:         NewEngine(cfg, logger, gelfWriter),
 			ProxyFactory:   NewProxyFactory(logger, NewBackendFactoryWithContext(ctx, logger, m)),
-			HandlerFactory: NewHandlerFactory(logger),
+			HandlerFactory: NewHandlerFactory(logger, tokenRejecterFactory),
 			MiddleWares:    []gin.HandlerFunc{},
 			Logger:         logger,
 			RunServer:      router.RunServerFunc(server.New(logger, melodyrouter.DefaultRunServer)),

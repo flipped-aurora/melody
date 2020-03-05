@@ -4,6 +4,7 @@ go 1.13
 
 require (
 	github.com/PuerkitoBio/goquery v1.5.1 // indirect
+	github.com/auth0-community/go-auth0 v1.0.0
 	github.com/clbanning/mxj v1.8.4
 	github.com/coreos/etcd v3.3.13+incompatible
 	github.com/devopsfaith/flatmap v0.0.0-20190628155411-90b768d6668b
@@ -44,4 +45,5 @@ require (
 	google.golang.org/grpc v1.27.1 // indirect
 	gopkg.in/Graylog2/go-gelf.v2 v2.0.0-20191017102106-1550ee647df0
 	gopkg.in/ini.v1 v1.51.1 // indirect
+	gopkg.in/square/go-jose.v2 v2.4.1
 )

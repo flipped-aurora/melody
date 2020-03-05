@@ -148,7 +148,7 @@ func TestConfig_init(t *testing.T) {
 	}
 
 	subject := ServiceConfig{
-		Version:   2,
+		Version:   1,
 		Timeout:   5 * time.Second,
 		CacheTTL:  30 * time.Minute,
 		Host:      []string{"http://127.0.0.1:8080"},
@@ -210,7 +210,7 @@ func TestConfig_init_NoBackends(t *testing.T) {
 	}
 
 	subject := ServiceConfig{
-		Version:   2,
+		Version:   1,
 		Timeout:   5 * time.Second,
 		CacheTTL:  30 * time.Minute,
 		Host:      []string{"http://127.0.0.1:8080"},

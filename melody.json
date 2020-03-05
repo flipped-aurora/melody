@@ -1,5 +1,5 @@
 {
-  "version": 2,
+  "version": 1,
   "extra_config": {
     "melody_http_server_handler": {
       "name": ["plugin_gologging"]
@@ -172,7 +172,32 @@
           "url_pattern": "roles",
           "encoding": "json",
           "sd": "static",
-          "extra_config": {},
+          "extra_config": {
+            "melody_proxy": {
+              "flatmap_filter": [
+                {
+                  "type": "move",
+                  "args": [
+                    "data.0.ID",
+                    "data.0.role_id"
+                  ]
+                },
+                {
+                  "type": "move",
+                  "args": [
+                    "data.0.CreatedAt",
+                    "data.0.create_at"
+                  ]
+                },
+                {
+                  "type": "del",
+                  "args": [
+                    "data.1.roleName"
+                  ]
+                }
+              ]
+            }
+          },
           "group": "roles",
           "method": "GET",
           "host": [
