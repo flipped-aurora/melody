@@ -59,7 +59,6 @@ dependency-reduced-pom.xml
 buildNumber.properties
 .mvn/timing.properties
 melody.exe
-melody
 *.out
 *.cover
 .cover/

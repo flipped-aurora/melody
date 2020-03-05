@@ -70,10 +70,21 @@
     },
     {
       "endpoint": "/get-person",
-      "method": "GET",
+      "method": "POST",
       "extra_config": {
-        "melody_ratelimit_router": {
-          "maxRate": 1
+          "melody_jsonschema": {
+            "type": "object",
+            "properties": {
+                "city": { "type": "string" },
+                "number": { "type": "number" },
+                "user": { 
+                    "type": "object",
+                    "properties": {
+                        "name" : {"type": "string"},
+                        "age" : {"type": "number"}
+                    }                       
+                }
+            }
         }
       },
       "output_encoding": "json",

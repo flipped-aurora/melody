@@ -3,6 +3,7 @@ package melody
 import (
 	"melody/logging"
 	"melody/proxy"
+	jsonschema "melody/middleware/melody-jsonschema"
 )
 
 func NewProxyFactory(logger logging.Logger, backend proxy.BackendFactory) proxy.Factory {
@@ -10,6 +11,7 @@ func NewProxyFactory(logger logging.Logger, backend proxy.BackendFactory) proxy.
 	// TODO 与其他服务集成
 	proxyFactory := proxy.NewDefaultFactory(backend, logger)
 	proxyFactory = proxy.NewShadowFactory(proxyFactory)
+	proxyFactory = jsonschema.ProxyFactory(proxyFactory)
 	return proxyFactory
 
 }

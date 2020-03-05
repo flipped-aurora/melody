@@ -6,6 +6,7 @@ import (
 	"log"
 	"os"
 	"strings"
+	"io/ioutil"
 )
 
 // Logger show logging information with level
@@ -41,6 +42,8 @@ var (
 		"ERROR":    LEVEL_ERROR,
 		"CRITICAL": LEVEL_CRITICAL,
 	}
+	// NoOp is the NO-OP logger
+	NoOp, _ = NewLogger("CRITICAL", ioutil.Discard, "")
 )
 
 //NewLogger returns a base logger

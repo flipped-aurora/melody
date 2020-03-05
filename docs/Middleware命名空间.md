@@ -330,3 +330,41 @@ backend: [{
 - Level: [Backend]
 - Status: 完成
 
+## 16.melody_jsonschema
+- Describe: 验证请求体中的json参数是否符合规则
+- Namespace: `melody_jsonschema`
+- Struct:
+```
+      "endpoint": "/get-person",
+      "method": "POST",
+      "extra_config": {
+          "melody_jsonschema": {
+            "type": "object",
+            "properties": {
+                "city": { "type": "string" },
+                "number": { "type": "number" },
+                "user": { 
+                    "type": "object",
+                    "properties": {
+                        "name" : {"type": "string"},
+                        "age" : {"type": "number"}
+                    }                       
+                }
+            }
+        }
+      },
+
+```
+- jsonCase:
+```
+{
+    "city" : "123", 
+    "number": 20, 
+    "user" : {
+        "name":"Alex", 
+        "age":20
+        }
+}
+```
+- Level: [endpoint]
+- Status: 完成
