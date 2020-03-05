@@ -5,17 +5,18 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"melody/config"
+	"melody/logging"
+	"melody/proxy"
 	"net/http"
 	"net/http/httptest"
 	"strings"
 	"time"
 
-	krakendjose "github.com/devopsfaith/krakend-jose"
-	"github.com/devopsfaith/krakend/config"
-	"github.com/devopsfaith/krakend/logging"
-	"github.com/devopsfaith/krakend/proxy"
-	ginkrakend "github.com/devopsfaith/krakend/router/gin"
+	melodyjose "melody/middleware/melody-jose"
+
 	"github.com/gin-gonic/gin"
+	melodygin "melody/router/gin"
 )
 
 func Example_RS256() {
@@ -93,7 +94,7 @@ func Example_HS256_cookie() {
 	defer server.Close()
 
 	sCfg := newSignerEndpointCfg("HS256", "sim2", server.URL)
-	_, signer, _ := krakendjose.NewSigner(sCfg, nil)
+	_, signer, _ := melodyjose.NewSigner(sCfg, nil)
 	verifierCfg := newVerifierEndpointCfg("HS256", server.URL, []string{"role_a"})
 
 	externalTokenIssuer := func(rw http.ResponseWriter, req *http.Request) {
@@ -118,7 +119,7 @@ func Example_HS256_cookie() {
 
 	buf := new(bytes.Buffer)
 	logger, _ := logging.NewLogger("DEBUG", buf, "")
-	hf := HandlerFactory(ginkrakend.EndpointHandler, logger, nil)
+	hf := HandlerFactory(melodygin.EndpointHandler, logger, nil)
 
 	gin.SetMode(gin.TestMode)
 	engine := gin.New()
@@ -153,7 +154,7 @@ func Example_HS256_cookie() {
 func runValidationCycle(signerEndpointCfg, validatorEndpointCfg *config.EndpointConfig) {
 	buf := new(bytes.Buffer)
 	logger, _ := logging.NewLogger("DEBUG", buf, "")
-	hf := HandlerFactory(ginkrakend.EndpointHandler, logger, nil)
+	hf := HandlerFactory(melodygin.EndpointHandler, logger, nil)
 
 	gin.SetMode(gin.TestMode)
 	engine := gin.New()
@@ -163,7 +164,7 @@ func runValidationCycle(signerEndpointCfg, validatorEndpointCfg *config.Endpoint
 	engine.GET("/", hf(&config.EndpointConfig{
 		Timeout:  time.Second,
 		Endpoint: "/private",
-		Backend: []*config.Backend{
+		Backends: []*config.Backend{
 			{
 				URLPattern: "/",
 				Host:       []string{"http://example.com/"},
@@ -250,7 +251,7 @@ func newSignerEndpointCfg(alg, ID, URL string) *config.EndpointConfig {
 		Timeout:  time.Second,
 		Endpoint: "/token",
 		Method:   "POST",
-		Backend: []*config.Backend{
+		Backends: []*config.Backend{
 			{
 				URLPattern: "/token",
 				Host:       []string{"http://example.com/"},
@@ -258,7 +259,7 @@ func newSignerEndpointCfg(alg, ID, URL string) *config.EndpointConfig {
 			},
 		},
 		ExtraConfig: config.ExtraConfig{
-			krakendjose.SignerNamespace: map[string]interface{}{
+			melodyjose.SignerNamespace: map[string]interface{}{
 				"alg":                  alg,
 				"kid":                  ID,
 				"jwk-url":              URL,
@@ -274,7 +275,7 @@ func newVerifierEndpointCfg(alg, URL string, roles []string) *config.EndpointCon
 	return &config.EndpointConfig{
 		Timeout:  time.Second,
 		Endpoint: "/private",
-		Backend: []*config.Backend{
+		Backends: []*config.Backend{
 			{
 				URLPattern: "/",
 				Host:       []string{"http://example.com/"},
@@ -282,7 +283,7 @@ func newVerifierEndpointCfg(alg, URL string, roles []string) *config.EndpointCon
 			},
 		},
 		ExtraConfig: config.ExtraConfig{
-			krakendjose.ValidatorNamespace: map[string]interface{}{
+			melodyjose.ValidatorNamespace: map[string]interface{}{
 				"alg":                  alg,
 				"jwk-url":              URL,
 				"audience":             []string{"http://api.example.com"},

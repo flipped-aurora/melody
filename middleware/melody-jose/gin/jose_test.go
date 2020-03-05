@@ -3,16 +3,15 @@ package gin
 import (
 	"bytes"
 	"context"
+	"github.com/gin-gonic/gin"
 	"io/ioutil"
+	"melody/logging"
+	"melody/proxy"
+	melodygin "melody/router/gin"
 	"net/http"
 	"net/http/httptest"
 	"strings"
 	"testing"
-
-	"github.com/devopsfaith/krakend/logging"
-	"github.com/devopsfaith/krakend/proxy"
-	ginkrakend "github.com/devopsfaith/krakend/router/gin"
-	"github.com/gin-gonic/gin"
 )
 
 func TestTokenSignatureValidator(t *testing.T) {
@@ -48,7 +47,7 @@ func TestTokenSignatureValidator(t *testing.T) {
 
 	buf := new(bytes.Buffer)
 	logger, _ := logging.NewLogger("DEBUG", buf, "")
-	hf := HandlerFactory(ginkrakend.EndpointHandler, logger, nil)
+	hf := HandlerFactory(melodygin.EndpointHandler, logger, nil)
 
 	gin.SetMode(gin.TestMode)
 	engine := gin.New()
