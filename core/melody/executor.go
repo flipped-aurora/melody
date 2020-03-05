@@ -86,9 +86,8 @@ func NewExecutor(ctx context.Context) cmd.Executor {
 			logger.Warning("bloomFilter:", err.Error())
 		}
 
-		//TODO 10. 集成JWT，注册RejecterFactory
-
-		_ = jose.ChainedRejecterFactory([]jose.RejecterFactory{
+		// 10. 集成JWT，注册RejecterFactory
+		tokenRejecterFactory := jose.ChainedRejecterFactory([]jose.RejecterFactory{
 			jose.RejecterFactoryFunc(func(_ logging.Logger, _ *config.EndpointConfig) jose.Rejecter {
 				return jose.RejecterFunc(rejecter.RejectToken)
 			}),
@@ -104,7 +103,7 @@ func NewExecutor(ctx context.Context) cmd.Executor {
 		routerFactory := router.NewFactory(router.Config{
 			Engine:         NewEngine(cfg, logger, gelfWriter),
 			ProxyFactory:   NewProxyFactory(logger, NewBackendFactoryWithContext(ctx, logger, m)),
-			HandlerFactory: NewHandlerFactory(logger),
+			HandlerFactory: NewHandlerFactory(logger, tokenRejecterFactory),
 			MiddleWares:    []gin.HandlerFunc{},
 			Logger:         logger,
 			RunServer:      router.RunServerFunc(server.New(logger, melodyrouter.DefaultRunServer)),
