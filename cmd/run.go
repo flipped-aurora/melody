@@ -8,6 +8,7 @@ import (
 func runFunc(cmd *cobra.Command, args []string) {
 	if cfgFilePath == "" {
 		cmd.Println("Please provide the path to your melody config file ")
+		return
 	}
 	//Parse config file
 	serviceConfig, err := parser.Parse(cfgFilePath)
