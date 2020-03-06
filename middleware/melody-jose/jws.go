@@ -116,7 +116,7 @@ func NewSigner(cfg *config.EndpointConfig, te auth0.RequestTokenExtractor) (*Sig
 		return signerCfg, nopSigner, err
 	}
 	if key.IsPublic() {
-		// TODO: we should not sign with a public key
+		// TODO: 不用公钥签名
 	}
 	signingKey := jose.SigningKey{
 		Algorithm: jose.SignatureAlgorithm(signerCfg.Alg),

@@ -24,6 +24,8 @@ func HandlerFactory(hf melodygin.HandlerFactory, logger logging.Logger, rejecter
 func TokenSigner(hf melodygin.HandlerFactory, logger logging.Logger) melodygin.HandlerFactory {
 	return func(cfg *config.EndpointConfig, prxy proxy.Proxy) gin.HandlerFunc {
 		signerCfg, signer, err := melodyjose.NewSigner(cfg, nil)
+		// 如果是签名接口 则返回签名后的 token
+		// 如果不是签名接口 则判断是否需要签名 和 签名的正确性
 		if err == melodyjose.ErrNoSignerCfg {
 			logger.Info("JOSE: singer disabled for the endpoint", cfg.Endpoint)
 			return hf(cfg, prxy)
@@ -74,7 +76,7 @@ func TokenSignatureValidator(hf melodygin.HandlerFactory, logger logging.Logger,
 		rejecter := rejecterF.New(logger, cfg)
 
 		handler := hf(cfg, prxy)
-		scfg, err := melodyjose.GetSignatureConfig(cfg)
+		signatureCfg, err := melodyjose.GetSignatureConfig(cfg)
 		if err == melodyjose.ErrNoValidatorCfg {
 			logger.Info("JOSE: validator disabled for the endpoint", cfg.Endpoint)
 			return handler
@@ -84,14 +86,14 @@ func TokenSignatureValidator(hf melodygin.HandlerFactory, logger logging.Logger,
 			return handler
 		}
 
-		validator, err := melodyjose.NewValidator(scfg, FromCookie)
+		validator, err := melodyjose.NewValidator(signatureCfg, FromCookie)
 		if err != nil {
 			log.Fatalf("%s: %s", cfg.Endpoint, err.Error())
 		}
 
 		var aclCheck func(string, map[string]interface{}, []string) bool
 
-		if strings.Contains(scfg.RolesKey, ".") {
+		if strings.Contains(signatureCfg.RolesKey, ".") {
 			aclCheck = melodyjose.CanAccessNested
 		} else {
 			aclCheck = melodyjose.CanAccess
@@ -118,7 +120,7 @@ func TokenSignatureValidator(hf melodygin.HandlerFactory, logger logging.Logger,
 				return
 			}
 
-			if !aclCheck(scfg.RolesKey, claims, scfg.Roles) {
+			if !aclCheck(signatureCfg.RolesKey, claims, signatureCfg.Roles) {
 				c.AbortWithStatus(http.StatusForbidden)
 				return
 			}
