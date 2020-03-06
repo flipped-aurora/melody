@@ -31,8 +31,8 @@ func writeToDot(writer io.Writer, config config.ServiceConfig, cmd *cobra.Comman
 	buf.WriteTo(writer)
 }
 
-const tmplGraph = `digraph krakend { {{ $port := .Port }}
-    label="KrakenD Gateway";
+const tmplGraph = `digraph melody { {{ $port := .Port }}
+    label="Melody Gateway";
     labeljust="l";
     fontname="Ubuntu";
     fontsize="13";
