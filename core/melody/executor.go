@@ -52,7 +52,7 @@ func NewExecutor(ctx context.Context) cmd.Executor {
 
 			if enableGologgingError != nil {
 				// 2.3 默认使用基础Log  Level:Debug, Output:stdout, Prefix: ""
-				logger, err := logging.NewLogger("DEBUG", os.Stdout, "")
+				logger, err = logging.NewLogger("DEBUG", os.Stdout, "")
 				if err != nil {
 					return
 				}
