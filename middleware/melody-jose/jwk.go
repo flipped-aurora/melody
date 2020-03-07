@@ -141,7 +141,7 @@ func (d *Dialer) DialTLS(network, addr string) (net.Conn, error) {
 	}
 	connState := c.ConnectionState()
 	keyPinValid := false
-	// 指纹是 证书的PKIX格式DER编码 的 sha256 散列码
+	// 指纹是 证书里公钥的sha256散列码
 	for _, peerCert := range connState.PeerCertificates {
 		der, err := x509.MarshalPKIXPublicKey(peerCert.PublicKey)
 		hash := sha256.Sum256(der)
@@ -150,7 +150,7 @@ func (d *Dialer) DialTLS(network, addr string) (net.Conn, error) {
 		}
 		for _, fingerprint := range d.fingerprints {
 			if bytes.Compare(hash[0:], fingerprint) == 0 {
-				keyPinValid = true
+				keyPinValid = true // 证书合法
 				break
 			}
 		}

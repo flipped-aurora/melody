@@ -75,7 +75,7 @@ func TokenSignatureValidator(hf melodygin.HandlerFactory, logger logging.Logger,
 		}
 		rejecter := rejecterF.New(logger, cfg)
 
-		handler := hf(cfg, prxy)
+		handler := hf(cfg, prxy) // 完成juju的准备工作
 		signatureCfg, err := melodyjose.GetSignatureConfig(cfg)
 		if err == melodyjose.ErrNoValidatorCfg {
 			logger.Info("JOSE: validator disabled for the endpoint", cfg.Endpoint)
