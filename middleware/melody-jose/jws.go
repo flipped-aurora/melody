@@ -71,30 +71,13 @@ func GetSignatureConfig(cfg *config.EndpointConfig) (*SignatureConfig, error) {
 	return res, nil
 }
 
-// uri = https://xxx   disableJWKSecurity = true
-func getSignerConfig(cfg *config.EndpointConfig) (*SignerConfig, error) {
-	tmp, ok := cfg.ExtraConfig[SignerNamespace]
-	if !ok {
-		return nil, ErrNoSignerCfg
-	}
-	data, _ := json.Marshal(tmp)
-	res := new(SignerConfig)
-	if err := json.Unmarshal(data, &res); err != nil {
-		return nil, err
-	}
-	if !strings.HasPrefix(res.URI, "https://") && !res.DisableJWKSecurity {
-		return res, ErrInsecureJWKSource
-	}
-	return res, nil
-}
-
 func NewSigner(cfg *config.EndpointConfig, te auth0.RequestTokenExtractor) (*SignerConfig, Signer, error) {
 	signerCfg, err := getSignerConfig(cfg)
 	if err != nil {
 		return signerCfg, nopSigner, err
 	}
 
-	// base64 decode
+	// 查看指纹是否格式正确
 	decodedFs, err := DecodeFingerprints(signerCfg.Fingerprints)
 	if err != nil {
 		return signerCfg, nopSigner, err
@@ -136,6 +119,23 @@ func NewSigner(cfg *config.EndpointConfig, te auth0.RequestTokenExtractor) (*Sig
 		return signerCfg, fullSerializeSigner{signer{s}}.Sign, nil
 	}
 	return signerCfg, compactSerializeSigner{signer{s}}.Sign, nil
+}
+
+// uri = https://xxx   disableJWKSecurity = true
+func getSignerConfig(cfg *config.EndpointConfig) (*SignerConfig, error) {
+	tmp, ok := cfg.ExtraConfig[SignerNamespace]
+	if !ok {
+		return nil, ErrNoSignerCfg
+	}
+	data, _ := json.Marshal(tmp)
+	res := new(SignerConfig)
+	if err := json.Unmarshal(data, &res); err != nil {
+		return nil, err
+	}
+	if !strings.HasPrefix(res.URI, "https://") && !res.DisableJWKSecurity {
+		return res, ErrInsecureJWKSource
+	}
+	return res, nil
 }
 
 type Signer func(interface{}) (string, error)
