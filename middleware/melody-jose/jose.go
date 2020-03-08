@@ -11,7 +11,7 @@ package jose
 import (
 	"fmt"
 	"github.com/auth0-community/go-auth0"
-	jose "gopkg.in/square/go-jose.v2"
+	"gopkg.in/square/go-jose.v2"
 	"gopkg.in/square/go-jose.v2/jwt"
 	"melody/proxy"
 	"net/http"
