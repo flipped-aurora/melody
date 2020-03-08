@@ -3,7 +3,6 @@ package gin
 import (
 	"context"
 	"fmt"
-	"log"
 	"melody/config"
 	"melody/logging"
 	melodyjose "melody/middleware/melody-jose"
@@ -88,7 +87,7 @@ func TokenSignatureValidator(hf melodygin.HandlerFactory, logger logging.Logger,
 
 		validator, err := melodyjose.NewValidator(signatureCfg, FromCookie)
 		if err != nil {
-			log.Fatalf("%s: %s", cfg.Endpoint, err.Error())
+			logger.Fatal("%s: %s", cfg.Endpoint, err.Error())
 		}
 
 		var aclCheck func(string, map[string]interface{}, []string) bool
