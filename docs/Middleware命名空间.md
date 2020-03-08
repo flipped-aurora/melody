@@ -368,3 +368,56 @@ backend: [{
 ```
 - Level: [endpoint]
 - Status: 完成
+
+## 17.melody_jose_validator
+- Describe: 验证token
+- Namespace: `melody_ratelimit_proxy`
+- Struct:
+```
+	...
+	"extra_config": {
+        "melody_jose_validator": {
+          "alg": "HS256",
+          "cipher_suites": [
+            47
+          ],
+          "cache": true,
+          "jwk-url": "https://www.test.com/public",
+          "issuer": "god",
+          "roles": [
+            "admin"
+          ],
+          "audience": [
+            "http://api.test.com"
+          ],
+          "roles_key": "roles",
+          "cookie_key": "token",
+          "jwk_fingerprints": [
+            "fingerprintts"
+          ]
+        },
+		...
+	},
+	...
+```
+- Level: [Endpoint]
+- Status: 完成
+
+## 17.melody_jose_signer
+- Describe: 对token签名
+- Namespace: `melody_jose_signer`
+- Struct:
+```
+	...
+	"extra_config": {
+        "melody_jose_signer": {
+          "alg": "HS256",
+          "jwk-url": "https://www.test.com/private",
+          "kid": "keyID"
+        },
+		...
+	},
+	...
+```
+- Level: [Endpoint]
+- Status: 完成
