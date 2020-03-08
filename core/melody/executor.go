@@ -99,7 +99,7 @@ func NewExecutor(ctx context.Context) cmd.Executor {
 			//}),
 		})
 
-		//TODO 11. Set up melody Router
+		//11. Set up melody Router
 		routerFactory := router.NewFactory(router.Config{
 			Engine:         NewEngine(cfg, logger, gelfWriter),
 			ProxyFactory:   NewProxyFactory(logger, NewBackendFactoryWithContext(ctx, logger, m)),
