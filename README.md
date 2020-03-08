@@ -9,12 +9,13 @@ High Quality API Getaway with middlewares - help you to sort out your complex ap
 [![Go Report Card](https://goreportcard.com/badge/github.com/granty1/melody)](https://goreportcard.com/report/github.com/granty1/melody)
 
 ## Resource
-
-document source repository:https://github.com/granty1/melody-docs
-document :https://granty1.github.io/melody-docs
-web source repository:https://github.com/granty1/melody-web
-web :https://granty1.github.io/melody-web/
-test api repository:https://github.com/granty1/gin-gorm-jwt-quick-start
+|name|path|
+|--|--|
+|document source repository|https://github.com/granty1/melody-docs|
+|document|https://granty1.github.io/melody-docs|
+|web source repository|https://github.com/granty1/melody-web|
+|web|https://granty1.github.io/melody-web/|
+|test api repository|https://github.com/granty1/gin-gorm-jwt-quick-start|
 
 ## Version
 Melody 1.0
