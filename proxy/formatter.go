@@ -64,7 +64,7 @@ func NewEntityFormatter(remote *config.Backend) EntityFormatter {
 		"a": []
 	}
 	 */
-	//TODO 创建flatMapFormatter对象
+	// 创建flatMapFormatter对象
 	if entityFormatter := newFlatmapFormatter(remote); entityFormatter != nil {
 		return entityFormatter
 	}
