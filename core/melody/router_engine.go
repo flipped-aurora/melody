@@ -5,6 +5,7 @@ import (
 	"melody/config"
 	"melody/logging"
 
+	botmonitor "melody/middleware/melody-botmonitor/gin"
 	cors "melody/middleware/melody-cors/gin"
 	httpsecure "melody/middleware/melody-httpsecure/gin"
 
@@ -32,6 +33,7 @@ func NewEngine(cfg config.ServiceConfig, logger logging.Logger, gelf io.Writer) 
 		logger.Warning(err)
 	}
 	//TODO lua register
-	//TODO botdetector register
+	//botmonitor middleware
+	botmonitor.Register(cfg, logger, engine)
 	return engine
 }

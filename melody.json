@@ -70,22 +70,16 @@
     },
     {
       "endpoint": "/get-person",
-      "method": "POST",
+      "method": "GET",
       "extra_config": {
-          "melody_jsonschema": {
-            "type": "object",
-            "properties": {
-                "city": { "type": "string" },
-                "number": { "type": "number" },
-                "user": { 
-                    "type": "object",
-                    "properties": {
-                        "name" : {"type": "string"},
-                        "age" : {"type": "number"}
-                    }                       
-                }
-            }
-        }
+        "melody_botmonitor": {
+          "blacklist": ["Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:73.0) Gecko/20100101 Firefox/73.0", "b"],
+          "patterns": [
+              "(Mozilla/5.0).*",
+              "(d)/.*"
+          ],
+          "cacheSize": 0
+      }
       },
       "output_encoding": "json",
       "backends": [
@@ -110,6 +104,20 @@
           },
           "method": "GET",
           "group": "aaa",
+          "host": [
+            "127.0.0.1:8080"
+          ]
+        },
+        {
+          "url_pattern": "/person/3",
+          "encoding": "json",
+          "extra_config": {
+            "melody_proxy": {
+              "shadow": true
+            }
+          },
+          "method": "GET",
+          "group": "bbb",
           "host": [
             "127.0.0.1:8080"
           ]

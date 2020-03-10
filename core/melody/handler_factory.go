@@ -2,6 +2,7 @@ package melody
 
 import (
 	"melody/logging"
+	botmonitor "melody/middleware/melody-botmonitor/gin"
 	jose "melody/middleware/melody-jose"
 	ginjose "melody/middleware/melody-jose/gin"
 	juju "melody/middleware/melody-ratelimit/juju/router/gin"
@@ -15,5 +16,6 @@ func NewHandlerFactory(logger logging.Logger, rejecter jose.RejecterFactory) rou
 	handlerFactory := router.EndpointHandler
 	handlerFactory = juju.NewRateLimiterMw(handlerFactory)
 	handlerFactory = ginjose.HandlerFactory(handlerFactory, logger, rejecter)
+	handlerFactory = botmonitor.New(handlerFactory, logger)
 	return handlerFactory
 }
