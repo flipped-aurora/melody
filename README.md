@@ -11,9 +11,11 @@ High Quality API Getaway with middlewares - help you to sort out your complex ap
 ## Resource
 |name|path|
 |--|--|
-|document source repository|https://github.com/granty1/melody-docs|
+|document repository|https://github.com/granty1/melody-docs|
 |document|https://granty1.github.io/melody-docs|
-|web source repository|https://github.com/granty1/melody-web|
+|online config repository|https://github.com/granty1/melody-config|
+|online config|https://granty1.github.io/melody-config|
+|web repository|https://github.com/granty1/melody-web|
 |web|https://granty1.github.io/melody-web/|
 |test api repository|https://github.com/granty1/gin-gorm-jwt-quick-start|
 
