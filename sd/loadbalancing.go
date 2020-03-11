@@ -8,19 +8,18 @@ import (
 	"github.com/valyala/fastrand"
 )
 
-// Balancer applies a balancing stategy in order to select the backend host to be used
+// Balancer 用一个负载均衡策略去选择使用哪一个backend
 type Balancer interface {
 	Host() (string, error)
 }
 
-// ErrNoHosts is the error the balancer must return when there are 0 hosts ready
 var ErrNoHosts = errors.New("no hosts available")
 
-// NewBalancer returns the best perfomant balancer depending on the number of available processors.
-// If GOMAXPROCS = 1, it returns a round robin LB due there is no contention over the atomic counter.
-// If GOMAXPROCS > 1, it returns a pseudo random LB optimized for scaling over the number of CPUs.
+// NewBalancer 按照可用 processors 的数量来返回最合适的 balancer
+// If GOMAXPROCS = 1, 返回一个轮询LB，因为原子计数器没有竞争
+// If GOMAXPROCS > 1, 返回基于CPU数量而优化的伪随机LB
 func NewBalancer(subscriber Subscriber) Balancer {
-	if p := runtime.GOMAXPROCS(-1); p == 1 {
+	if p := runtime.GOMAXPROCS(-1); p == 1 { // runtime.GOMAXPROCS 返回可同时执行的最大CPU数
 		return NewRoundRobinLB(subscriber)
 	}
 	return NewRandomLB(subscriber)
@@ -48,11 +47,12 @@ func (r *roundRobinLB) Host() (string, error) {
 	if err != nil {
 		return "", err
 	}
+	// atomic.AddUint64 原子性的将val的值添加到*addr并返回新值
 	offset := (atomic.AddUint64(&r.counter, 1) - 1) % uint64(len(hosts))
 	return hosts[offset], nil
 }
 
-// NewRandomLB returns a new balancer using a fastrand pseudorandom generator
+// NewRandomLB 使用 fastrand 伪随机数生成器
 func NewRandomLB(subscriber Subscriber) Balancer {
 	if s, ok := subscriber.(FixedSubscriber); ok && len(s) == 1 {
 		return nopBalancer(s[0])
