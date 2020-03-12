@@ -22,6 +22,7 @@ require (
 	github.com/prometheus/procfs v0.0.10 // indirect
 	github.com/rcrowley/go-metrics v0.0.0-20190826022208-cac0b30c2563
 	github.com/rs/cors v1.7.0
+	github.com/sony/gobreaker v0.4.1
 	github.com/spf13/afero v1.2.2 // indirect
 	github.com/spf13/cast v1.3.1 // indirect
 	github.com/spf13/cobra v0.0.5

@@ -422,7 +422,7 @@ backend: [{
 - Level: [Endpoint]
 - Status: 完成
 
-## 17.melody_jose_signer
+## 18.melody_botmonitor
 - Describe: 机器人探测器
 - Namespace: `melody_botmonitor`
 - Struct:
@@ -442,4 +442,24 @@ backend: [{
 	...
 ```
 - Level: [Endpoint、ServiceConfig]
+- Status: 完成
+
+
+## 19.melody_circuitbreaker
+- Describe: 断路器
+- Namespace: `melody_circuitbreaker`
+- Struct:
+```
+"melody_circuitbreaker": {
+    // 给定时间间隔(秒)
+    "interval": 60,
+    // 等待时间窗口(秒)
+    "timeout": 10,
+    // 连续故障数
+    "maxErrors": 1,
+    // 断路器状态改变时，是否log
+    "logStatusChange": true
+}
+```
+- Level: [Backend]
 - Status: 完成
