@@ -12,6 +12,14 @@ import (
 	"melody/proxy"
 )
 
+func TestBackendFactory(t *testing.T) {
+	BackendFactory(func(backend *config.Backend) proxy.Proxy {
+		return func(ctx context.Context, request *proxy.Request) (response *proxy.Response, err error) {
+			return nil, nil
+		}
+	}, gologging.MustGetLogger("proxy_test"))
+}
+
 func TestNewMiddleware_multipleNext(t *testing.T) {
 	defer func() {
 		if r := recover(); r != proxy.ErrTooManyProxies {
