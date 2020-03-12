@@ -5,6 +5,7 @@ import (
 	"melody/config"
 	"melody/logging"
 	circuitbreaker "melody/middleware/melody-circuitbreaker/proxy"
+	juju "melody/middleware/melody-ratelimit/juju/proxy/gin"
 	metrics "melody/middleware/melody-metrics/gin"
 	"melody/proxy"
 	"melody/transport/http/client"
@@ -17,6 +18,7 @@ func NewBackendFactoryWithContext(ctx context.Context, logger logging.Logger, me
 	backendFactory := func(backend *config.Backend) proxy.Proxy {
 		return proxy.NewHTTPProxyWithHTTPRequestExecutor(backend, httpRequestExecutor, backend.Decoder)
 	}
+	backendFactory = juju.BackendFactory(backendFactory)
 	// 使用断路器
 	backendFactory = circuitbreaker.BackendFactory(backendFactory, logger)
 	return backendFactory
