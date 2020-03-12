@@ -13,7 +13,9 @@ import (
 func NewBackendFactoryWithContext(ctx context.Context, logger logging.Logger, metrics *metrics.Metrics) proxy.BackendFactory {
 	clientFactory := client.NewHTTPClient
 	httpRequestExecutor := client.DefaultHTTPRequestExecutor(clientFactory)
-	return func(backend *config.Backend) proxy.Proxy {
+	backendFactory := func(backend *config.Backend) proxy.Proxy {
 		return proxy.NewHTTPProxyWithHTTPRequestExecutor(backend, httpRequestExecutor, backend.Decoder)
 	}
+
+	return backendFactory
 }
