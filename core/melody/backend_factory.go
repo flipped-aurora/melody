@@ -5,8 +5,8 @@ import (
 	"melody/config"
 	"melody/logging"
 	circuitbreaker "melody/middleware/melody-circuitbreaker/proxy"
-	juju "melody/middleware/melody-ratelimit/juju/proxy/gin"
 	metrics "melody/middleware/melody-metrics/gin"
+	juju "melody/middleware/melody-ratelimit/juju/proxy"
 	"melody/proxy"
 	"melody/transport/http/client"
 )
