@@ -75,7 +75,7 @@
 - Struct:
 ```
 "melody_metrics": {
-    proxy_disable     bool
+    proxy_disabled     bool
     router_disabled   bool
     backend_disabled  bool
     endpoint_disabled bool

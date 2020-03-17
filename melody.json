@@ -2,7 +2,9 @@
   "version": 1,
   "extra_config": {
     "melody_http_server_handler": {
-      "name": ["plugin_gologging"]
+      "name": [
+        "plugin_gologging"
+      ]
     },
     "melody_gologging": {
       "level": "DEBUG",
@@ -10,6 +12,13 @@
       "syslog": false,
       "stdout": true,
       "format": "default"
+    },
+    "melody_metrics": {
+      "proxy_disable": false,
+      "router_disabled": false,
+      "backend_disabled": false,
+      "endpoint_disabled": false,
+      "collection_time": "60s"
     }
   },
   "timeout": "3000ms",
@@ -73,22 +82,23 @@
       "method": "GET",
       "extra_config": {
         "melody_botmonitor": {
-          "blacklist": ["Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:73.0) Gecko/20100101 Firefox/73.0", "b"],
+          "blacklist": [
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:73.0) Gecko/20100101 Firefox/73.0",
+            "b"
+          ],
           "patterns": [
-              "(Mozilla/5.0).*",
-              "(d)/.*"
+            "(Mozilla/5.0).*",
+            "(d)/.*"
           ],
           "cacheSize": 0
-      }
+        }
       },
       "output_encoding": "json",
       "backends": [
         {
           "url_pattern": "/person",
           "encoding": "json",
-          "extra_config": {
-
-          },
+          "extra_config": {},
           "method": "GET",
           "host": [
             "127.0.0.1:8080"
@@ -142,6 +152,12 @@
           "sd": "static",
           "extra_config": {},
           "method": "GET",
+          "mapping": {
+            "name": "user_name"
+          },
+          "blacklist": [
+            "id"
+          ],
           "host": [
             "127.0.0.1:8001"
           ]
@@ -166,7 +182,9 @@
         "melody_proxy": {
           "sequential": true,
           "static": {
-            "strategy": ["success"],
+            "strategy": [
+              "success"
+            ],
             "data": {
               "static": [
                 {
@@ -181,7 +199,6 @@
               ]
             }
           }
-
         }
       },
       "output_encoding": "json",
@@ -220,7 +237,8 @@
           "group": "roles",
           "method": "GET",
           "host": [
-            "127.0.0.1:8001"
+            "127.0.0.1:8001",
+            "127.0.0.1:8002"
           ]
         },
         {
@@ -232,6 +250,33 @@
           "group": "static_data",
           "host": [
             "127.0.0.1:7777"
+          ]
+        }
+      ]
+    },
+    {
+      "endpoint": "/newpage",
+      "backends": [
+        {
+          "url_pattern": "/page",
+          "target": "page",
+          "host": [
+            "http://127.0.0.1:8001"
+          ]
+        }
+      ]
+    },
+    {
+      "endpoint": "/list",
+      "backends": [
+        {
+          "url_pattern": "/pages",
+          "is_collection": "true",
+          "mapping": {
+            "collection": "list"
+          },
+          "host": [
+            "http://127.0.0.1:8001"
           ]
         }
       ]
