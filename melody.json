@@ -81,53 +81,20 @@
       "endpoint": "/get-person",
       "method": "GET",
       "extra_config": {
-        "melody_botmonitor": {
-          "blacklist": [
-            "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:73.0) Gecko/20100101 Firefox/73.0",
-            "b"
-          ],
-          "patterns": [
-            "(Mozilla/5.0).*",
-            "(d)/.*"
-          ],
-          "cacheSize": 0
-        }
       },
       "output_encoding": "json",
       "backends": [
         {
           "url_pattern": "/person",
           "encoding": "json",
-          "extra_config": {},
-          "method": "GET",
-          "host": [
-            "127.0.0.1:8080"
-          ]
-        },
-        {
-          "url_pattern": "/person/2",
-          "encoding": "json",
           "extra_config": {
-            "melody_proxy": {
-              "shadow": true
+            "header.Modifier": {
+              "scope": ["request", "response"],
+              "name": "X-Martian",
+              "value": "true"
             }
           },
           "method": "GET",
-          "group": "aaa",
-          "host": [
-            "127.0.0.1:8080"
-          ]
-        },
-        {
-          "url_pattern": "/person/3",
-          "encoding": "json",
-          "extra_config": {
-            "melody_proxy": {
-              "shadow": true
-            }
-          },
-          "method": "GET",
-          "group": "bbb",
           "host": [
             "127.0.0.1:8080"
           ]
