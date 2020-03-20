@@ -5,6 +5,7 @@ import (
 	"melody/config"
 	"melody/logging"
 	circuitbreaker "melody/middleware/melody-circuitbreaker/proxy"
+	martian "melody/middleware/melody-martian"
 	metrics "melody/middleware/melody-metrics/gin"
 	juju "melody/middleware/melody-ratelimit/juju/proxy"
 	"melody/proxy"
@@ -18,6 +19,7 @@ func NewBackendFactoryWithContext(ctx context.Context, logger logging.Logger, me
 	backendFactory := func(backend *config.Backend) proxy.Proxy {
 		return proxy.NewHTTPProxyWithHTTPRequestExecutor(backend, httpRequestExecutor, backend.Decoder)
 	}
+	backendFactory = martian.NewBackendFactory(logger, httpRequestExecutor)
 	backendFactory = juju.BackendFactory(backendFactory)
 	// 使用断路器
 	backendFactory = circuitbreaker.BackendFactory(backendFactory, logger)

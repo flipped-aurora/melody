@@ -88,10 +88,26 @@
           "url_pattern": "/person",
           "encoding": "json",
           "extra_config": {
-            "header.Modifier": {
-              "scope": ["request", "response"],
-              "name": "X-Martian",
-              "value": "true"
+            "melody_martian": {
+              "fifo.Group": {
+                "scope": ["request", "response"],
+                "aggregateErrors": true,
+                "modifiers": [
+                    {
+                        "body.Modifier": {
+                            "scope": ["request","response"],
+                            "body": "eyJtc2ciOiJ5b3Ugcm9jayEifQ=="
+                        }
+                    },
+                    {
+                      "header.Modifier": {
+                        "scope": ["request","response"],
+                        "name": "YUHN-ZHNAG",
+                        "value": "true"
+                      }
+                    }
+                ]
+            }
             }
           },
           "method": "GET",
