@@ -21,7 +21,7 @@ const (
 )
 
 var (
-	DefaultPattern           = ` %{time:2006/01/02 - 15:04:05.000} %{color}▶ %{level:.6s}%{color:reset} %{message}`
+	DefaultPattern           = `%{time:2006/01/02 - 15:04:05.000} %{color}▶ %{level:.6s}%{color:reset} %{message}`
 	LogstashPattern          = `{"@timestamp":"%{time:200-01-02T15:04:05.000+00:00}", "@version": 1, "level": "%{level}", "message": "%{message}", "module": "%{module}"}`
 	ActivePattren            = DefaultPattern
 	ErrorWrongConfig         = fmt.Errorf("not found extra config about melody-gologging module")
