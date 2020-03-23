@@ -76,7 +76,7 @@ func NewExecutor(ctx context.Context) cmd.Executor {
 		// 5.注册etcd, dns srv,并返回func to register consul
 		reg := RegisterSubscriberFactories(ctx, cfg, logger)
 		// 6.创建Metrics监控
-		m := metrics.New(ctx, cfg.ExtraConfig, logger)
+		metricsController := metrics.New(ctx, cfg.ExtraConfig, logger)
 		//TODO 7. 集成influxdb
 		//TODO 8. 集成opencensus
 
@@ -102,8 +102,8 @@ func NewExecutor(ctx context.Context) cmd.Executor {
 		//11. Set up melody Router
 		routerFactory := router.NewFactory(router.Config{
 			Engine:         NewEngine(cfg, logger, gelfWriter),
-			ProxyFactory:   NewProxyFactory(logger, NewBackendFactoryWithContext(ctx, logger, m)),
-			HandlerFactory: NewHandlerFactory(logger, tokenRejecterFactory),
+			ProxyFactory:   NewProxyFactory(logger, NewBackendFactoryWithContext(ctx, logger, metricsController), metricsController),
+			HandlerFactory: NewHandlerFactory(logger, tokenRejecterFactory, metricsController),
 			MiddleWares:    []gin.HandlerFunc{},
 			Logger:         logger,
 			RunServer:      router.RunServerFunc(server.New(logger, melodyrouter.DefaultRunServer)),

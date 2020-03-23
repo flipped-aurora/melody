@@ -21,7 +21,7 @@ require (
 	github.com/pelletier/go-toml v1.6.0 // indirect
 	github.com/prometheus/client_golang v1.4.1 // indirect
 	github.com/prometheus/procfs v0.0.10 // indirect
-	github.com/rcrowley/go-metrics v0.0.0-20190826022208-cac0b30c2563
+	github.com/rcrowley/go-metrics v0.0.0-20200313005456-10cdbea86bc0
 	github.com/rs/cors v1.7.0
 	github.com/sony/gobreaker v0.4.1
 	github.com/spf13/afero v1.2.2 // indirect

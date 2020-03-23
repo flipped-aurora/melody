@@ -5,8 +5,11 @@ import (
 	"melody/config"
 	"melody/logging"
 	metrics "melody/middleware/melody-metrics"
+	"melody/proxy"
+	melodygin "melody/router/gin"
 	"net/http"
 	"os"
+	"strconv"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -16,6 +19,13 @@ import (
 // Metrics 定义了包装计数器
 type Metrics struct {
 	*metrics.Metrics
+}
+
+type ginResponseWriter struct {
+	gin.ResponseWriter
+	name string
+	begin time.Time
+	rm *metrics.RouterMetrics
 }
 
 // New 返回一个基础的计数控制器
@@ -72,3 +82,40 @@ func (m *Metrics) NewEngine() *gin.Engine {
 func (m *Metrics) NewExpHandler() gin.HandlerFunc {
 	return gin.WrapH(exp.ExpHandler(*m.Registry))
 }
+
+func (m *Metrics) NewHTTPHandleFactory(handleFactory melodygin.HandlerFactory) melodygin.HandlerFactory {
+	if m.Config == nil || m.Config.RouterDisabled {
+		return handleFactory
+	}
+	return NewHTTPHandleFactory(m.Router, handleFactory)
+}
+
+func NewHTTPHandleFactory(routerMetrics *metrics.RouterMetrics, handleFactory melodygin.HandlerFactory) melodygin.HandlerFactory {
+	return func(endpointConfig *config.EndpointConfig, proxy proxy.Proxy) gin.HandlerFunc {
+		next := handleFactory(endpointConfig, proxy)
+		routerMetrics.RegisterResponseWriterMetrics(endpointConfig.Endpoint)
+		return func(c *gin.Context) {
+			rw := &ginResponseWriter{
+				ResponseWriter: c.Writer,
+				name:           endpointConfig.Endpoint,
+				begin:          time.Now(),
+				rm:             routerMetrics,
+			}
+			c.Writer = rw
+
+			next(c)
+
+			rw.end()
+			routerMetrics.Disconnection()
+		}
+	}
+}
+
+func (gw *ginResponseWriter) end() {
+	duration := time.Since(gw.begin)
+	gw.rm.Counter("response", gw.name, "status", strconv.Itoa(gw.Status()), "count").Inc(1)
+	gw.rm.Histogram("response", gw.name, "size").Update(int64(gw.Size()))
+	gw.rm.Histogram("response", gw.name, "time").Update(int64(duration))
+}
+
+

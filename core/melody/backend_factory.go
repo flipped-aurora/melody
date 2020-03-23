@@ -23,5 +23,6 @@ func NewBackendFactoryWithContext(ctx context.Context, logger logging.Logger, me
 	backendFactory = juju.BackendFactory(backendFactory)
 	// 使用断路器
 	backendFactory = circuitbreaker.BackendFactory(backendFactory, logger)
+	backendFactory = metrics.NewBackendFactory("backend", backendFactory)
 	return backendFactory
 }

@@ -2,16 +2,17 @@ package melody
 
 import (
 	"melody/logging"
-	"melody/proxy"
 	jsonschema "melody/middleware/melody-jsonschema"
+	metrics "melody/middleware/melody-metrics/gin"
+	"melody/proxy"
 )
 
-func NewProxyFactory(logger logging.Logger, backend proxy.BackendFactory) proxy.Factory {
+func NewProxyFactory(logger logging.Logger, backend proxy.BackendFactory, metrics *metrics.Metrics) proxy.Factory {
 	// 完成了默认的ProxyFactory
-	// TODO 与其他服务集成
 	proxyFactory := proxy.NewDefaultFactory(backend, logger)
 	proxyFactory = proxy.NewShadowFactory(proxyFactory)
 	proxyFactory = jsonschema.ProxyFactory(proxyFactory)
+	proxyFactory = metrics.NewProxyFactory("endpoint", proxyFactory)
 	return proxyFactory
 
 }

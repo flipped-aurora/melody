@@ -18,11 +18,12 @@ const (
 
 var (
 	percentiles = []float64{0.1, 0.25, 0.5, 0.75, 0.9, 0.95, 0.99}
+	defaultSample = func() metrics.Sample { return metrics.NewUniformSample(1028) }
 )
 
 // Config metrics 服务默认配置
 type Config struct {
-	ProxyDisable     bool
+	ProxyDisabled     bool
 	RouterDisabled   bool
 	BackendDisabled  bool
 	CollectionTime   time.Duration
@@ -155,7 +156,7 @@ func GetConfig(e config.ExtraConfig) interface{} {
 		}
 	}
 
-	config.ProxyDisable = getBool(temp, "proxy_disabled")
+	config.ProxyDisabled = getBool(temp, "proxy_disabled")
 	config.RouterDisabled = getBool(temp, "router_disabled")
 	config.BackendDisabled = getBool(temp, "backend_disabled")
 	config.EndpointDisabled = getBool(temp, "endpoint_disabled")
