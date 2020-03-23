@@ -463,3 +463,20 @@ backend: [{
 ```
 - Level: [Backend]
 - Status: 完成
+
+## 20.melody_influxdb
+- Describe: 集成influxDB，将Metrics收集到的数据写到influxDB
+- Namespace: `melody_influxdb`
+- Struct:
+```
+"melody_influxdb": {
+  "address": "http://localhost:8086",
+  "username": "",
+  "password": "",
+  "buffer_size": 4096,
+  "ttl": "5s",
+  "time_out": "5s"
+}
+```
+- Level: [ServiceConfig]
+- Status: 完成

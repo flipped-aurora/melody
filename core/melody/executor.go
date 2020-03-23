@@ -9,6 +9,7 @@ import (
 	bloomfilter "melody/middleware/melody-bloomfilter"
 	gelf "melody/middleware/melody-gelf"
 	gologging "melody/middleware/melody-gologging"
+	influxdb "melody/middleware/melody-influxdb"
 	jose "melody/middleware/melody-jose"
 	logstash "melody/middleware/melody-logstash"
 	metrics "melody/middleware/melody-metrics/gin"
@@ -78,6 +79,9 @@ func NewExecutor(ctx context.Context) cmd.Executor {
 		// 6.创建Metrics监控
 		metricsController := metrics.New(ctx, cfg.ExtraConfig, logger)
 		//TODO 7. 集成influxdb
+		if err := influxdb.Register(ctx, cfg.ExtraConfig, metricsController, logger); err != nil {
+			logger.Warning(err)
+		}
 		//TODO 8. 集成opencensus
 
 		// 9. 集成bloomFilter

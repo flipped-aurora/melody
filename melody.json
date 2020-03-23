@@ -14,6 +14,14 @@
       "backend_disabled": false,
       "endpoint_disabled": false,
       "collection_time": "60s"
+    },
+    "melody_influxdb": {
+      "address": "http://localhost:8086",
+      "username": "",
+      "password": "",
+      "buffer_size": 4096,
+      "ttl": "5s",
+      "time_out": "5s"
     }
   },
   "timeout": "3000ms",

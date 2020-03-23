@@ -124,6 +124,10 @@ func (m *Metrics) TakeSnapshot() Stats {
 	return sta
 }
 
+func (m *Metrics) GetSnapshot() Stats {
+	return m.latestSnapshot
+}
+
 // NewNullRegistry 返回一个Null registry
 func NewNullRegistry() metrics.Registry {
 	return &NullRegistry{}

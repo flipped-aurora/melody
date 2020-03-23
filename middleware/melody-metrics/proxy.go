@@ -61,7 +61,7 @@ func NewProxyMiddleware(layer, name string, pm *ProxyMetrics) proxy.Middleware {
 				complete := strconv.FormatBool(resp != nil && resp.IsComplete)
 				labels := "layer." + layer + ".name." + name + ".complete." + complete + ".error." + errored
 				pm.Counter("requests." + labels).Inc(1)
-				pm.Histogram("latency.").Update(duration)
+				pm.Histogram("latency." + labels).Update(duration)
 			}(time.Since(begin).Nanoseconds(), resp, err)
 
 			return resp, err
