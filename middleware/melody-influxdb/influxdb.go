@@ -68,9 +68,10 @@ func Register(ctx context.Context, extra config.ExtraConfig, metrics *ginmetrics
 		buf:        NewBuffer(config.bufferSize),
 	}
 
-	// Create melody data server
-	clientWrapper.runEndpoint(ctx, clientWrapper.newEngine(logger), logger)
-
+	if config.dataServerEnable {
+		// Create melody data server
+		clientWrapper.runEndpoint(ctx, clientWrapper.newEngine(logger), logger)
+	}
 
 	go clientWrapper.updateAndSendData(ctx, t.C)
 

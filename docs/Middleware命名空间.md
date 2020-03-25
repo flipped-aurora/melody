@@ -475,7 +475,8 @@ backend: [{
   "password": "",
   "buffer_size": 4096,
   "ttl": "5s",
-  "time_out": "5s"
+  "time_out": "5s",
+  "data_server_enable": true
 }
 ```
 - Level: [ServiceConfig]

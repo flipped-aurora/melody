@@ -23,6 +23,7 @@ type influxdbConfig struct {
 	db         string
 	bufferSize int
 	timeout    time.Duration
+	dataServerEnable bool
 }
 
 func getConfig(config config.ExtraConfig) interface{} {
@@ -50,6 +51,10 @@ func getConfig(config config.ExtraConfig) interface{} {
 
 	if value, ok := mapStruct["password"]; ok {
 		influx.password = value.(string)
+	}
+
+	if value, ok := mapStruct["data_server_enable"]; ok {
+		influx.dataServerEnable = value.(bool)
 	}
 
 	if value, ok := mapStruct["db"]; ok {
