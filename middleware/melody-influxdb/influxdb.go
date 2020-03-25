@@ -86,7 +86,7 @@ func (cw clientWrapper) runEndpoint(ctx context.Context, engine *gin.Engine, log
 	}
 
 	go func() {
-		logger.Info("melody data server listening in", defaultListenPort, "🎁")
+		logger.Info("melody data server listening on port:", defaultListenPort, "🎁")
 		logger.Error(server.ListenAndServe())
 	}()
 

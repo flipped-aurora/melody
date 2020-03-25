@@ -44,7 +44,7 @@ func (m *Metrics) RunEndpoint(c context.Context, engine *gin.Engine, logger logg
 	}
 
 	go func() {
-		logger.Info("metrics server listening in", m.Config.ListenAddr, "🎁")
+		logger.Info("metrics server listening on port:", m.Config.ListenAddr, "🎁")
 		logger.Error(server.ListenAndServe())
 	}()
 

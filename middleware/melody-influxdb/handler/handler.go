@@ -27,11 +27,11 @@ func Query(cli client.Client, logger logging.Logger) gin.HandlerFunc {
 		resp, err := cli.Query(client.NewQuery(q.Command, q.Database, q.Precision))
 		if err != nil || resp.Err != "" {
 			logger.Error("query influxdb error:", err, ", Err:", resp.Err)
-			c.JSON(http.StatusBadRequest, gin.H{"error": err})
+			c.JSON(http.StatusBadRequest, gin.H{"error": err, "Err": resp.Err})
 			return
 		}
 		logger.Debug("<- query success")
-		c.JSON(http.StatusOK, gin.H{"response": resp.Results})
+		c.JSON(http.StatusOK, resp.Results)
 		return
 	}
 }

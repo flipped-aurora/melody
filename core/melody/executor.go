@@ -65,7 +65,6 @@ func NewExecutor(ctx context.Context) cmd.Executor {
 			logger.Debug("use logstash as logger")
 		}
 
-		logger.Info("Melody server listening on port:", cfg.Port, "🎁")
 
 		//TODO 3.Start Reporter (暂时不做)
 
@@ -112,6 +111,8 @@ func NewExecutor(ctx context.Context) cmd.Executor {
 			Logger:         logger,
 			RunServer:      router.RunServerFunc(server.New(logger, melodyrouter.DefaultRunServer)),
 		})
+
+		logger.Info("melody server listening on port:", cfg.Port, "🎁")
 
 		routerFactory.NewWithContext(ctx).Run(cfg)
 
