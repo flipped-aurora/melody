@@ -20,8 +20,11 @@
       "username": "",
       "password": "",
       "buffer_size": 4096,
-      "ttl": "5s",
-      "time_out": "5s"
+      "ttl": "60s",
+      "time_out": "1s",
+      "data_server_enable": true,
+      "data_server_port": ":8080",
+      "data_server_query_enable": true
     }
   },
   "timeout": "3000ms",

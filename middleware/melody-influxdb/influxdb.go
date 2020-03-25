@@ -17,15 +17,14 @@ import (
 )
 
 var (
-	pingTimeOut = time.Second
-	defaultListenPort = ":8080"
+	pingTimeOut       = time.Second
 )
 
 type clientWrapper struct {
 	client     client.Client
 	collection *ginmetrics.Metrics
 	logger     logging.Logger
-	db         string
+	config     influxdbConfig
 	buf        *Buffer
 }
 
@@ -56,15 +55,13 @@ func Register(ctx context.Context, extra config.ExtraConfig, metrics *ginmetrics
 	}
 	logger.Debug("ping success to influx server with duration:", duration, " and message:", msg)
 
-
-
 	t := time.NewTicker(config.ttl)
 
 	clientWrapper := clientWrapper{
 		client:     influxClient,
 		collection: metrics,
 		logger:     logger,
-		db:         config.db,
+		config:     config,
 		buf:        NewBuffer(config.bufferSize),
 	}
 
@@ -82,12 +79,12 @@ func Register(ctx context.Context, extra config.ExtraConfig, metrics *ginmetrics
 
 func (cw clientWrapper) runEndpoint(ctx context.Context, engine *gin.Engine, logger logging.Logger) {
 	server := &http.Server{
-		Addr:              defaultListenPort,
-		Handler:           engine,
+		Addr:    cw.config.dataServerPort,
+		Handler: engine,
 	}
 
 	go func() {
-		logger.Info("melody data server listening on port:", defaultListenPort, "🎁")
+		logger.Info("melody data server listening on port:", cw.config.dataServerPort, "🎁")
 		logger.Error(server.ListenAndServe())
 	}()
 
@@ -110,7 +107,9 @@ func (cw clientWrapper) newEngine(logger logging.Logger) *gin.Engine {
 	// 例: /../fo -> /fo
 	engine.RedirectFixedPath = true
 	engine.HandleMethodNotAllowed = true
-	engine.POST("/query", handler.Query(cw.client, logger))
+	if cw.config.dataServerQueryEnable {
+		engine.POST("/query", handler.Query(cw.client, logger))
+	}
 
 	return engine
 }
@@ -138,7 +137,7 @@ func (cw clientWrapper) updateAndSendData(ctx context.Context, ticker <-chan tim
 
 		bp, _ := client.NewBatchPoints(client.BatchPointsConfig{
 			Precision: "s",
-			Database:  cw.db,
+			Database:  cw.config.db,
 		})
 		now := time.Unix(0, snapshot.Time)
 
@@ -169,7 +168,7 @@ func (cw clientWrapper) updateAndSendData(ctx context.Context, ticker <-chan tim
 		}
 
 		retryBatch, _ := client.NewBatchPoints(client.BatchPointsConfig{
-			Database:  cw.db,
+			Database:  cw.config.db,
 			Precision: "s",
 		})
 		retryBatch.AddPoints(pts)

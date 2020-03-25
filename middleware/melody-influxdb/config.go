@@ -10,6 +10,7 @@ const (
 	Namespace = "melody_influxdb"
 	defaultDB = "melody_data"
 	defaultAddress = "*:8086"
+	dataServerDefaultListenPort = ":8080"
 )
 
 var configErr = errors.New("load influx config error")
@@ -24,6 +25,8 @@ type influxdbConfig struct {
 	bufferSize int
 	timeout    time.Duration
 	dataServerEnable bool
+	dataServerPort string
+	dataServerQueryEnable bool
 }
 
 func getConfig(config config.ExtraConfig) interface{} {
@@ -55,6 +58,16 @@ func getConfig(config config.ExtraConfig) interface{} {
 
 	if value, ok := mapStruct["data_server_enable"]; ok {
 		influx.dataServerEnable = value.(bool)
+	}
+
+	if value, ok := mapStruct["data_server_query_enable"]; ok {
+		influx.dataServerQueryEnable = value.(bool)
+	}
+
+	if value, ok := mapStruct["data_server_port"]; ok || value != "" {
+		influx.dataServerPort = value.(string)
+	} else {
+		influx.dataServerPort = dataServerDefaultListenPort
 	}
 
 	if value, ok := mapStruct["db"]; ok {
