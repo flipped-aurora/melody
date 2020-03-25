@@ -78,7 +78,7 @@ func NewExecutor(ctx context.Context) cmd.Executor {
 		reg := RegisterSubscriberFactories(ctx, cfg, logger)
 		// 6.创建Metrics监控
 		metricsController := metrics.New(ctx, cfg.ExtraConfig, logger)
-		//TODO 7. 集成influxdb
+		//7. 集成influxdb
 		if err := influxdb.Register(ctx, cfg.ExtraConfig, metricsController, logger); err != nil {
 			logger.Warning(err)
 		}

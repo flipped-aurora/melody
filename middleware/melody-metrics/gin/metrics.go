@@ -8,7 +8,6 @@ import (
 	"melody/proxy"
 	melodygin "melody/router/gin"
 	"net/http"
-	"os"
 	"strconv"
 	"time"
 
@@ -45,17 +44,16 @@ func (m *Metrics) RunEndpoint(c context.Context, engine *gin.Engine, logger logg
 	}
 
 	go func() {
-		logger.Info("Metrics server listening in", m.Config.ListenAddr, "🎁")
+		logger.Info("metrics server listening in", m.Config.ListenAddr, "🎁")
 		logger.Error(server.ListenAndServe())
 	}()
 
 	go func() {
 		<-c.Done()
-		logger.Info("shutting down the stats handler")
+		logger.Info("shutting down the metrics server")
 		ctx, cancel := context.WithTimeout(c, time.Second)
 		server.Shutdown(ctx)
 		cancel()
-		os.Exit(1)
 	}()
 }
 

@@ -2,18 +2,24 @@ package influxdb
 
 import (
 	"context"
+	"github.com/gin-gonic/gin"
 	"github.com/influxdata/influxdb/client/v2"
 	"melody/config"
 	"melody/logging"
 	"melody/middleware/melody-influxdb/counter"
 	"melody/middleware/melody-influxdb/gauge"
+	"melody/middleware/melody-influxdb/handler"
 	"melody/middleware/melody-influxdb/histogram"
 	ginmetrics "melody/middleware/melody-metrics/gin"
+	"net/http"
 	"os"
 	"time"
 )
 
-var pingTimeOut = time.Second
+var (
+	pingTimeOut = time.Second
+	defaultListenPort = ":8080"
+)
 
 type clientWrapper struct {
 	client     client.Client
@@ -43,13 +49,14 @@ func Register(ctx context.Context, extra config.ExtraConfig, metrics *ginmetrics
 	}
 
 	// 开辟goroutine去检察influx server是否宕机
-	go func() {
-		duration, msg, err := influxClient.Ping(pingTimeOut)
-		if err != nil {
-			logger.Error("unable to ping influx server,", err.Error())
-		}
-		logger.Debug("ping success to influx server with duration:", duration, " and message:", msg)
-	}()
+	duration, msg, err := influxClient.Ping(pingTimeOut)
+	if err != nil {
+		logger.Error("unable to ping influx server,", err.Error())
+		return err
+	}
+	logger.Debug("ping success to influx server with duration:", duration, " and message:", msg)
+
+
 
 	t := time.NewTicker(config.ttl)
 
@@ -61,11 +68,50 @@ func Register(ctx context.Context, extra config.ExtraConfig, metrics *ginmetrics
 		buf:        NewBuffer(config.bufferSize),
 	}
 
+	// Create melody data server
+	clientWrapper.runEndpoint(ctx, clientWrapper.newEngine(logger), logger)
+
+
 	go clientWrapper.updateAndSendData(ctx, t.C)
 
 	logger.Debug("influx client run success")
 
 	return nil
+}
+
+func (cw clientWrapper) runEndpoint(ctx context.Context, engine *gin.Engine, logger logging.Logger) {
+	server := &http.Server{
+		Addr:              defaultListenPort,
+		Handler:           engine,
+	}
+
+	go func() {
+		logger.Info("melody data server listening in", defaultListenPort, "🎁")
+		logger.Error(server.ListenAndServe())
+	}()
+
+	go func() {
+		<-ctx.Done()
+		logger.Info("shutting down the melody data server")
+		c, cancel := context.WithTimeout(ctx, time.Second)
+		server.Shutdown(c)
+		cancel()
+	}()
+}
+
+func (cw clientWrapper) newEngine(logger logging.Logger) *gin.Engine {
+	gin.SetMode(gin.ReleaseMode)
+	engine := gin.New()
+
+	engine.Use(gin.Recovery())
+	// 例: /fo/ -> /fo
+	engine.RedirectTrailingSlash = true
+	// 例: /../fo -> /fo
+	engine.RedirectFixedPath = true
+	engine.HandleMethodNotAllowed = true
+	engine.POST("/query", handler.Query(cw.client, logger))
+
+	return engine
 }
 
 func (cw clientWrapper) updateAndSendData(ctx context.Context, ticker <-chan time.Time) {
