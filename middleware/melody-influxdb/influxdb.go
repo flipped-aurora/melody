@@ -8,8 +8,8 @@ import (
 	"melody/logging"
 	"melody/middleware/melody-influxdb/counter"
 	"melody/middleware/melody-influxdb/gauge"
-	"melody/middleware/melody-influxdb/handler"
 	"melody/middleware/melody-influxdb/histogram"
+	"melody/middleware/melody-influxdb/middleware"
 	ginmetrics "melody/middleware/melody-metrics/gin"
 	"net/http"
 	"os"
@@ -107,8 +107,10 @@ func (cw clientWrapper) newEngine(logger logging.Logger) *gin.Engine {
 	// 例: /../fo -> /fo
 	engine.RedirectFixedPath = true
 	engine.HandleMethodNotAllowed = true
+	engine.Use(middleware.Cors())
+	engine.POST("/ping", Ping(logger, cw.config))
 	if cw.config.dataServerQueryEnable {
-		engine.POST("/query", handler.Query(cw.client, logger))
+		engine.POST("/query", Query(cw.client, logger, cw.config))
 	}
 
 	return engine

@@ -13,14 +13,15 @@
       "router_disabled": false,
       "backend_disabled": false,
       "endpoint_disabled": false,
-      "collection_time": "60s"
+      "collection_time": "120s"
     },
     "melody_influxdb": {
       "address": "http://localhost:8086",
       "username": "",
       "password": "",
       "buffer_size": 4096,
-      "ttl": "60s",
+      "ttl": "120s",
+      "db": "test",
       "time_out": "1s",
       "data_server_enable": true,
       "data_server_port": ":8080",
@@ -91,34 +92,13 @@
       "output_encoding": "json",
       "backends": [
         {
-          "url_pattern": "/person",
+          "url_pattern": "/person/1/Grant",
           "encoding": "json",
           "extra_config": {
-            "melody_martian": {
-              "fifo.Group": {
-                "scope": ["request", "response"],
-                "aggregateErrors": true,
-                "modifiers": [
-                    {
-                        "body.Modifier": {
-                            "scope": ["request","response"],
-                            "body": "eyJtc2ciOiJ5b3Ugcm9jayEifQ=="
-                        }
-                    },
-                    {
-                      "header.Modifier": {
-                        "scope": ["request","response"],
-                        "name": "YUHN-ZHNAG",
-                        "value": "true"
-                      }
-                    }
-                ]
-            }
-            }
           },
           "method": "GET",
           "host": [
-            "127.0.0.1:8080"
+            "127.0.0.1:8001"
           ]
         }
       ]
@@ -226,8 +206,7 @@
           "group": "roles",
           "method": "GET",
           "host": [
-            "127.0.0.1:8001",
-            "127.0.0.1:8002"
+            "127.0.0.1:8001"
           ]
         },
         {
@@ -248,7 +227,6 @@
       "backends": [
         {
           "url_pattern": "/page",
-          "target": "page",
           "host": [
             "http://127.0.0.1:8001"
           ]
@@ -266,6 +244,17 @@
           },
           "host": [
             "http://127.0.0.1:8001"
+          ]
+        }
+      ]
+    },
+    {
+      "endpoint": "/ping",
+      "backends": [
+        {
+          "url_pattern": "/__debug/bar",
+          "host": [
+            "127.0.0.1:8000"
           ]
         }
       ]
