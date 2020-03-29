@@ -3,6 +3,7 @@ package influxdb
 import (
 	"context"
 	"github.com/gin-gonic/gin"
+	"github.com/gorilla/websocket"
 	"github.com/influxdata/influxdb/client/v2"
 	"melody/config"
 	"melody/logging"
@@ -10,14 +11,16 @@ import (
 	"melody/middleware/melody-influxdb/gauge"
 	"melody/middleware/melody-influxdb/histogram"
 	"melody/middleware/melody-influxdb/middleware"
+	"melody/middleware/melody-influxdb/ws"
 	ginmetrics "melody/middleware/melody-metrics/gin"
 	"net/http"
+	"net/url"
 	"os"
 	"time"
 )
 
 var (
-	pingTimeOut       = time.Second
+	pingTimeOut = time.Second
 )
 
 type clientWrapper struct {
@@ -47,7 +50,7 @@ func Register(ctx context.Context, extra config.ExtraConfig, metrics *ginmetrics
 		return err
 	}
 
-	// 开辟goroutine去检察influx server是否宕机
+	// 检察influx server是否宕机
 	duration, msg, err := influxClient.Ping(pingTimeOut)
 	if err != nil {
 		logger.Error("unable to ping influx server,", err.Error())
@@ -68,6 +71,9 @@ func Register(ctx context.Context, extra config.ExtraConfig, metrics *ginmetrics
 	if config.dataServerEnable {
 		// Create melody data server
 		clientWrapper.runEndpoint(ctx, clientWrapper.newEngine(logger), logger)
+
+		// Create melody data websocket server
+		clientWrapper.runWebSocketServer(ctx, logger)
 	}
 
 	go clientWrapper.updateAndSendData(ctx, t.C)
@@ -75,6 +81,24 @@ func Register(ctx context.Context, extra config.ExtraConfig, metrics *ginmetrics
 	logger.Debug("influx client run success")
 
 	return nil
+}
+
+func (cw clientWrapper) runWebSocketServer(ctx context.Context, logger logging.Logger) {
+	upgrader := websocket.Upgrader{
+		CheckOrigin: func(r *http.Request) bool {
+			return true
+		},
+	}
+	http.HandleFunc("/test", ws.Test(upgrader, logger))
+
+	go func() {
+		u := url.URL{
+			Scheme: "ws",
+			Host:   "localhost:8002",
+		}
+		logger.Debug("melody data websocket server run on ", u.String(), "🎁")
+		logger.Error(http.ListenAndServe(dataServerDefaultWebSocketPort, nil))
+	}()
 }
 
 func (cw clientWrapper) runEndpoint(ctx context.Context, engine *gin.Engine, logger logging.Logger) {

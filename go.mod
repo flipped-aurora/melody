@@ -12,6 +12,7 @@ require (
 	github.com/go-contrib/uuid v1.2.0
 	github.com/golang/groupcache v0.0.0-20200121045136-8c9f03a8e57e // indirect
 	github.com/google/martian v2.1.0+incompatible
+	github.com/gorilla/websocket v1.4.2
 	github.com/hashicorp/consul v1.5.1
 	github.com/hashicorp/consul/api v1.1.0
 	github.com/hashicorp/golang-lru v0.5.0
