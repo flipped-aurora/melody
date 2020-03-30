@@ -70,7 +70,7 @@ func Register(ctx context.Context, extra config.ExtraConfig, metrics *ginmetrics
 
 	if config.dataServerEnable {
 		// Create melody data server
-		clientWrapper.runEndpoint(ctx, clientWrapper.newEngine(logger), logger)
+		clientWrapper.runEndpoint(ctx, clientWrapper.newEngine(), logger)
 
 		// Create melody data websocket server
 		clientWrapper.runWebSocketServer(ctx, logger)
@@ -89,12 +89,20 @@ func (cw clientWrapper) runWebSocketServer(ctx context.Context, logger logging.L
 			return true
 		},
 	}
-	http.HandleFunc("/test", ws.Test(upgrader, logger))
+
+	wsc := ws.WebSocketClient{
+		Client:   cw.client,
+		Upgrader: upgrader,
+		Logger:   cw.logger,
+		DB:       cw.config.db,
+	}
+
+	http.HandleFunc("/debug/num/gc", wsc.GetDebugNumGC())
 
 	go func() {
 		u := url.URL{
 			Scheme: "ws",
-			Host:   "localhost:8002",
+			Host:   dataServerDefaultWebSocketPort,
 		}
 		logger.Debug("melody data websocket server run on ", u.String(), "🎁")
 		logger.Error(http.ListenAndServe(dataServerDefaultWebSocketPort, nil))
@@ -121,7 +129,7 @@ func (cw clientWrapper) runEndpoint(ctx context.Context, engine *gin.Engine, log
 	}()
 }
 
-func (cw clientWrapper) newEngine(logger logging.Logger) *gin.Engine {
+func (cw clientWrapper) newEngine() *gin.Engine {
 	gin.SetMode(gin.ReleaseMode)
 	engine := gin.New()
 
@@ -132,9 +140,9 @@ func (cw clientWrapper) newEngine(logger logging.Logger) *gin.Engine {
 	engine.RedirectFixedPath = true
 	engine.HandleMethodNotAllowed = true
 	engine.Use(middleware.Cors())
-	engine.POST("/ping", Ping(logger, cw.config))
+	engine.POST("/ping", cw.Ping())
 	if cw.config.dataServerQueryEnable {
-		engine.POST("/query", Query(cw.client, logger, cw.config))
+		engine.POST("/query", cw.Query())
 	}
 
 	return engine
