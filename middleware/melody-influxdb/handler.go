@@ -5,6 +5,7 @@ import (
 	"melody/middleware/melody-influxdb/response"
 	"melody/middleware/melody-influxdb/ws"
 	"net/http"
+	"time"
 )
 
 const (
@@ -21,7 +22,7 @@ type AuthConfig struct {
 	Password string `json:"password"`
 }
 
-func (cw clientWrapper) Query() gin.HandlerFunc {
+func (cw *clientWrapper) Query() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var q query
 		if err := c.ShouldBindJSON(&q); err != nil {
@@ -42,22 +43,45 @@ func (cw clientWrapper) Query() gin.HandlerFunc {
 	}
 }
 
-func (cw clientWrapper) Ping() gin.HandlerFunc {
+func (cw *clientWrapper) Ping() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var con AuthConfig
 		err := c.ShouldBindJSON(&con)
 		if err != nil {
-			cw.logger.Debug("parse request body to query object error:", err)
+			cw.logger.Error("parse request body to query object error:", err)
 			response.Ok(c, requestFailCode, "parse request body error", nil)
 			return
 		}
 
 		if con.Username != cw.config.password || con.Password != cw.config.password {
-			cw.logger.Debug("influx db username or password incorrect")
+			cw.logger.Error("influx db username or password incorrect")
 			response.Ok(c, requestFailCode, "username or password incorrect", nil)
 			return
 		}
 
 		response.Ok(c, http.StatusOK, "ping success", cw.config.db)
+	}
+}
+
+func (cw *clientWrapper) ModifyTimeControl() gin.HandlerFunc {
+	return func(context *gin.Context) {
+		var t ws.TimeControl
+		err := context.ShouldBindJSON(&t)
+		if err != nil {
+			cw.logger.Error("parse request body to time control error:", err)
+			response.Ok(context, requestFailCode, "parse request body error", nil)
+			return
+		}
+
+		d, err := time.ParseDuration(t.RefreshParam)
+		if err != nil {
+			cw.logger.Error("refresh time can not convert to time.Duration :", err)
+			response.Ok(context, requestFailCode, "refresh time can not convert to time.Duration :", nil)
+			return
+		}
+		t.RefreshTime = d
+		ws.SetTimeControl(t)
+		cw.Refresh <- 1
+		response.Ok(context, http.StatusOK, "modify success", nil)
 	}
 }

@@ -25,14 +25,13 @@ func (wsc WebSocketClient) WebSocketHandler(handler WebSocketHandlerFunc) http.H
 				wsc.Logger.Debug("receive:", message, " type:", mt)
 			}
 		}()
-
 		for {
 			res, err := handler(request)
 			if err != nil {
 				wsc.Logger.Error("websocket handler error:", err)
-				errBytes, _ := json.Marshal(err)
+				errBytes, _ := json.Marshal(map[string]interface{}{"error": err})
 				ws.WriteMessage(1, errBytes)
-				continue
+				break
 			}
 			bytes, err := json.Marshal(res)
 			if err != nil {
@@ -44,8 +43,13 @@ func (wsc WebSocketClient) WebSocketHandler(handler WebSocketHandlerFunc) http.H
 				wsc.Logger.Debug("write:", err)
 				break
 			}
-			//wsc.Logger.Debug("send:", string(bytes))
-			time.Sleep(10 * time.Second)
+			wsc.Logger.Debug("send:", len(string(bytes)), "byte data.")
+
+			t := time.NewTicker(WsTimeControl.RefreshTime)
+			select {
+			case <-t.C:
+			case <-wsc.Refresh:
+			}
 		}
 		wsc.Logger.Debug("connect close and handler func end.")
 	}

@@ -17,6 +17,7 @@ type WebSocketClient struct {
 	Upgrader websocket.Upgrader
 	Logger   logging.Logger
 	DB       string
+	Refresh  chan int
 }
 
 func (wsc WebSocketClient) PushTestArray() http.HandlerFunc {
@@ -38,7 +39,7 @@ func (wsc WebSocketClient) GetDebugNumGC() http.HandlerFunc {
 	return wsc.WebSocketHandler(func(request *http.Request) (interface{}, error) {
 		cmd := fmt.Sprintf(`SELECT mean("GCStats.NumGC")
 					AS "mean_GCStats.NumGC" FROM "%s"."autogen"."debug" WHERE time > %s - %s AND time <
-				%s GROUP BY time(%s) FILL(null)`, "test", "now()", "12h", "now()", "4m")
+				%s GROUP BY time(%s) FILL(null)`, wsc.DB, WsTimeControl.MinTime, WsTimeControl.TimeInterval, WsTimeControl.MaxTime, WsTimeControl.GroupTime)
 		resu, err := ExecuteQuery(wsc.Client, cmd, wsc.DB)
 		if err != nil {
 			return nil, err
@@ -55,7 +56,7 @@ func (wsc WebSocketClient) GetDebugNumGC() http.HandlerFunc {
 			// time
 			if ts, ok := (v[0]).(json.Number); ok {
 				if ti, err := ts.Int64(); err == nil {
-					t := time.Unix(ti/1000, 0).Format("15:04:05")
+					t := time.Unix(ti, 0).Format("15:04:05")
 					xAxis = append(xAxis, t)
 				} else {
 					continue
@@ -75,7 +76,7 @@ func (wsc WebSocketClient) GetDebugNumGC() http.HandlerFunc {
 			"xAxis":   xAxis,
 			"yAxis":   yAxis,
 			"columns": columns,
-			"title": "debug.GCStats.NumGC",
+			"title":   "debug.GCStats.NumGC",
 		}, nil
 	})
 }

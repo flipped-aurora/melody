@@ -29,6 +29,8 @@ type clientWrapper struct {
 	logger     logging.Logger
 	config     influxdbConfig
 	buf        *Buffer
+	timer      *ws.TimeControl
+	Refresh    chan int
 }
 
 func Register(ctx context.Context, extra config.ExtraConfig, metrics *ginmetrics.Metrics, logger logging.Logger) error {
@@ -60,15 +62,17 @@ func Register(ctx context.Context, extra config.ExtraConfig, metrics *ginmetrics
 
 	t := time.NewTicker(config.ttl)
 
-	clientWrapper := clientWrapper{
+	clientWrapper := &clientWrapper{
 		client:     influxClient,
 		collection: metrics,
 		logger:     logger,
 		config:     config,
 		buf:        NewBuffer(config.bufferSize),
+		Refresh:    make(chan int),
 	}
 
 	if config.dataServerEnable {
+		ws.RegisterWSTimeControl()
 		// Create melody data server
 		clientWrapper.runEndpoint(ctx, clientWrapper.newEngine(), logger)
 
@@ -83,7 +87,7 @@ func Register(ctx context.Context, extra config.ExtraConfig, metrics *ginmetrics
 	return nil
 }
 
-func (cw clientWrapper) runWebSocketServer(ctx context.Context, logger logging.Logger) {
+func (cw *clientWrapper) runWebSocketServer(ctx context.Context, logger logging.Logger) {
 	upgrader := websocket.Upgrader{
 		CheckOrigin: func(r *http.Request) bool {
 			return true
@@ -95,6 +99,7 @@ func (cw clientWrapper) runWebSocketServer(ctx context.Context, logger logging.L
 		Upgrader: upgrader,
 		Logger:   cw.logger,
 		DB:       cw.config.db,
+		Refresh:  cw.Refresh,
 	}
 
 	http.HandleFunc("/debug/num/gc", wsc.GetDebugNumGC())
@@ -109,7 +114,7 @@ func (cw clientWrapper) runWebSocketServer(ctx context.Context, logger logging.L
 	}()
 }
 
-func (cw clientWrapper) runEndpoint(ctx context.Context, engine *gin.Engine, logger logging.Logger) {
+func (cw *clientWrapper) runEndpoint(ctx context.Context, engine *gin.Engine, logger logging.Logger) {
 	server := &http.Server{
 		Addr:    cw.config.dataServerPort,
 		Handler: engine,
@@ -129,7 +134,7 @@ func (cw clientWrapper) runEndpoint(ctx context.Context, engine *gin.Engine, log
 	}()
 }
 
-func (cw clientWrapper) newEngine() *gin.Engine {
+func (cw *clientWrapper) newEngine() *gin.Engine {
 	gin.SetMode(gin.ReleaseMode)
 	engine := gin.New()
 
@@ -144,11 +149,12 @@ func (cw clientWrapper) newEngine() *gin.Engine {
 	if cw.config.dataServerQueryEnable {
 		engine.POST("/query", cw.Query())
 	}
+	engine.POST("/time", cw.ModifyTimeControl())
 
 	return engine
 }
 
-func (cw clientWrapper) updateAndSendData(ctx context.Context, ticker <-chan time.Time) {
+func (cw *clientWrapper) updateAndSendData(ctx context.Context, ticker <-chan time.Time) {
 	hostname, err := os.Hostname()
 	if err != nil {
 		cw.logger.Error("influx client get hostname err:", err)
