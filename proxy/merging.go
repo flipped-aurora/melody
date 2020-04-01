@@ -302,7 +302,6 @@ func requestPart(ctx context.Context, next Proxy, request *Request, out chan<- *
 	case out <- resp:
 	case <- ctx.Done():
 		failed <- ctx.Err()
-		cancel()
 	}
 
 	cancel()

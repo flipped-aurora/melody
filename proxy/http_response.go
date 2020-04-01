@@ -27,6 +27,8 @@ func NoOpHTTPResponseParser(ctx context.Context, resp *http.Response) (*Response
 
 func DefaultHTTPResponseParserFactory(cfg HTTPResponseParserConfig) HTTPResponseParser {
 	return func(ctx context.Context, resp *http.Response) (*Response,error) {
+		defer resp.Body.Close()
+
 		var data map[string]interface{}
 		err := cfg.Decoder(resp.Body, &data)
 		if err != nil {
