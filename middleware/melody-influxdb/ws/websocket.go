@@ -3,6 +3,9 @@ package ws
 import (
 	"encoding/json"
 	"net/http"
+	"os"
+	"runtime"
+	"runtime/pprof"
 	"time"
 )
 
@@ -25,6 +28,10 @@ func (wsc WebSocketClient) WebSocketHandler(handler WebSocketHandlerFunc) http.H
 				wsc.Logger.Debug("receive:", message, " type:", mt)
 			}
 		}()
+		f, err := os.OpenFile("pprof.log", os.O_CREATE | os.O_APPEND | os.O_RDWR, os.ModePerm)
+		if err != nil {
+			wsc.Logger.Error(err)
+		}
 		for {
 			res, err := handler(request)
 			if err != nil {
@@ -44,7 +51,9 @@ func (wsc WebSocketClient) WebSocketHandler(handler WebSocketHandlerFunc) http.H
 				break
 			}
 			wsc.Logger.Debug("send:", len(string(bytes)), "byte data.")
-
+			wsc.Logger.Warning("goroutine nums:", runtime.NumGoroutine())
+			p := pprof.Lookup("goroutine")
+			p.WriteTo(f, 1)
 			t := time.NewTicker(WsTimeControl.RefreshTime)
 			select {
 			case <-t.C:

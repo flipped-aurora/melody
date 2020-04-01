@@ -13,14 +13,14 @@
       "router_disabled": false,
       "backend_disabled": false,
       "endpoint_disabled": false,
-      "collection_time": "5s"
+      "collection_time": "10s"
     },
     "melody_influxdb": {
       "address": "http://localhost:8086",
       "username": "",
       "password": "",
       "buffer_size": 4096,
-      "ttl": "5s",
+      "ttl": "10s",
       "db": "test",
       "time_out": "1s",
       "data_server_enable": true,
@@ -224,11 +224,12 @@
     },
     {
       "endpoint": "/newpage",
+      "concurrent_calls": 5,
       "backends": [
         {
           "url_pattern": "/page",
           "host": [
-            "http://127.0.0.1:8001"
+            "http://127.0.0.1:9001"
           ]
         }
       ]

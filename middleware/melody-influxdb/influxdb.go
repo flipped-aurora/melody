@@ -102,7 +102,7 @@ func (cw *clientWrapper) runWebSocketServer(ctx context.Context, logger logging.
 		Refresh:  cw.Refresh,
 	}
 
-	http.HandleFunc("/debug/num/gc", wsc.GetDebugNumGC())
+	wsc.RegisterHandleFunc()
 
 	go func() {
 		u := url.URL{

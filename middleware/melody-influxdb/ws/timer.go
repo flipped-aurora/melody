@@ -1,6 +1,9 @@
 package ws
 
-import "time"
+import (
+	"regexp"
+	"time"
+)
 
 type TimeControl struct {
 	MinTime      string        `json:"min_time"`
@@ -25,4 +28,25 @@ func RegisterWSTimeControl() {
 
 func SetTimeControl(timer TimeControl) {
 	WsTimeControl = timer
+}
+
+var r =  regexp.MustCompile(`([0-9]*)([a-z])`)
+
+const (
+	hour = "15:04"
+	day = "01-02 15:04"
+)
+
+func GetTimeFormat() string {
+	if WsTimeControl.TimeInterval != "" {
+		match := r.FindAllStringSubmatch(WsTimeControl.TimeInterval, -1)
+		m := match[0]
+		if len(m) == 3 {
+			unit := m[2]
+			if unit == "d" {
+				return day
+			}
+		}
+	}
+	return hour
 }
