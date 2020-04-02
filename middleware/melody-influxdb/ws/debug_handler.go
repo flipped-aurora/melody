@@ -2,33 +2,27 @@ package ws
 
 import (
 	"errors"
-	"fmt"
-	"math/rand"
 	"melody/middleware/melody-influxdb/ws/convert"
 	"net/http"
 )
 
 func (wsc WebSocketClient) PushTestArray() http.HandlerFunc {
-
-	return wsc.WebSocketHandler(func(request *http.Request) (i interface{}, err error) {
-		var array []int
-		for i := 0; i < 7; i++ {
-			randNum := rand.Int() % 1500
-			array = append(array, randNum)
+	return wsc.WebSocketHandler(func(request *http.Request, data map[string]interface{}) (i interface{}, err error) {
+		if data != nil {
+			if v, ok := data["message"].(string); ok {
+				return v, nil
+			}
 		}
-		return map[string]interface{}{
-			"xAxis": []string{"1", "2", "3", "4", "5", "6", "7"},
-			"yAxis": array,
-		}, nil
+		return
 	})
 }
 
 func (wsc WebSocketClient) GetDebugNumGC() http.HandlerFunc {
-	return wsc.WebSocketHandler(func(request *http.Request) (interface{}, error) {
-		cmd := fmt.Sprintf(`SELECT sum("GCStats.NumGC")
-					AS "mean_GCStats.NumGC" FROM "%s"."autogen"."debug" WHERE time > %s - %s AND time <
-				%s GROUP BY time(%s) FILL(null)`, wsc.DB, WsTimeControl.MinTime, WsTimeControl.TimeInterval, WsTimeControl.MaxTime, WsTimeControl.GroupTime)
-		resu, err := ExecuteQuery(wsc.Client, cmd, wsc.DB)
+	return wsc.WebSocketHandler(func(request *http.Request, data map[string]interface{}) (interface{}, error) {
+		cmd := wsc.generateCommand(`SELECT sum("GCStats.NumGC")
+					AS "GCStats.NumGC" FROM "%s"."autogen"."debug" WHERE time > %s - %s AND time <
+				%s GROUP BY time(%s) FILL(null)`)
+		resu, err := wsc.executeQuery(cmd)
 		if err != nil {
 			return nil, err
 		}
@@ -37,29 +31,34 @@ func (wsc WebSocketClient) GetDebugNumGC() http.HandlerFunc {
 			return nil, errors.New(result.Err)
 		}
 		values := result.Series[0].Values
-		columns := result.Series[0].Columns
-		var xAxis []string
-		var yAxis []float64
+		var times []string
+		var debugNumGC []float64
 		for _, v := range values {
 			// time
-			t, ok := convert.ObjectToStringTime(v[0], GetTimeFormat())
-			if !ok {
+			if t, ok := convert.ObjectToStringTime(v[0], GetTimeFormat()); ok {
+				times = append(times, t)
+			} else {
 				continue
 			}
-			xAxis = append(xAxis, t)
 			// value
 			if f, ok := convert.ObjectToFloat(v[1]); ok {
-				yAxis = append(yAxis, f)
+				debugNumGC = append(debugNumGC, f)
 			} else {
-				yAxis = append(yAxis, 0)
+				debugNumGC = append(debugNumGC, 0)
 			}
 		}
 
 		return map[string]interface{}{
-			"xAxis":   xAxis,
-			"yAxis":   yAxis,
-			"columns": columns,
-			"title":   "GCStats.NumGC",
+			"title": "debug.NumGC",
+			"times": times,
+			"series": []map[string]interface{}{
+				{
+					"data":   debugNumGC,
+					"name":   "GCNum",
+					"type":   "line",
+					"smooth": true,
+				},
+			},
 		}, nil
 	})
 }

@@ -17,5 +17,11 @@ type WebSocketClient struct {
 
 func (wsc WebSocketClient) RegisterHandleFunc() {
 	http.HandleFunc("/debug/num/gc", wsc.GetDebugNumGC())
-	http.HandleFunc("/runtime/num/goroutine_thread", wsc.GetGoroutineAndThreadNum())
+
+	http.HandleFunc("/runtime/num/gc", wsc.GetNumGC())
+	http.HandleFunc("/runtime/num/goroutine", wsc.GetNumGoroutine())
+	http.HandleFunc("/runtime/num/frees", wsc.GetNumMemoryFree())
+	http.HandleFunc("/runtime/num/memory", wsc.GetSysMemory())
+
+	http.HandleFunc("/test", wsc.PushTestArray())
 }

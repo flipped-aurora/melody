@@ -46,7 +46,7 @@
           "extra_config": {},
           "method": "GET",
           "host": [
-            "127.0.0.1:8001"
+            "127.0.0.1:9001"
           ],
           "disable_host_sanitize": false,
           "group": "roles_info"
@@ -57,7 +57,7 @@
           "extra_config": {},
           "method": "GET",
           "host": [
-            "127.0.0.1:8001"
+            "127.0.0.1:9001"
           ],
           "disable_host_sanitize": false,
           "group": "person_info"
@@ -98,7 +98,7 @@
           },
           "method": "GET",
           "host": [
-            "127.0.0.1:8001"
+            "127.0.0.1:9001"
           ]
         }
       ]
@@ -128,7 +128,7 @@
             "id"
           ],
           "host": [
-            "127.0.0.1:8001"
+            "127.0.0.1:9001"
           ]
         },
         {
@@ -139,7 +139,7 @@
           "method": "GET",
           "group": "role_info",
           "host": [
-            "127.0.0.1:8001"
+            "127.0.0.1:9001"
           ]
         }
       ]
@@ -206,7 +206,7 @@
           "group": "roles",
           "method": "GET",
           "host": [
-            "127.0.0.1:8001"
+            "127.0.0.1:9001"
           ]
         },
         {
@@ -225,6 +225,7 @@
     {
       "endpoint": "/newpage",
       "concurrent_calls": 5,
+      "method": "post",
       "backends": [
         {
           "url_pattern": "/page",
@@ -244,7 +245,7 @@
             "collection": "list"
           },
           "host": [
-            "http://127.0.0.1:8001"
+            "http://127.0.0.1:9001"
           ]
         }
       ]

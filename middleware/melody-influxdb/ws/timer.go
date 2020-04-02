@@ -20,9 +20,9 @@ func RegisterWSTimeControl() {
 	WsTimeControl = TimeControl{
 		MinTime:      "now()",
 		MaxTime:      "now()",
-		TimeInterval: "1h",
-		GroupTime:    "5m",
-		RefreshTime:  5 * time.Second,
+		TimeInterval: "15m",
+		GroupTime:    "10s",
+		RefreshTime:  10 * time.Second,
 	}
 }
 

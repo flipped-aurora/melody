@@ -31,7 +31,7 @@ func (cw *clientWrapper) Query() gin.HandlerFunc {
 			return
 		}
 		cw.logger.Debug("-> query influxdb with query:", q)
-		res, err := ws.ExecuteQuery(cw.client, q.Command, cw.config.db)
+		res, err := ws.NormalExecuteQuery(cw.client, q.Command, cw.config.db)
 		if err != nil {
 			cw.logger.Error("query influxdb error:", err)
 			c.JSON(http.StatusBadRequest, gin.H{"error": err})
