@@ -8,7 +8,7 @@ import (
 
 func (wsc WebSocketClient) GetNumGoroutine() http.HandlerFunc {
 	return wsc.WebSocketHandler(func(request *http.Request, data map[string]interface{}) (i interface{}, err error) {
-		cmd := wsc.generateCommand(`SELECT sum("NumGoroutine") AS "mean_NumGoroutine" 
+		cmd := wsc.generateCommand(`SELECT mean("NumGoroutine") AS "mean_NumGoroutine" 
 		FROM "%s"."autogen"."runtime" WHERE time > %s - %s AND time < %s GROUP BY time(%s) 
 		FILL(null)`)
 		re, err := wsc.executeQuery(cmd)
@@ -108,9 +108,9 @@ func (wsc WebSocketClient) GetNumMemoryFree() http.HandlerFunc {
 
 func (wsc WebSocketClient) GetSysMemory() http.HandlerFunc {
 	return wsc.WebSocketHandler(func(request *http.Request, data map[string]interface{}) (i interface{}, err error) {
-		cmd := wsc.generateCommand(`SELECT sum("MemStats.HeapSys") AS "sum_MemStats.HeapSys", sum("MemStats.MCacheSys")
-		AS "sum_MemStats.MCacheSys", sum("MemStats.MSpanSys") AS "sum_MemStats.MSpanSys", sum("MemStats.Sys") AS "sum_MemStats.Sys",
-		sum("MemStats.StackSys") AS "sum_MemStats.StackSys" FROM "%s"."autogen"."runtime" WHERE time > %s - %s AND time <
+		cmd := wsc.generateCommand(`SELECT mean("MemStats.HeapSys") AS "sum_MemStats.HeapSys", mean("MemStats.MCacheSys")
+		AS "sum_MemStats.MCacheSys", mean("MemStats.MSpanSys") AS "sum_MemStats.MSpanSys", mean("MemStats.Sys") AS "sum_MemStats.Sys",
+		mean("MemStats.StackSys") AS "sum_MemStats.StackSys" FROM "%s"."autogen"."runtime" WHERE time > %s - %s AND time <
 		%s GROUP BY time(%s) FILL(null)`)
 		resp, err := wsc.executeQuery(cmd)
 

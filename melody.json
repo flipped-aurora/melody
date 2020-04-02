@@ -21,7 +21,7 @@
       "password": "",
       "buffer_size": 4096,
       "ttl": "10s",
-      "db": "test",
+      "db": "melody_data_p1",
       "time_out": "1s",
       "data_server_enable": true,
       "data_server_port": ":8001",
