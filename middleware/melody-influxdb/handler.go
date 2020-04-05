@@ -2,6 +2,7 @@ package influxdb
 
 import (
 	"github.com/gin-gonic/gin"
+	"melody/middleware/melody-influxdb/refresh"
 	"melody/middleware/melody-influxdb/response"
 	"melody/middleware/melody-influxdb/ws"
 	"net/http"
@@ -81,7 +82,12 @@ func (cw *clientWrapper) ModifyTimeControl() gin.HandlerFunc {
 		}
 		t.RefreshTime = d
 		ws.SetTimeControl(t)
-		cw.Refresh <- 1
+
+		head := refresh.RefreshList.Front()
+		for i := 0; i < refresh.RefreshList.Size; i++ {
+			*head.Value <- 1
+			head = head.Next
+		}
 		response.Ok(context, http.StatusOK, "modify success", nil)
 	}
 }

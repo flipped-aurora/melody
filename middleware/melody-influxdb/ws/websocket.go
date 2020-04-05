@@ -2,6 +2,7 @@ package ws
 
 import (
 	"encoding/json"
+	refresh2 "melody/middleware/melody-influxdb/refresh"
 	"net/http"
 	"time"
 )
@@ -9,13 +10,22 @@ import (
 type WebSocketHandlerFunc func(request *http.Request, data map[string]interface{}) (interface{}, error)
 
 func (wsc WebSocketClient) WebSocketHandler(handler WebSocketHandlerFunc) http.HandlerFunc {
+
 	return func(writer http.ResponseWriter, request *http.Request) {
+		ch := make(chan int)
+		refresh := &refresh2.Refresh{Value: &ch}
+		refresh2.RefreshList.Add(refresh)
+
 		ws, err := wsc.Upgrader.Upgrade(writer, request, nil)
 		if err != nil {
 			wsc.Logger.Error("websocket upgrade:", err)
 		}
 		data := make(map[string]interface{})
-		defer ws.Close()
+		defer func() {
+			refresh2.RefreshList.Remove(refresh)
+			close(ch)
+			ws.Close()
+		}()
 		go func(data map[string]interface{}) {
 			for {
 				mt, message, err := ws.ReadMessage()
@@ -49,7 +59,7 @@ func (wsc WebSocketClient) WebSocketHandler(handler WebSocketHandlerFunc) http.H
 			t := time.NewTicker(WsTimeControl.RefreshTime)
 			select {
 			case <-t.C:
-			case <-wsc.Refresh:
+			case <-ch:
 			}
 		}
 		wsc.Logger.Debug("connect close and handler func end.")

@@ -30,7 +30,6 @@ type clientWrapper struct {
 	config     influxdbConfig
 	buf        *Buffer
 	timer      *ws.TimeControl
-	Refresh    chan int
 }
 
 func Register(ctx context.Context, extra config.ExtraConfig, metrics *ginmetrics.Metrics, logger logging.Logger) error {
@@ -68,7 +67,6 @@ func Register(ctx context.Context, extra config.ExtraConfig, metrics *ginmetrics
 		logger:     logger,
 		config:     config,
 		buf:        NewBuffer(config.bufferSize),
-		Refresh:    make(chan int),
 	}
 
 	if config.dataServerEnable {
@@ -99,7 +97,6 @@ func (cw *clientWrapper) runWebSocketServer(ctx context.Context, logger logging.
 		Upgrader: upgrader,
 		Logger:   cw.logger,
 		DB:       cw.config.db,
-		Refresh:  cw.Refresh,
 	}
 
 	wsc.RegisterHandleFunc()

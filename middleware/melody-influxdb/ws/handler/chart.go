@@ -14,7 +14,7 @@ func ResultDataHandler(times *[]string, data [][]interface{}, format string, lin
 		if t, ok := convert.ObjectToStringTime(v[0], format); ok {
 			*times = append(*times, t)
 		}
-		for index:= range lines {
+		for index := range lines {
 			if g, ok := convert.ObjectToInt(v[index+1]); ok {
 				*lines[index] = append(*lines[index], g)
 			} else {

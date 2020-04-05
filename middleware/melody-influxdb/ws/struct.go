@@ -12,7 +12,6 @@ type WebSocketClient struct {
 	Upgrader websocket.Upgrader
 	Logger   logging.Logger
 	DB       string
-	Refresh  chan int
 }
 
 func (wsc WebSocketClient) RegisterHandleFunc() {
@@ -22,6 +21,8 @@ func (wsc WebSocketClient) RegisterHandleFunc() {
 	http.HandleFunc("/runtime/num/goroutine", wsc.GetNumGoroutine())
 	http.HandleFunc("/runtime/num/frees", wsc.GetNumMemoryFree())
 	http.HandleFunc("/runtime/num/memory", wsc.GetSysMemory())
+
+	http.HandleFunc("/requests/complete", wsc.GetRequestsComplete())
 
 	http.HandleFunc("/test", wsc.PushTestArray())
 }
