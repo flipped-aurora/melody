@@ -65,7 +65,6 @@ func NewExecutor(ctx context.Context) cmd.Executor {
 			logger.Debug("use logstash as logger")
 		}
 
-
 		//TODO 3.Start Reporter (暂时不做)
 
 		//TODO 4.加载插件 (暂时不做,加了点头)
@@ -78,7 +77,7 @@ func NewExecutor(ctx context.Context) cmd.Executor {
 		// 6.创建Metrics监控
 		metricsController := metrics.New(ctx, cfg.ExtraConfig, logger)
 		//7. 集成influxdb
-		if err := influxdb.Register(ctx, cfg.ExtraConfig, metricsController, logger); err != nil {
+		if err := influxdb.Register(ctx, &cfg, metricsController, logger); err != nil {
 			logger.Warning(err)
 		}
 		//TODO 8. 集成opencensus

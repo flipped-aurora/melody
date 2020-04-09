@@ -32,10 +32,10 @@ type clientWrapper struct {
 	timer      *ws.TimeControl
 }
 
-func Register(ctx context.Context, extra config.ExtraConfig, metrics *ginmetrics.Metrics, logger logging.Logger) error {
-	config, ok := getConfig(extra).(influxdbConfig)
+func Register(ctx context.Context, cfg *config.ServiceConfig, metrics *ginmetrics.Metrics, logger logging.Logger) error {
+	config, ok := getConfig(cfg.ExtraConfig).(influxdbConfig)
 	if !ok {
-		logger.Debug("no config for the influxdb client. Aborting")
+		logger.Debug("no config for the influxDB client. Aborting")
 		return configErr
 	}
 
@@ -72,7 +72,7 @@ func Register(ctx context.Context, extra config.ExtraConfig, metrics *ginmetrics
 	if config.dataServerEnable {
 		ws.RegisterWSTimeControl()
 		// Create melody data server
-		clientWrapper.runEndpoint(ctx, clientWrapper.newEngine(), logger)
+		clientWrapper.runEndpoint(ctx, clientWrapper.newEngine(cfg), logger)
 
 		// Create melody data websocket server
 		clientWrapper.runWebSocketServer(ctx, logger)
@@ -131,7 +131,7 @@ func (cw *clientWrapper) runEndpoint(ctx context.Context, engine *gin.Engine, lo
 	}()
 }
 
-func (cw *clientWrapper) newEngine() *gin.Engine {
+func (cw *clientWrapper) newEngine(cfg *config.ServiceConfig) *gin.Engine {
 	gin.SetMode(gin.ReleaseMode)
 	engine := gin.New()
 
@@ -147,6 +147,7 @@ func (cw *clientWrapper) newEngine() *gin.Engine {
 		engine.POST("/query", cw.Query())
 	}
 	engine.POST("/time", cw.ModifyTimeControl())
+	engine.POST("/backends", cw.Backends(cfg))
 
 	return engine
 }

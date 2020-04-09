@@ -17,13 +17,13 @@ const (
 )
 
 var (
-	percentiles = []float64{0.1, 0.25, 0.5, 0.75, 0.9, 0.95, 0.99}
+	percentiles   = []float64{0.1, 0.25, 0.5, 0.75, 0.9, 0.95, 0.99}
 	defaultSample = func() metrics.Sample { return metrics.NewUniformSample(1028) }
 )
 
 // Config metrics 服务默认配置
 type Config struct {
-	ProxyDisabled     bool
+	ProxyDisabled    bool
 	RouterDisabled   bool
 	BackendDisabled  bool
 	CollectionTime   time.Duration
@@ -64,17 +64,18 @@ func New(ctx context.Context, e config.ExtraConfig, logger logging.Logger) *Metr
 
 	m := Metrics{
 		Config:         metricsConfig,
-		Proxy:          NewProxyMetrics(&registry),
-		Router:         NewRouterMetrics(&registry),
+		Proxy:          NewProxyMetrics(&registry),  // melody.proxy.
+		Router:         NewRouterMetrics(&registry), // melody.router.
 		Registry:       &registry,
 		latestSnapshot: NewStats(),
 	}
 
-	m.processMetrics(ctx, m.Config.CollectionTime, logger)
+	m.processMetrics(ctx, m.Config.CollectionTime, logger) // melody.service.
 
 	return &m
 }
 
+// debugGC runtimeMem
 func (m *Metrics) processMetrics(ctx context.Context, duration time.Duration, logger logging.Logger) {
 	r := metrics.NewPrefixedChildRegistry(*(m.Registry), "service.")
 
@@ -89,7 +90,7 @@ func (m *Metrics) processMetrics(ctx context.Context, duration time.Duration, lo
 			case <-ticket.C:
 				metrics.CaptureDebugGCStatsOnce(r)
 				metrics.CaptureRuntimeMemStatsOnce(r)
-				m.Router.Aggregate()
+				m.Router.Aggregate() // 统计 router 的连接情况
 				m.latestSnapshot = m.TakeSnapshot()
 			case <-ctx.Done():
 				return

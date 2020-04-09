@@ -23,6 +23,9 @@ func (wsc WebSocketClient) RegisterHandleFunc() {
 	http.HandleFunc("/runtime/num/memory", wsc.GetSysMemory())
 
 	http.HandleFunc("/requests/complete", wsc.GetRequestsComplete())
+	http.HandleFunc("/requests/error", wsc.GetRequestsError())
+	http.HandleFunc("/requests/endpoints", wsc.GetRequestsEndpoints())
+	http.HandleFunc("/requests/backends", wsc.GetRequestsBackends())
 
 	http.HandleFunc("/test", wsc.PushTestArray())
 }

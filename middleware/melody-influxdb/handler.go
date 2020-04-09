@@ -2,6 +2,7 @@ package influxdb
 
 import (
 	"github.com/gin-gonic/gin"
+	"melody/config"
 	"melody/middleware/melody-influxdb/refresh"
 	"melody/middleware/melody-influxdb/response"
 	"melody/middleware/melody-influxdb/ws"
@@ -90,4 +91,35 @@ func (cw *clientWrapper) ModifyTimeControl() gin.HandlerFunc {
 		}
 		response.Ok(context, http.StatusOK, "modify success", nil)
 	}
+}
+
+func (cw *clientWrapper) Backends(cfg *config.ServiceConfig) gin.HandlerFunc {
+	e2b := make([]E2B, len(cfg.Endpoints))
+	for i, endpointCfg := range cfg.Endpoints {
+		bs := make([]Backend, len(endpointCfg.Backends)+1)
+		bs[0].Value = "ALL"
+		bs[0].Label = "ALL"
+		for j, backendCfg := range endpointCfg.Backends {
+			bs[j+1].Value = backendCfg.URLPattern
+			bs[j+1].Label = backendCfg.URLPattern
+		}
+		e2b[i].Value = endpointCfg.Endpoint
+		e2b[i].Label = endpointCfg.Endpoint
+		e2b[i].Backends = bs
+	}
+	return func(c *gin.Context) {
+
+		response.Ok(c, http.StatusOK, "", e2b)
+	}
+}
+
+type E2B struct {
+	Value    string    `json:"value"`
+	Label    string    `json:"label"`
+	Backends []Backend `json:"children"`
+}
+
+type Backend struct {
+	Value string `json:"value"`
+	Label string `json:"label"`
 }
