@@ -26,6 +26,7 @@ func (wsc WebSocketClient) RegisterHandleFunc() {
 	http.HandleFunc("/requests/error", wsc.GetRequestsError())
 	http.HandleFunc("/requests/endpoints", wsc.GetRequestsEndpoints())
 	http.HandleFunc("/requests/backends", wsc.GetRequestsBackends())
+	http.HandleFunc("/requests/api", wsc.GetRequestsAPI())
 
 	http.HandleFunc("/test", wsc.PushTestArray())
 }

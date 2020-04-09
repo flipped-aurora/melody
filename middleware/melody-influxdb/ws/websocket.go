@@ -2,7 +2,7 @@ package ws
 
 import (
 	"encoding/json"
-	refresh2 "melody/middleware/melody-influxdb/refresh"
+	influxrefresh "melody/middleware/melody-influxdb/refresh"
 	"net/http"
 	"time"
 )
@@ -13,8 +13,8 @@ func (wsc WebSocketClient) WebSocketHandler(handler WebSocketHandlerFunc) http.H
 
 	return func(writer http.ResponseWriter, request *http.Request) {
 		ch := make(chan int)
-		refresh := &refresh2.Refresh{Value: &ch}
-		refresh2.RefreshList.Add(refresh)
+		refresh := &influxrefresh.Refresh{Value: &ch}
+		influxrefresh.RefreshList.Add(refresh)
 
 		ws, err := wsc.Upgrader.Upgrade(writer, request, nil)
 		if err != nil {
@@ -22,7 +22,7 @@ func (wsc WebSocketClient) WebSocketHandler(handler WebSocketHandlerFunc) http.H
 		}
 		data := make(map[string]interface{})
 		defer func() {
-			refresh2.RefreshList.Remove(refresh)
+			influxrefresh.RefreshList.Remove(refresh)
 			close(ch)
 			ws.Close()
 		}()
@@ -35,6 +35,7 @@ func (wsc WebSocketClient) WebSocketHandler(handler WebSocketHandlerFunc) http.H
 				}
 				wsc.Logger.Debug("receive:", string(message), " type:", mt)
 				data["message"] = string(message)
+				ch <- 1
 			}
 		}(data)
 		for {
