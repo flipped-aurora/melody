@@ -41,12 +41,12 @@ time(%s) FILL(null)
 			"series": []map[string]interface{}{
 				{
 					"data": total,
-					"name": "requests total",
+					"name": "total",
 					"type": "line",
 				},
 				{
 					"data": count,
-					"name": "requests count",
+					"name": "count",
 					"type": "line",
 				},
 			},
@@ -87,12 +87,12 @@ time(%s) FILL(null)
 			"series": []map[string]interface{}{
 				{
 					"data": total,
-					"name": "requests total",
+					"name": "total",
 					"type": "line",
 				},
 				{
 					"data": count,
-					"name": "requests count",
+					"name": "count",
 					"type": "line",
 				},
 			},
@@ -133,12 +133,12 @@ time(%s) FILL(null)
 			"series": []map[string]interface{}{
 				{
 					"data": total,
-					"name": "requests total",
+					"name": "total",
 					"type": "line",
 				},
 				{
 					"data": count,
-					"name": "requests count",
+					"name": "count",
 					"type": "line",
 				},
 			},
@@ -179,12 +179,12 @@ time(%s) FILL(null)
 			"series": []map[string]interface{}{
 				{
 					"data": total,
-					"name": "requests total",
+					"name": "total",
 					"type": "line",
 				},
 				{
 					"data": count,
-					"name": "requests count",
+					"name": "count",
 					"type": "line",
 				},
 			},
@@ -230,12 +230,12 @@ time(%s) FILL(null)
 			"series": []map[string]interface{}{
 				{
 					"data": total,
-					"name": "requests total",
+					"name": "total",
 					"type": "line",
 				},
 				{
 					"data": count,
-					"name": "requests count",
+					"name": "count",
 					"type": "line",
 				},
 			},
