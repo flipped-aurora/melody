@@ -2,10 +2,12 @@ package influxdb
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/influxdata/influxdb/client/v2"
-	"melody/logging"
+	"melody/config"
+	"melody/middleware/melody-influxdb/refresh"
 	"melody/middleware/melody-influxdb/response"
+	"melody/middleware/melody-influxdb/ws"
 	"net/http"
+	"time"
 )
 
 const (
@@ -22,47 +24,119 @@ type AuthConfig struct {
 	Password string `json:"password"`
 }
 
-func Query(cli client.Client, logger logging.Logger, config influxdbConfig) gin.HandlerFunc {
+func (cw *clientWrapper) Query() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var q query
 		if err := c.ShouldBindJSON(&q); err != nil {
-			logger.Error("parse request body to query object error:", err)
+			cw.logger.Error("parse request body to query object error:", err)
 			c.JSON(http.StatusBadRequest, gin.H{"error": err})
 			return
 		}
-		logger.Debug("-> query influxdb with query:", q)
-		resp, err := cli.Query(client.NewQuery(q.Command, config.db, q.Precision))
-		if err != nil || resp.Err != "" {
-			errMsg := err.Error()
-			if resp != nil && resp.Err != "" {
-				errMsg = resp.Err
-			}
-			logger.Error("query influxdb error:", errMsg)
-			c.JSON(http.StatusBadRequest, gin.H{"error": errMsg})
+		cw.logger.Debug("-> query influxdb with query:", q)
+		res, err := ws.NormalExecuteQuery(cw.client, q.Command, cw.config.db)
+		if err != nil {
+			cw.logger.Error("query influxdb error:", err)
+			c.JSON(http.StatusBadRequest, gin.H{"error": err})
 			return
 		}
-		logger.Debug("<- query success")
-		response.Ok(c, http.StatusOK, "", resp.Results[0].Series[0])
+		cw.logger.Debug("<- query success")
+		response.Ok(c, http.StatusOK, "", res[0].Series[0])
 		return
 	}
 }
 
-func Ping(logger logging.Logger, config influxdbConfig) gin.HandlerFunc {
+func (cw *clientWrapper) Ping() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var con AuthConfig
 		err := c.ShouldBindJSON(&con)
-		if  err != nil {
-			logger.Debug("parse request body to query object error:", err)
+		if err != nil {
+			cw.logger.Error("parse request body to query object error:", err)
 			response.Ok(c, requestFailCode, "parse request body error", nil)
 			return
 		}
 
-		if con.Username != config.password || con.Password != config.password{
-			logger.Debug("influx db username or password incorrect")
+		if con.Username != cw.config.password || con.Password != cw.config.password {
+			cw.logger.Error("influx db username or password incorrect")
 			response.Ok(c, requestFailCode, "username or password incorrect", nil)
 			return
 		}
 
-		response.Ok(c, http.StatusOK, "ping success", config.db)
+		response.Ok(c, http.StatusOK, "ping success", cw.config.db)
 	}
+}
+
+func (cw *clientWrapper) ModifyTimeControl() gin.HandlerFunc {
+	return func(context *gin.Context) {
+		var t ws.TimeControl
+		err := context.ShouldBindJSON(&t)
+		if err != nil {
+			cw.logger.Error("parse request body to time control error:", err)
+			response.Ok(context, requestFailCode, "parse request body error", nil)
+			return
+		}
+
+		d, err := time.ParseDuration(t.RefreshParam)
+		if err != nil {
+			cw.logger.Error("refresh time can not convert to time.Duration :", err)
+			response.Ok(context, requestFailCode, "refresh time can not convert to time.Duration :", nil)
+			return
+		}
+		t.RefreshTime = d
+		ws.SetTimeControl(t)
+
+		head := refresh.RefreshList.Front()
+		for i := 0; i < refresh.RefreshList.Size; i++ {
+			*head.Value <- 1
+			head = head.Next
+		}
+		response.Ok(context, http.StatusOK, "modify success", nil)
+	}
+}
+
+func (cw *clientWrapper) Backends(cfg *config.ServiceConfig) gin.HandlerFunc {
+	e2b := make([]E2B, len(cfg.Endpoints))
+	option := []Option{
+		{
+			"Complete",
+			"Complete",
+		},
+		{
+			"Error",
+			"Error",
+		},
+	}
+	for i, endpointCfg := range cfg.Endpoints {
+		bs := make([]Backend, len(endpointCfg.Backends)+1)
+		bs[0].Value = "ALL"
+		bs[0].Label = "ALL"
+		bs[0].Children = option
+		for j, backendCfg := range endpointCfg.Backends {
+			bs[j+1].Value = backendCfg.URLPattern
+			bs[j+1].Label = backendCfg.URLPattern
+			bs[j+1].Children = option
+		}
+		e2b[i].Value = endpointCfg.Endpoint
+		e2b[i].Label = endpointCfg.Endpoint
+		e2b[i].Backends = bs
+	}
+	return func(c *gin.Context) {
+		response.Ok(c, http.StatusOK, "", e2b)
+	}
+}
+
+type E2B struct {
+	Value    string    `json:"value"`
+	Label    string    `json:"label"`
+	Backends []Backend `json:"children"`
+}
+
+type Backend struct {
+	Value    string   `json:"value"`
+	Label    string   `json:"label"`
+	Children []Option `json:"children"`
+}
+
+type Option struct {
+	Value string `json:"value"`
+	Label string `json:"label"`
 }

@@ -3,6 +3,7 @@ package influxdb
 import (
 	"context"
 	"github.com/gin-gonic/gin"
+	"github.com/gorilla/websocket"
 	"github.com/influxdata/influxdb/client/v2"
 	"melody/config"
 	"melody/logging"
@@ -10,14 +11,16 @@ import (
 	"melody/middleware/melody-influxdb/gauge"
 	"melody/middleware/melody-influxdb/histogram"
 	"melody/middleware/melody-influxdb/middleware"
+	"melody/middleware/melody-influxdb/ws"
 	ginmetrics "melody/middleware/melody-metrics/gin"
 	"net/http"
+	"net/url"
 	"os"
 	"time"
 )
 
 var (
-	pingTimeOut       = time.Second
+	pingTimeOut = time.Second
 )
 
 type clientWrapper struct {
@@ -26,12 +29,13 @@ type clientWrapper struct {
 	logger     logging.Logger
 	config     influxdbConfig
 	buf        *Buffer
+	timer      *ws.TimeControl
 }
 
-func Register(ctx context.Context, extra config.ExtraConfig, metrics *ginmetrics.Metrics, logger logging.Logger) error {
-	config, ok := getConfig(extra).(influxdbConfig)
+func Register(ctx context.Context, cfg *config.ServiceConfig, metrics *ginmetrics.Metrics, logger logging.Logger) error {
+	config, ok := getConfig(cfg.ExtraConfig).(influxdbConfig)
 	if !ok {
-		logger.Debug("no config for the influxdb client. Aborting")
+		logger.Debug("no config for the influxDB client. Aborting")
 		return configErr
 	}
 
@@ -47,7 +51,7 @@ func Register(ctx context.Context, extra config.ExtraConfig, metrics *ginmetrics
 		return err
 	}
 
-	// 开辟goroutine去检察influx server是否宕机
+	// 检察influx server是否宕机
 	duration, msg, err := influxClient.Ping(pingTimeOut)
 	if err != nil {
 		logger.Error("unable to ping influx server,", err.Error())
@@ -57,7 +61,7 @@ func Register(ctx context.Context, extra config.ExtraConfig, metrics *ginmetrics
 
 	t := time.NewTicker(config.ttl)
 
-	clientWrapper := clientWrapper{
+	clientWrapper := &clientWrapper{
 		client:     influxClient,
 		collection: metrics,
 		logger:     logger,
@@ -66,8 +70,12 @@ func Register(ctx context.Context, extra config.ExtraConfig, metrics *ginmetrics
 	}
 
 	if config.dataServerEnable {
+		ws.RegisterWSTimeControl()
 		// Create melody data server
-		clientWrapper.runEndpoint(ctx, clientWrapper.newEngine(logger), logger)
+		clientWrapper.runEndpoint(ctx, clientWrapper.newEngine(cfg), logger)
+
+		// Create melody data websocket server
+		clientWrapper.runWebSocketServer(ctx, logger)
 	}
 
 	go clientWrapper.updateAndSendData(ctx, t.C)
@@ -77,7 +85,33 @@ func Register(ctx context.Context, extra config.ExtraConfig, metrics *ginmetrics
 	return nil
 }
 
-func (cw clientWrapper) runEndpoint(ctx context.Context, engine *gin.Engine, logger logging.Logger) {
+func (cw *clientWrapper) runWebSocketServer(ctx context.Context, logger logging.Logger) {
+	upgrader := websocket.Upgrader{
+		CheckOrigin: func(r *http.Request) bool {
+			return true
+		},
+	}
+
+	wsc := ws.WebSocketClient{
+		Client:   cw.client,
+		Upgrader: upgrader,
+		Logger:   cw.logger,
+		DB:       cw.config.db,
+	}
+
+	wsc.RegisterHandleFunc()
+
+	go func() {
+		u := url.URL{
+			Scheme: "ws",
+			Host:   dataServerDefaultWebSocketPort,
+		}
+		logger.Debug("melody data websocket server run on ", u.String(), "🎁")
+		logger.Error(http.ListenAndServe(dataServerDefaultWebSocketPort, nil))
+	}()
+}
+
+func (cw *clientWrapper) runEndpoint(ctx context.Context, engine *gin.Engine, logger logging.Logger) {
 	server := &http.Server{
 		Addr:    cw.config.dataServerPort,
 		Handler: engine,
@@ -97,7 +131,7 @@ func (cw clientWrapper) runEndpoint(ctx context.Context, engine *gin.Engine, log
 	}()
 }
 
-func (cw clientWrapper) newEngine(logger logging.Logger) *gin.Engine {
+func (cw *clientWrapper) newEngine(cfg *config.ServiceConfig) *gin.Engine {
 	gin.SetMode(gin.ReleaseMode)
 	engine := gin.New()
 
@@ -108,15 +142,17 @@ func (cw clientWrapper) newEngine(logger logging.Logger) *gin.Engine {
 	engine.RedirectFixedPath = true
 	engine.HandleMethodNotAllowed = true
 	engine.Use(middleware.Cors())
-	engine.POST("/ping", Ping(logger, cw.config))
+	engine.POST("/ping", cw.Ping())
 	if cw.config.dataServerQueryEnable {
-		engine.POST("/query", Query(cw.client, logger, cw.config))
+		engine.POST("/query", cw.Query())
 	}
+	engine.POST("/time", cw.ModifyTimeControl())
+	engine.POST("/backends", cw.Backends(cfg))
 
 	return engine
 }
 
-func (cw clientWrapper) updateAndSendData(ctx context.Context, ticker <-chan time.Time) {
+func (cw *clientWrapper) updateAndSendData(ctx context.Context, ticker <-chan time.Time) {
 	hostname, err := os.Hostname()
 	if err != nil {
 		cw.logger.Error("influx client get hostname err:", err)

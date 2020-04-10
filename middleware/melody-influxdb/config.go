@@ -10,7 +10,8 @@ const (
 	Namespace = "melody_influxdb"
 	defaultDB = "melody_data"
 	defaultAddress = "*:8086"
-	dataServerDefaultListenPort = ":8080"
+	dataServerDefaultListenPort = ":8001"
+	dataServerDefaultWebSocketPort = ":8002"
 )
 
 var configErr = errors.New("load influx config error")

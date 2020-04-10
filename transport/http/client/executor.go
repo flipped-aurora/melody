@@ -19,7 +19,7 @@ func NewHTTPClient(context.Context) *http.Client {
 
 // DefaultHTTPRequestExecutor 默认的request执行器
 func DefaultHTTPRequestExecutor(clientFactory HTTPClientFactory) HTTPRequestExecutor {
-	return func(i context.Context, request *http.Request) (response *http.Response, e error) {
-		return clientFactory(i).Do(request)
+	return func(ctx context.Context, request *http.Request) (response *http.Response, e error) {
+		return clientFactory(ctx).Do(request.WithContext(ctx))
 	}
 }

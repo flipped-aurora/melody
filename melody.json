@@ -13,18 +13,18 @@
       "router_disabled": false,
       "backend_disabled": false,
       "endpoint_disabled": false,
-      "collection_time": "120s"
+      "collection_time": "10s"
     },
     "melody_influxdb": {
       "address": "http://localhost:8086",
       "username": "",
       "password": "",
       "buffer_size": 4096,
-      "ttl": "120s",
-      "db": "test",
+      "ttl": "10s",
+      "db": "melody_data_p1",
       "time_out": "1s",
       "data_server_enable": true,
-      "data_server_port": ":8080",
+      "data_server_port": ":8001",
       "data_server_query_enable": true
     }
   },
@@ -46,7 +46,7 @@
           "extra_config": {},
           "method": "GET",
           "host": [
-            "127.0.0.1:8001"
+            "127.0.0.1:9001"
           ],
           "disable_host_sanitize": false,
           "group": "roles_info"
@@ -57,7 +57,7 @@
           "extra_config": {},
           "method": "GET",
           "host": [
-            "127.0.0.1:8001"
+            "127.0.0.1:9001"
           ],
           "disable_host_sanitize": false,
           "group": "person_info"
@@ -77,7 +77,7 @@
           "extra_config": {},
           "method": "GET",
           "host": [
-            "127.0.0.1:8001"
+            "127.0.0.1:8003"
           ],
           "disable_host_sanitize": false,
           "group": "roles_info"
@@ -98,7 +98,7 @@
           },
           "method": "GET",
           "host": [
-            "127.0.0.1:8001"
+            "127.0.0.1:9001"
           ]
         }
       ]
@@ -128,7 +128,7 @@
             "id"
           ],
           "host": [
-            "127.0.0.1:8001"
+            "127.0.0.1:9001"
           ]
         },
         {
@@ -139,7 +139,7 @@
           "method": "GET",
           "group": "role_info",
           "host": [
-            "127.0.0.1:8001"
+            "127.0.0.1:9001"
           ]
         }
       ]
@@ -206,7 +206,7 @@
           "group": "roles",
           "method": "GET",
           "host": [
-            "127.0.0.1:8001"
+            "127.0.0.1:9001"
           ]
         },
         {
@@ -224,11 +224,13 @@
     },
     {
       "endpoint": "/newpage",
+      "concurrent_calls": 5,
+      "method": "post",
       "backends": [
         {
           "url_pattern": "/page",
           "host": [
-            "http://127.0.0.1:8001"
+            "http://127.0.0.1:9001"
           ]
         }
       ]
@@ -243,7 +245,7 @@
             "collection": "list"
           },
           "host": [
-            "http://127.0.0.1:8001"
+            "http://127.0.0.1:9001"
           ]
         }
       ]
