@@ -95,20 +95,31 @@ func (cw *clientWrapper) ModifyTimeControl() gin.HandlerFunc {
 
 func (cw *clientWrapper) Backends(cfg *config.ServiceConfig) gin.HandlerFunc {
 	e2b := make([]E2B, len(cfg.Endpoints))
+	option := []Option{
+		{
+			"Complete",
+			"Complete",
+		},
+		{
+			"Error",
+			"Error",
+		},
+	}
 	for i, endpointCfg := range cfg.Endpoints {
 		bs := make([]Backend, len(endpointCfg.Backends)+1)
 		bs[0].Value = "ALL"
 		bs[0].Label = "ALL"
+		bs[0].Children = option
 		for j, backendCfg := range endpointCfg.Backends {
 			bs[j+1].Value = backendCfg.URLPattern
 			bs[j+1].Label = backendCfg.URLPattern
+			bs[j+1].Children = option
 		}
 		e2b[i].Value = endpointCfg.Endpoint
 		e2b[i].Label = endpointCfg.Endpoint
 		e2b[i].Backends = bs
 	}
 	return func(c *gin.Context) {
-
 		response.Ok(c, http.StatusOK, "", e2b)
 	}
 }
@@ -120,6 +131,12 @@ type E2B struct {
 }
 
 type Backend struct {
+	Value    string   `json:"value"`
+	Label    string   `json:"label"`
+	Children []Option `json:"children"`
+}
+
+type Option struct {
 	Value string `json:"value"`
 	Label string `json:"label"`
 }

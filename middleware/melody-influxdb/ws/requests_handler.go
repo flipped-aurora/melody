@@ -2,8 +2,10 @@ package ws
 
 import (
 	"errors"
+	"fmt"
 	"melody/middleware/melody-influxdb/ws/handler"
 	"net/http"
+	"strings"
 )
 
 func (wsc WebSocketClient) GetRequestsComplete() http.HandlerFunc {
@@ -192,19 +194,19 @@ time(%s) FILL(null)
 
 func (wsc WebSocketClient) GetRequestsAPI() http.HandlerFunc {
 	return wsc.WebSocketHandler(func(request *http.Request, data map[string]interface{}) (i interface{}, err error) {
-		api, ok := data["message"]
-		if ok {
-			api = api.(string)
-		} else {
+		message, ok := data["message"]
+		if !ok {
 			return nil, nil
 		}
+
+		api := strings.Fields(message.(string))
 		cmd := wsc.generateCommand(`
 SELECT 
 sum("total") AS "sum_total", sum("count") AS "sum_count" 
 FROM 
 "%s"."autogen"."requests" 
 WHERE 
-time > %s - %s AND time < %s AND "name"='` + api.(string) + `'
+time > %s - %s AND time < %s AND "name"='` + api[0] + `' AND "` + strings.ToLower(api[1]) + `"='true'
 GROUP BY 
 time(%s) FILL(null)
 `)
@@ -223,7 +225,7 @@ time(%s) FILL(null)
 		handler.ResultDataHandler(&times, values, GetTimeFormat(), &total, &count)
 
 		return map[string]interface{}{
-			"title": api,
+			"title": fmt.Sprintf("%s %s", api[0], api[1]),
 			"times": times,
 			"series": []map[string]interface{}{
 				{
