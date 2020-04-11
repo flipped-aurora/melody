@@ -22,9 +22,9 @@ type Metrics struct {
 
 type ginResponseWriter struct {
 	gin.ResponseWriter
-	name string
+	name  string
 	begin time.Time
-	rm *metrics.RouterMetrics
+	rm    *metrics.RouterMetrics
 }
 
 // New 返回一个基础的计数控制器
@@ -59,7 +59,7 @@ func (m *Metrics) RunEndpoint(c context.Context, engine *gin.Engine, logger logg
 
 // NewEngine 返回一个gin.Engine去驱动metrics的运行
 func (m *Metrics) NewEngine() *gin.Engine {
-	gin.SetMode(gin.ReleaseMode)
+	//gin.SetMode(gin.ReleaseMode)
 	engine := gin.New()
 	// 紧急恢复middleware
 	engine.Use(gin.Recovery())
@@ -115,5 +115,3 @@ func (gw *ginResponseWriter) end() {
 	gw.rm.Histogram("response", gw.name, "size").Update(int64(gw.Size()))
 	gw.rm.Histogram("response", gw.name, "time").Update(int64(duration))
 }
-
-

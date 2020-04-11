@@ -102,13 +102,25 @@ time(%s) FILL(null)
 
 func (wsc WebSocketClient) GetRequestsEndpoints() http.HandlerFunc {
 	return wsc.WebSocketHandler(func(request *http.Request, data map[string]interface{}) (i interface{}, err error) {
+		if _, ok := data["message"]; !ok {
+			return map[string]interface{}{
+				"title": "Requests Endpoints",
+			}, nil
+		}
+		status := data["message"].(string)
+		title := status
+		if status == "ALL" {
+			status = ""
+		} else {
+			status = ` AND "` + strings.ToLower(status) + `"='true'`
+		}
 		cmd := wsc.generateCommand(`
 SELECT 
 sum("total") AS "sum_total", sum("count") AS "sum_count" 
 FROM 
 "%s"."autogen"."requests" 
 WHERE 
-time > %s - %s AND time < %s AND "layer"='endpoint'
+time > %s - %s AND time < %s AND "layer"='endpoint'` + status + `
 GROUP BY 
 time(%s) FILL(null)
 `)
@@ -128,7 +140,7 @@ time(%s) FILL(null)
 		handler.ResultDataHandler(&times, values, GetTimeFormat(), &total, &count)
 
 		return map[string]interface{}{
-			"title": "Requests Endpoints",
+			"title": fmt.Sprintf("Requests Endpoints %s", title),
 			"times": times,
 			"series": []map[string]interface{}{
 				{
@@ -148,13 +160,25 @@ time(%s) FILL(null)
 
 func (wsc WebSocketClient) GetRequestsBackends() http.HandlerFunc {
 	return wsc.WebSocketHandler(func(request *http.Request, data map[string]interface{}) (i interface{}, err error) {
+		if _, ok := data["message"]; !ok {
+			return map[string]interface{}{
+				"title": "Requests Backends",
+			}, nil
+		}
+		status := data["message"].(string)
+		title := status
+		if status == "ALL" {
+			status = ""
+		} else {
+			status = ` AND "` + strings.ToLower(status) + `"='true'`
+		}
 		cmd := wsc.generateCommand(`
 SELECT 
 sum("total") AS "sum_total", sum("count") AS "sum_count" 
 FROM 
 "%s"."autogen"."requests" 
 WHERE 
-time > %s - %s AND time < %s AND "layer"='backend'
+time > %s - %s AND time < %s AND "layer"='backend'` + status + `
 GROUP BY 
 time(%s) FILL(null)
 `)
@@ -174,7 +198,7 @@ time(%s) FILL(null)
 		handler.ResultDataHandler(&times, values, GetTimeFormat(), &total, &count)
 
 		return map[string]interface{}{
-			"title": "Requests Backends",
+			"title": fmt.Sprintf("Requests Backends %s", title),
 			"times": times,
 			"series": []map[string]interface{}{
 				{
@@ -196,7 +220,9 @@ func (wsc WebSocketClient) GetRequestsAPI() http.HandlerFunc {
 	return wsc.WebSocketHandler(func(request *http.Request, data map[string]interface{}) (i interface{}, err error) {
 		message, ok := data["message"]
 		if !ok {
-			return nil, nil
+			return map[string]interface{}{
+				"title": "Requests API",
+			}, nil
 		}
 
 		api := strings.Fields(message.(string))

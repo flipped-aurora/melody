@@ -1,7 +1,18 @@
-name: Go
-on: [push]
+name: Melody code build
+on:
+  push:
+    branches:
+      - '*'
+    paths-ignore:
+      - './docs/**'
+      - '**.md'
+  pull_request:
+    branches:
+      - '*'
+    paths-ignore:
+      - './docs/**'
+      - '**.md'
 jobs:
-
   build:
     name: Build
     runs-on: ubuntu-latest
