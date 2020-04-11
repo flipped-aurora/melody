@@ -172,7 +172,6 @@ func (wsc WebSocketClient) GetRequestsBackends() http.HandlerFunc {
 		} else {
 			status = ` AND "` + strings.ToLower(status) + `"='true'`
 		}
-		fmt.Println(status, title)
 		cmd := wsc.generateCommand(`
 SELECT 
 sum("total") AS "sum_total", sum("count") AS "sum_count" 
