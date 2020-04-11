@@ -377,13 +377,10 @@ backend: [{
 	...
 	"extra_config": {
         "melody_jose_validator": {
-          "alg": "HS256",
-          "cipher_suites": [
-            47
-          ],
+          "alg": "RS256",
           "cache": true,
           "jwk-url": "https://www.test.com/public",
-          "issuer": "god",
+          "issuer": "Melody",
           "roles": [
             "admin"
           ],
