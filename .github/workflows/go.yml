@@ -1,4 +1,4 @@
-name: Go
+name: Melody code build
 on:
   push:
     branches:
