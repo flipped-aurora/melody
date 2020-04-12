@@ -11,7 +11,7 @@ import (
 )
 
 func TestNewClient_withDefaults(t *testing.T) {
-	client, err := NewClient(
+	client, err := NewReg(
 		context.Background(),
 		[]string{"http://irrelevant:12345"},
 		ClientOptions{},
@@ -24,9 +24,9 @@ func TestNewClient_withDefaults(t *testing.T) {
 	}
 }
 
-// NewClient should fail when providing invalid or missing endpoints.
+// NewReg should fail when providing invalid or missing endpoints.
 func TestOptions(t *testing.T) {
-	a, err := NewClient(
+	a, err := NewReg(
 		context.Background(),
 		[]string{},
 		ClientOptions{
@@ -45,7 +45,7 @@ func TestOptions(t *testing.T) {
 		t.Fatalf("expected client to be nil on failure")
 	}
 
-	_, err = NewClient(
+	_, err = NewReg(
 		context.Background(),
 		[]string{"http://irrelevant:12345"},
 		ClientOptions{

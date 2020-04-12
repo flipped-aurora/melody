@@ -73,6 +73,7 @@ func NewExecutor(ctx context.Context) cmd.Executor {
 		}
 
 		// 5.注册etcd, dns srv,并返回func to register consul
+
 		reg := RegisterSubscriberFactories(ctx, cfg, logger)
 		// 6.创建Metrics监控
 		metricsController := metrics.New(ctx, cfg.ExtraConfig, logger)

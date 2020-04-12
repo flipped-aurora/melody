@@ -14,16 +14,18 @@ import (
 // RegisterSubscriberFactories registers all the available sd adaptors
 // sd = service discovery
 func RegisterSubscriberFactories(ctx context.Context, cfg config.ServiceConfig, logger logging.Logger) func(n string, p int) {
-	// setup the etcd client if necessary
+	// setup the etcdReg if necessary
 	// etcd Raft
-	etcdClient, err := etcd.New(ctx, cfg.ExtraConfig)
+	etcdReg, err := etcd.New(ctx, cfg.ExtraConfig)
+
 	if err != nil {
 		logger.Warning("building the etcd client:", err.Error())
 	}
+
 	register := sd.GetRegister()
-	register.Register("etcd", etcd.SubscriberFactory(ctx, etcdClient))
+	register.Register("etcd", etcd.SubscriberFactory(ctx, etcdReg))
 	// register.Get("etcd")(backend) 会得到此backend中以第一个host为prefix的key的所有value的一个slice
-	// etcdClient.GetEntries(host[0])
+	// etcdReg.GetEntries(host[0])
 
 	// register the dns service discovery
 	// 同上 register.Get("dns")(backend)

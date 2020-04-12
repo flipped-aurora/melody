@@ -3,7 +3,6 @@ package etcd
 import (
 	"context"
 	"fmt"
-	"log"
 	"melody/config"
 	"time"
 )
@@ -35,14 +34,6 @@ func New(ctx context.Context, e config.ExtraConfig) (Client, error) {
 		return nil, err
 	}
 	etcdClient, err := NewClient(ctx, machines, parseOptions(tmp))
-
-	// test
-	entries, err := etcdClient.GetEntries("hello")
-	if err != nil {
-		log.Println(err)
-	}
-	fmt.Println(entries)
-	// end test
 
 	return etcdClient, err
 }
