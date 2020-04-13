@@ -39,6 +39,6 @@ func DefaultHTTPResponseParserFactory(cfg HTTPResponseParserConfig) HTTPResponse
 			IsComplete: true,
 		}
 		response = cfg.EntityFormatter.Format(response)
-		return &response, err
+		return &response, nil
 	}
 }
