@@ -91,11 +91,6 @@ func parseOptions(cfg map[string]interface{}) ClientOptions {
 		}
 	}
 
-	if o, ok := tmp["header_timeout"]; ok {
-		if d, err := parseDuration(o); err == nil {
-			options.HeaderTimeoutPerRequest = d
-		}
-	}
 	return options
 }
 

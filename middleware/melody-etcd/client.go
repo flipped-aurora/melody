@@ -2,12 +2,21 @@ package etcd
 
 import (
 	"context"
+	"crypto/tls"
+	"crypto/x509"
+	"fmt"
+	"io/ioutil"
 	"time"
 
 	"github.com/coreos/etcd/clientv3"
 )
 
 // Code taken from https://github.com/go-kit/kit/blob/master/sd/etcd/client.go
+
+var (
+	// ErrNoConfig is the error to be returned when there is no config with the etcd namespace
+	ErrNoHost = fmt.Errorf("get 0 host from etcd client: no host")
+)
 
 const defaultTTL = 3 * time.Second
 
@@ -36,12 +45,11 @@ type client struct {
 // ClientOptions defines options for the etcd client. All values are optional.
 // If any duration is not specified, a default of 3 seconds will be used.
 type ClientOptions struct {
-	Cert                    string
-	Key                     string
-	CACert                  string
-	DialTimeout             time.Duration
-	DialKeepAlive           time.Duration
-	HeaderTimeoutPerRequest time.Duration
+	Cert          string
+	Key           string
+	CACert        string
+	DialTimeout   time.Duration
+	DialKeepAlive time.Duration
 }
 
 // NewClient returns Client with a connection to the named machines. It will
@@ -55,37 +63,31 @@ func NewClient(ctx context.Context, machines []string, options ClientOptions) (C
 	if options.DialKeepAlive == 0 {
 		options.DialKeepAlive = defaultTTL
 	}
-	if options.HeaderTimeoutPerRequest == 0 {
-		options.HeaderTimeoutPerRequest = defaultTTL
+
+	var tlsCfg *tls.Config
+	if options.Cert != "" && options.Key != "" {
+		tlsCert, err := tls.LoadX509KeyPair(options.Cert, options.Key)
+		if err != nil {
+			return nil, err
+		}
+		tlsCfg := &tls.Config{
+			Certificates: []tls.Certificate{tlsCert},
+		}
+		if caCertCt, err := ioutil.ReadFile(options.CACert); err == nil {
+			caCertPool := x509.NewCertPool()
+			caCertPool.AppendCertsFromPEM(caCertCt)
+			tlsCfg.RootCAs = caCertPool
+		}
 	}
 
-	//if options.Cert != "" && options.Key != "" {
-	//	tlsCert, err := tls.LoadX509KeyPair(options.Cert, options.Key)
-	//	if err != nil {
-	//		return nil, err
-	//	}
-	//	tlsCfg := &tls.Config{
-	//		Certificates: []tls.Certificate{tlsCert},
-	//	}
-	//	if caCertCt, err := ioutil.ReadFile(options.CACert); err == nil {
-	//		caCertPool := x509.NewCertPool()
-	//		caCertPool.AppendCertsFromPEM(caCertCt)
-	//		tlsCfg.RootCAs = caCertPool
-	//	}
-	//	transport = &http.Transport{
-	//		TLSClientConfig: tlsCfg,
-	//		DialContext: func(ctx context.Context, network, address string) (net.Conn, error) {
-	//			return (&net.Dialer{
-	//				Timeout:   options.DialTimeout,
-	//				KeepAlive: options.DialKeepAlive,
-	//			}).Dial(network, address)
-	//		},
-	//	}
-	//}
-
 	ce, err := clientv3.New(clientv3.Config{
-		Endpoints: machines,
+		Endpoints:         machines,
+		DialTimeout:       options.DialTimeout,
+		DialKeepAliveTime: options.DialKeepAlive,
+		Context:           ctx,
+		TLS:               tlsCfg,
 	})
+
 	if err != nil {
 		return nil, err
 	}
@@ -107,7 +109,7 @@ func (c *client) GetEntries(key string) ([]string, error) {
 	// resp.Node.Value is also empty, in which case the key is empty and we
 	// should not return any entries.
 	if len(resp.Kvs) == 0 && resp.Count == 0 {
-		return nil, nil
+		return nil, ErrNoHost
 	}
 
 	entries := make([]string, resp.Count)

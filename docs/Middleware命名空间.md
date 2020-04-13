@@ -478,3 +478,20 @@ backend: [{
 ```
 - Level: [ServiceConfig]
 - Status: 完成
+
+## 21.melody_martian
+- Describe: 通过配置文件中的简单DSL定义来改变请求和响应
+- NameSpace `melody_martian`
+- Struct: (DSL语句较多，具体配置阅读文档)
+```
+"melody_martian": {
+	"header.Copy": {
+        "scope": ["request", "response"],
+        "from": "Original-Header",
+        "to": "Copy-Header"
+    }
+    ...
+}
+```
+- Level: [BackendConfig]
+- Status: 完成

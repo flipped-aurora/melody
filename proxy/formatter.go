@@ -63,7 +63,7 @@ func NewEntityFormatter(remote *config.Backend) EntityFormatter {
 	{
 		"a": []
 	}
-	 */
+	*/
 	// 创建flatMapFormatter对象
 	if flatMapFormatter := newFlatmapFormatter(remote); flatMapFormatter != nil {
 		return flatMapFormatter
@@ -73,7 +73,7 @@ func NewEntityFormatter(remote *config.Backend) EntityFormatter {
 	{
 		"a" : {...}
 	}
-	 */
+	*/
 	var propertyFilter propertyFilter
 	if len(remote.Whitelist) > 0 {
 		propertyFilter = newWhitelistingFilter(remote.Whitelist)
@@ -97,6 +97,7 @@ func NewEntityFormatter(remote *config.Backend) EntityFormatter {
 func newFlatmapFormatter(remote *config.Backend) EntityFormatter {
 	if v, ok := remote.ExtraConfig[Namespace]; ok {
 		if e, ok := v.(map[string]interface{}); ok {
+			// e 是 config
 			if a, ok := e[flatmapKey].([]interface{}); ok {
 				if len(a) == 0 {
 					return nil
@@ -137,15 +138,23 @@ func newFlatmapFormatter(remote *config.Backend) EntityFormatter {
 	return nil
 }
 
+// newWhitelistingFilter 初始化白名单
 func newWhitelistingFilter(whitelist []string) propertyFilter {
 	wlDict := make(map[string]interface{})
+	// e.g. 白名单中有 a.b.c 和 a.b.c.d
+	// 第一轮 wlDict[a][b][c] = true
+	// 第二轮 wlDict[a][b][c].(map[string]interface{}) !ok 直接 break
+	// 然后将 wlDict[a][b][c] 改成 map, wlDict[a][b][c][d] = true
+	// 结果就是: 只有 a.b.c.d 生效
 	for _, k := range whitelist {
 		wlFields := strings.Split(k, ".")
 		d := buildDictPath(wlDict, wlFields[:len(wlFields)-1])
 		d[wlFields[len(wlFields)-1]] = true
 	}
-	
+
 	return func(response *Response) {
+		// 如果最顶层需要删除的话, 遍历所有的 key 进行删除
+		// (感觉这里的操作多余了...)
 		if whitelistPrune(wlDict, response.Data) {
 			for k := range response.Data {
 				delete(response.Data, k)
@@ -154,6 +163,7 @@ func newWhitelistingFilter(whitelist []string) propertyFilter {
 	}
 }
 
+// newWhitelistingFilter 生成白名单字典
 func buildDictPath(accumulator map[string]interface{}, fields []string) map[string]interface{} {
 	ok := true
 	var c map[string]interface{}
@@ -174,21 +184,29 @@ func buildDictPath(accumulator map[string]interface{}, fields []string) map[stri
 	return p
 }
 
+// whitelistPrune 递归删除不在白名单中的数据
 func whitelistPrune(wlDict map[string]interface{}, inDict map[string]interface{}) bool {
-	canDelete := true
+	canDelete := true // 只有这一层所有的 value 全部要删的时候才是 true
 	var deleteSibling bool
 	for k, v := range inDict {
 		deleteSibling = true
 		if subWl, ok := wlDict[k]; ok {
+			// 此 key 在白名单中, 判断 白名单[key] 的类型
 			if subWlDict, okk := subWl.(map[string]interface{}); okk {
+				// 白名单[key] 是 map[string]interface{} 的时候往下一层走
+				// 如果 response[key] 也是 map[string]interface{} 的时候进行递归
+				// 递归到最后的情况: (核心)
+				// response 中的所有 value 都不是 map[string]interface{}
+				// 此时便可对这一层级进行逐一 delete, 这也是上一次递归的一个小分支
 				if subInDict, isDict := v.(map[string]interface{}); isDict && !whitelistPrune(subWlDict, subInDict) {
 					deleteSibling = false
 				}
 			} else {
-				// whitelist leaf, maintain this branch
+				// 当 value 不是 map[string]interface{} 时, 一定是 true (即保留)
 				deleteSibling = false
 			}
 		}
+		// 不在白名单中, 直接删除
 		if deleteSibling {
 			delete(inDict, k)
 		} else {
@@ -198,9 +216,12 @@ func whitelistPrune(wlDict map[string]interface{}, inDict map[string]interface{}
 	return canDelete
 }
 
+// newBlacklistingFilter 初始化黑名单
 func newBlacklistingFilter(blacklist []string) propertyFilter {
 	bl := make(map[string][]string, len(blacklist))
 	for _, key := range blacklist {
+		// e.g. a.b.c   a.b.c.d
+		// bl[a] = ["b", "b"]
 		keys := strings.Split(key, ".")
 		if len(keys) > 1 {
 			if sub, ok := bl[keys[0]]; ok {
