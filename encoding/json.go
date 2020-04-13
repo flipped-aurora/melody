@@ -13,8 +13,6 @@ func NewJSONDecoder(isCollection bool) func(io.Reader, *map[string]interface{}) 
 	} else {
 		return JSONDecoder()
 	}
-
-	return nil
 }
 
 func JSONDecoder() Decoder {
