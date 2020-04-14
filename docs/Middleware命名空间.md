@@ -220,7 +220,6 @@ response:
     ],
     "dial_timeout": "5s",
     "dial_keepalive": "30s",
-    "header_timeout": "1s",
     "cert": "/https/cert",
     "key": "/https/privateKey",
     "cacert": "/https/CaCert"
