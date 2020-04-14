@@ -53,8 +53,6 @@ func (wsc WebSocketClient) GetDebugNumGC() http.HandlerFunc {
 	})
 }
 
-// SELECT sum("GCStats.PauseTotal") AS "sum_GCStats.PauseTotal" FROM "melody_data_p1"."autogen"."debug" WHERE time > :dashboardTime: AND time < :upperDashboardTime: GROUP BY time(:interval:) FILL(null)
-
 func (wsc WebSocketClient) GetDebugFreeTotal() http.HandlerFunc {
 	return wsc.WebSocketHandler(func(request *http.Request, data map[string]interface{}) (interface{}, error) {
 		cmd := wsc.generateCommand(`

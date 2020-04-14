@@ -7,10 +7,10 @@ import (
 )
 
 const (
-	Namespace = "melody_influxdb"
-	defaultDB = "melody_data"
-	defaultAddress = "*:8086"
-	dataServerDefaultListenPort = ":8001"
+	Namespace                      = "melody_influxdb"
+	defaultDB                      = "melody_data"
+	defaultAddress                 = "*:8086"
+	dataServerDefaultListenPort    = ":8001"
 	dataServerDefaultWebSocketPort = ":8002"
 )
 
@@ -18,15 +18,15 @@ var configErr = errors.New("load influx config error")
 
 // influxdbConfig 描述metrics输出的influxDB的信息
 type influxdbConfig struct {
-	address    string
-	username   string
-	password   string
-	ttl        time.Duration
-	db         string
-	bufferSize int
-	timeout    time.Duration
-	dataServerEnable bool
-	dataServerPort string
+	address               string
+	username              string
+	password              string
+	ttl                   time.Duration
+	db                    string
+	bufferSize            int
+	timeout               time.Duration
+	dataServerEnable      bool
+	dataServerPort        string
 	dataServerQueryEnable bool
 }
 
