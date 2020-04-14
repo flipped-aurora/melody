@@ -100,6 +100,7 @@ func NewClient(ctx context.Context, machines []string, options ClientOptions) (C
 
 // GetEntries implements the etcd Client interface.
 func (c *client) GetEntries(key string) ([]string, error) {
+	// TODO: bug 如果没有先启动 etcd 这里就会崩掉 并且卡住之后的endpoint的初始化
 	resp, err := c.v3.Get(c.ctx, key, clientv3.WithPrefix())
 	if err != nil {
 		return nil, err

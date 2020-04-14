@@ -10,7 +10,7 @@ func RegisterSubscriberFactory(name string, sf SubscriberFactory) error {
 	return subscriberFactories.Register(name, sf)
 }
 
-// GetSubscriber returns a subscriber from package register
+// GetSubscriber 在此处选择调用哪种服务发现
 func GetSubscriber(cfg *config.Backend) Subscriber {
 	return subscriberFactories.Get(cfg.SD)(cfg)
 }

@@ -2,6 +2,7 @@ package etcd
 
 import (
 	"context"
+	"errors"
 	"melody/config"
 	"melody/sd"
 	"sync"
@@ -11,6 +12,7 @@ var (
 	subscribers               = map[string]sd.Subscriber{}
 	subscribersMutex          = &sync.Mutex{}
 	fallbackSubscriberFactory = sd.FixedSubscriberFactory
+	NoClientError             = errors.New("errors: no SD client")
 )
 
 // SubscriberFactory builds a an etcd subscriber SubscriberFactory with the received etcd client
@@ -55,6 +57,10 @@ func NewSubscriber(ctx context.Context, c Client, prefix string) (*Subscriber, e
 		cache:  &sd.FixedSubscriber{},
 		ctx:    ctx,
 		mutex:  &sync.RWMutex{},
+	}
+
+	if s.client == nil {
+		return nil, NoClientError
 	}
 
 	// 获取 key 为 s.prefix 的所有value
