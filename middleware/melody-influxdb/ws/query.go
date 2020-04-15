@@ -16,6 +16,9 @@ func (wsc WebSocketClient) executeQuery(cmd string) ([]client.Result, error) {
 	if resp.Err != "" {
 		return nil, errors.New(resp.Err)
 	}
+	if len(resp.Results) == 0 {
+		return nil, errors.New("error: influx query no resp")
+	}
 	return resp.Results, nil
 }
 
@@ -29,6 +32,9 @@ func NormalExecuteQuery(c client.Client, cmd, db string) ([]client.Result, error
 	}
 	if resp.Err != "" {
 		return nil, errors.New(resp.Err)
+	}
+	if len(resp.Results) == 0 {
+		return nil, errors.New("error: influx query no resp")
 	}
 	return resp.Results, nil
 }
