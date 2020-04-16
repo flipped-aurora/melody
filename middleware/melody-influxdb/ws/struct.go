@@ -3,6 +3,7 @@ package ws
 import (
 	"github.com/gorilla/websocket"
 	"github.com/influxdata/influxdb/client/v2"
+	"melody/config"
 	"melody/logging"
 	"net/http"
 )
@@ -14,7 +15,7 @@ type WebSocketClient struct {
 	DB       string
 }
 
-func (wsc WebSocketClient) RegisterHandleFunc() {
+func (wsc WebSocketClient) RegisterHandleFunc(cfg *config.ServiceConfig) {
 	http.HandleFunc("/debug/num/gc", wsc.GetDebugNumGC())
 	http.HandleFunc("/debug/free-total", wsc.GetDebugFreeTotal())
 
@@ -28,6 +29,7 @@ func (wsc WebSocketClient) RegisterHandleFunc() {
 	http.HandleFunc("/requests/endpoints", wsc.GetRequestsEndpoints())
 	http.HandleFunc("/requests/backends", wsc.GetRequestsBackends())
 	http.HandleFunc("/requests/api", wsc.GetRequestsAPI())
+	http.HandleFunc("/requests/endpoints/pie", wsc.GetRequestsEndpointsPie(cfg))
 
 	http.HandleFunc("/router/direction", wsc.GetRouterDirection())
 }

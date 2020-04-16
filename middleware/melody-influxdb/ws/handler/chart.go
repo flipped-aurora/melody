@@ -1,6 +1,9 @@
 package handler
 
-import "melody/middleware/melody-influxdb/ws/convert"
+import (
+	"encoding/json"
+	"melody/middleware/melody-influxdb/ws/convert"
+)
 
 /**
  将InfluxDB返回的结果集映射到数组中
@@ -20,6 +23,17 @@ func ResultDataHandler(times *[]string, data [][]interface{}, format string, lin
 			} else {
 				*lines[index] = append(*lines[index], 0)
 			}
+		}
+	}
+}
+
+func ResultSingleDataHandler(times *[]string, data [][]interface{}, format string, singleField *int64) {
+	for _, v := range data {
+		if t, ok := convert.ObjectToStringTime(v[0], format); ok {
+			*times = append(*times, t)
+		}
+		if vv, ok := v[1].(json.Number); ok {
+			*singleField, _ = vv.Int64()
 		}
 	}
 }
