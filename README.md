@@ -20,9 +20,13 @@ High Quality API Getaway with middlewares - help you to sort out your complex ap
 |web|https://granty1.github.io/melody-web/|
 |test api repository|https://github.com/granty1/gin-gorm-jwt-quick-start|
 
-## Example
+## Melody series structure chart
 
-![melody-logo](<https://github.com/granty1/melody/blob/master/docs/img/example.png>)
+![melody-struct](<https://github.com/granty1/melody/blob/master/docs/img/struct.png>)
+
+## Use example
+
+![melody-example](<https://github.com/granty1/melody/blob/master/docs/img/example.png>)
 
 ## Version
 Melody 1.0
