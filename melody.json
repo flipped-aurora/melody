@@ -3,7 +3,7 @@
   "extra_config": {
     "melody_gologging": {
       "level": "DEBUG",
-      "prefix": "[Grant]",
+      "prefix": "[Melody]",
       "syslog": false,
       "stdout": true,
       "format": "default"
@@ -67,7 +67,15 @@
     {
       "endpoint": "/roles",
       "method": "GET",
-      "extra_config": {},
+      "extra_config": {
+        "melody_jose_validator": {
+          "alg": "RS256",
+          "cache": true,
+          "jwk-url": "http://localhost:9001/public",
+          "issuer": "Melody",
+          "disable_jwk_security": true
+        }
+      },
       "output_encoding": "json",
       "concurrent_calls": 1,
       "backends": [
@@ -77,9 +85,9 @@
           "extra_config": {},
           "method": "GET",
           "host": [
-            "127.0.0.1:8003"
+            "http://127.0.0.1:9001"
           ],
-          "disable_host_sanitize": false,
+          "disable_host_sanitize": true,
           "group": "roles_info"
         }
       ]
@@ -217,7 +225,7 @@
           "method": "GET",
           "group": "static_data",
           "host": [
-            "127.0.0.1:7777"
+            "127.0.0.1:9001"
           ]
         }
       ]
@@ -256,10 +264,31 @@
         {
           "url_pattern": "/__debug/bar",
           "host": [
-            "127.0.0.1:8000"
+            "127.0.0.1:9001"
           ]
         }
       ]
+    },
+    {
+      "endpoint": "/token",
+      "method": "POST",
+      "backends": [
+        {
+          "url_pattern": "/auth/login",
+          "host": [
+            "127.0.0.1:9001"
+          ]
+        }
+      ],
+      "extra_config": {
+        "melody_jose_signer": {
+          "alg": "RS256",
+          "jwk-url": "http://localhost:9001/private",
+          "kid": "melody",
+          "keys-to-sign": ["data"],
+          "disable_jwk_security": true
+        }
+      }
     }
   ]
 }

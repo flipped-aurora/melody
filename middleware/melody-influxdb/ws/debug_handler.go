@@ -3,19 +3,9 @@ package ws
 import (
 	"errors"
 	"melody/middleware/melody-influxdb/ws/convert"
+	"melody/middleware/melody-influxdb/ws/handler"
 	"net/http"
 )
-
-func (wsc WebSocketClient) PushTestArray() http.HandlerFunc {
-	return wsc.WebSocketHandler(func(request *http.Request, data map[string]interface{}) (i interface{}, err error) {
-		if data != nil {
-			if v, ok := data["message"].(string); ok {
-				return v, nil
-			}
-		}
-		return
-	})
-}
 
 func (wsc WebSocketClient) GetDebugNumGC() http.HandlerFunc {
 	return wsc.WebSocketHandler(func(request *http.Request, data map[string]interface{}) (interface{}, error) {
@@ -57,6 +47,45 @@ func (wsc WebSocketClient) GetDebugNumGC() http.HandlerFunc {
 					"name":   "GCNum",
 					"type":   "line",
 					"smooth": true,
+				},
+			},
+		}, nil
+	})
+}
+
+func (wsc WebSocketClient) GetDebugFreeTotal() http.HandlerFunc {
+	return wsc.WebSocketHandler(func(request *http.Request, data map[string]interface{}) (interface{}, error) {
+		cmd := wsc.generateCommand(`
+SELECT
+sum("GCStats.PauseTotal") AS "sum_GCStats.PauseTotal"
+FROM
+"%s"."autogen"."debug"
+WHERE
+time > %s - %s AND time < %s 
+GROUP BY
+time(%s) FILL(null)
+`)
+		resu, err := wsc.executeQuery(cmd)
+		if err != nil {
+			return nil, err
+		}
+		result := resu[0]
+		if result.Err != "" {
+			return nil, errors.New(result.Err)
+		}
+		values := result.Series[0].Values
+		var times []string
+		var freeTotal []int64
+		handler.ResultDataHandler(&times, values, GetTimeFormat(), &freeTotal)
+		return map[string]interface{}{
+			"title": "debug.FreeTotal",
+			"times": times,
+			"series": []map[string]interface{}{
+				{
+					"data":      freeTotal,
+					"name":      "FreeTotal",
+					"type":      "line",
+					"areaStyle": map[string]interface{}{},
 				},
 			},
 		}, nil

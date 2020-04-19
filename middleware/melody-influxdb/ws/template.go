@@ -10,6 +10,10 @@ func (wsc WebSocketClient) generateCommand(cmd string) string {
 	return fmt.Sprintf(cmd, wsc.DB, WsTimeControl.MinTime, WsTimeControl.TimeInterval, WsTimeControl.MaxTime, WsTimeControl.GroupTime)
 }
 
+func (wsc WebSocketClient) generateCommandWithSingle(cmd string) string {
+	return fmt.Sprintf(cmd, wsc.DB, WsTimeControl.MinTime, WsTimeControl.TimeInterval, WsTimeControl.MaxTime)
+}
+
 func (wsc WebSocketClient) generateCommandWithEndpoints(cmd string, cfg *config.ServiceConfig) string {
 	var endpointStr []string
 	for i := range cfg.Endpoints {

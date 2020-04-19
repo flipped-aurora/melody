@@ -4,15 +4,19 @@ import (
 	"context"
 	"crypto/tls"
 	"crypto/x509"
+	"fmt"
 	"io/ioutil"
-	"net"
-	"net/http"
 	"time"
 
-	etcd "github.com/coreos/etcd/client"
+	"github.com/coreos/etcd/clientv3"
 )
 
 // Code taken from https://github.com/go-kit/kit/blob/master/sd/etcd/client.go
+
+var (
+	// ErrNoConfig is the error to be returned when there is no config with the etcd namespace
+	ErrNoHost = fmt.Errorf("get 0 host from etcd client: no host")
+)
 
 const defaultTTL = 3 * time.Second
 
@@ -34,19 +38,18 @@ type Client interface {
 }
 
 type client struct {
-	keysAPI etcd.KeysAPI
-	ctx     context.Context
+	v3  *clientv3.Client
+	ctx context.Context
 }
 
 // ClientOptions defines options for the etcd client. All values are optional.
 // If any duration is not specified, a default of 3 seconds will be used.
 type ClientOptions struct {
-	Cert                    string
-	Key                     string
-	CACert                  string
-	DialTimeout             time.Duration
-	DialKeepAlive           time.Duration
-	HeaderTimeoutPerRequest time.Duration
+	Cert          string
+	Key           string
+	CACert        string
+	DialTimeout   time.Duration
+	DialKeepAlive time.Duration
 }
 
 // NewClient returns Client with a connection to the named machines. It will
@@ -60,11 +63,8 @@ func NewClient(ctx context.Context, machines []string, options ClientOptions) (C
 	if options.DialKeepAlive == 0 {
 		options.DialKeepAlive = defaultTTL
 	}
-	if options.HeaderTimeoutPerRequest == 0 {
-		options.HeaderTimeoutPerRequest = defaultTTL
-	}
 
-	transport := etcd.DefaultTransport
+	var tlsCfg *tls.Config
 	if options.Cert != "" && options.Key != "" {
 		tlsCert, err := tls.LoadX509KeyPair(options.Cert, options.Key)
 		if err != nil {
@@ -78,35 +78,30 @@ func NewClient(ctx context.Context, machines []string, options ClientOptions) (C
 			caCertPool.AppendCertsFromPEM(caCertCt)
 			tlsCfg.RootCAs = caCertPool
 		}
-		transport = &http.Transport{
-			TLSClientConfig: tlsCfg,
-			DialContext: func(ctx context.Context, network, address string) (net.Conn, error) {
-				return (&net.Dialer{
-					Timeout:   options.DialTimeout,
-					KeepAlive: options.DialKeepAlive,
-				}).Dial(network, address)
-			},
-		}
 	}
 
-	ce, err := etcd.New(etcd.Config{
-		Endpoints:               machines,
-		Transport:               transport,
-		HeaderTimeoutPerRequest: options.HeaderTimeoutPerRequest,
+	ce, err := clientv3.New(clientv3.Config{
+		Endpoints:         machines,
+		DialTimeout:       options.DialTimeout,
+		DialKeepAliveTime: options.DialKeepAlive,
+		Context:           ctx,
+		TLS:               tlsCfg,
 	})
+
 	if err != nil {
 		return nil, err
 	}
 
 	return &client{
-		keysAPI: etcd.NewKeysAPI(ce),
-		ctx:     ctx,
+		v3:  ce,
+		ctx: ctx,
 	}, nil
 }
 
 // GetEntries implements the etcd Client interface.
 func (c *client) GetEntries(key string) ([]string, error) {
-	resp, err := c.keysAPI.Get(c.ctx, key, &etcd.GetOptions{Recursive: true})
+	// TODO: bug 如果没有先启动 etcd 这里就会崩掉 并且卡住之后的endpoint的初始化
+	resp, err := c.v3.Get(c.ctx, key, clientv3.WithPrefix())
 	if err != nil {
 		return nil, err
 	}
@@ -114,25 +109,29 @@ func (c *client) GetEntries(key string) ([]string, error) {
 	// Special case. Note that it's possible that len(resp.Node.Nodes) == 0 and
 	// resp.Node.Value is also empty, in which case the key is empty and we
 	// should not return any entries.
-	if len(resp.Node.Nodes) == 0 && resp.Node.Value != "" {
-		return []string{resp.Node.Value}, nil
+	if len(resp.Kvs) == 0 && resp.Count == 0 {
+		return nil, ErrNoHost
 	}
 
-	entries := make([]string, len(resp.Node.Nodes))
-	for i, node := range resp.Node.Nodes {
-		entries[i] = node.Value
+	entries := make([]string, resp.Count)
+	for i, node := range resp.Kvs {
+		entries[i] = string(node.Value)
 	}
 	return entries, nil
 }
 
 // WatchPrefix implements the etcd Client interface.
 func (c *client) WatchPrefix(prefix string, ch chan struct{}) {
-	watch := c.keysAPI.Watcher(prefix, &etcd.WatcherOptions{AfterIndex: 0, Recursive: true})
-	ch <- struct{}{} // make sure caller invokes GetEntries
+	wch := c.v3.Watcher.Watch(c.ctx, prefix, clientv3.WithPrefix())
+	ch <- struct{}{}
 	for {
-		if _, err := watch.Next(c.ctx); err != nil {
-			return
+		select {
+		case resp := <-wch:
+			if resp.Canceled {
+				return
+			} else {
+				ch <- struct{}{}
+			}
 		}
-		ch <- struct{}{}
 	}
 }

@@ -55,7 +55,7 @@ func (d defaultFactory) New(cfg *config.EndpointConfig) (p Proxy, err error) {
 func (d defaultFactory) NewStack(backend *config.Backend) (p Proxy) {
 	// 根据config.Backend定制backendProxy 执行顺序：④
 	p = d.backendFactory(backend)
-	// 均衡中间件注册                     执行顺序：③
+	// 均衡中间件注册(在此处调用对应的服务发现)     执行顺序：③
 	p = NewLoadBalancedMiddlewareWithSubscriber(d.subscriberFactory(backend))(p)
 	if backend.ConcurrentCalls > 1 {
 		// 并发调用 > 1                    执行顺序：②

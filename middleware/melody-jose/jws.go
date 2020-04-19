@@ -65,9 +65,9 @@ func GetSignatureConfig(cfg *config.EndpointConfig) (*SignatureConfig, error) {
 	if res.RolesKey == "" {
 		res.RolesKey = defaultRolesKey
 	}
-	if !strings.HasPrefix(res.URI, "https://") && !res.DisableJWKSecurity {
-		return res, ErrInsecureJWKSource
-	}
+	//if !strings.HasPrefix(res.URI, "https://") && !res.DisableJWKSecurity {
+	//	return res, ErrInsecureJWKSource
+	//}
 	return res, nil
 }
 
@@ -77,8 +77,12 @@ func NewSigner(cfg *config.EndpointConfig, te auth0.RequestTokenExtractor) (*Sig
 		return signerCfg, nopSigner, err
 	}
 
-	// 查看指纹是否格式正确
-	decodedFs, err := DecodeFingerprints(signerCfg.Fingerprints)
+	var decodedFs [][]byte
+	if !signerCfg.DisableJWKSecurity {
+		// 如果不禁止安全性
+		// 查看指纹是否格式正确
+		decodedFs, err = DecodeFingerprints(signerCfg.Fingerprints)
+	}
 	if err != nil {
 		return signerCfg, nopSigner, err
 	}

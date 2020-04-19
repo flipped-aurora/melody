@@ -27,35 +27,6 @@ func Test_getSignatureConfig(t *testing.T) {
 	}
 }
 
-func Test_getSignatureConfig_unsecure(t *testing.T) {
-	cfg := &config.EndpointConfig{
-		Timeout:  time.Second,
-		Endpoint: "/private",
-		Backends: []*config.Backend{
-			{
-				URLPattern: "/",
-				Host:       []string{"http://example.com/"},
-				Timeout:    time.Second,
-			},
-		},
-		ExtraConfig: config.ExtraConfig{
-			ValidatorNamespace: map[string]interface{}{
-				"alg":      "RS256",
-				"jwk-url":  "http://jwk.example.com",
-				"audience": []string{"http://api.example.com"},
-				"issuer":   "http://example.com",
-				"roles":    []string{},
-				"cache":    false,
-			},
-		},
-	}
-
-	_, err := GetSignatureConfig(cfg)
-	if err != ErrInsecureJWKSource {
-		t.Errorf("unexpected error: %v", err)
-	}
-}
-
 func Test_getSignatureConfig_wrongStruct(t *testing.T) {
 	cfg := &config.EndpointConfig{
 		Timeout:  time.Second,

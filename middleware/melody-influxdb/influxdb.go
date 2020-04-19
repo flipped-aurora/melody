@@ -75,7 +75,7 @@ func Register(ctx context.Context, cfg *config.ServiceConfig, metrics *ginmetric
 		clientWrapper.runEndpoint(ctx, clientWrapper.newEngine(cfg), logger)
 
 		// Create melody data websocket server
-		clientWrapper.runWebSocketServer(ctx, logger)
+		clientWrapper.runWebSocketServer(ctx, cfg, logger)
 	}
 
 	go clientWrapper.updateAndSendData(ctx, t.C)
@@ -85,7 +85,7 @@ func Register(ctx context.Context, cfg *config.ServiceConfig, metrics *ginmetric
 	return nil
 }
 
-func (cw *clientWrapper) runWebSocketServer(ctx context.Context, logger logging.Logger) {
+func (cw *clientWrapper) runWebSocketServer(ctx context.Context, cfg *config.ServiceConfig, logger logging.Logger) {
 	upgrader := websocket.Upgrader{
 		CheckOrigin: func(r *http.Request) bool {
 			return true
@@ -99,7 +99,7 @@ func (cw *clientWrapper) runWebSocketServer(ctx context.Context, logger logging.
 		DB:       cw.config.db,
 	}
 
-	wsc.RegisterHandleFunc()
+	wsc.RegisterHandleFunc(cfg)
 
 	go func() {
 		u := url.URL{
