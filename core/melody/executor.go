@@ -24,9 +24,9 @@ import (
 //NewExecutor return an new executor
 func NewExecutor(ctx context.Context) cmd.Executor {
 	return func(cfg config.ServiceConfig) {
-		// 1. 确定以及初始化 log有哪些输出
+		// 确定以及初始化 log有哪些输出
 		var writers []io.Writer
-		// 1.1 检察是否使用Gelf
+		// 检察是否使用Gelf
 		gelfWriter, err := gelf.NewWriter(cfg.ExtraConfig)
 		if err == nil {
 			writers = append(writers, GelfWriter{gelfWriter})
@@ -39,20 +39,20 @@ func NewExecutor(ctx context.Context) cmd.Executor {
 				}
 			})
 		}
-		// 2.初始化Logger
+		// 初始化Logger
 
-		// 2.1 是否启用logstash
+		// 是否启用logstash
 		// Logstash 是开源的服务器端数据处理管道，能够同时从多个来源采集数据，转换数据，然后将数据发送到您最喜欢的“存储库”中。
 		// 所以没有logstash就没有下面其他logger
 		logger, enableLogstashError := logstash.NewLogger(cfg.ExtraConfig, writers...)
 
 		if enableLogstashError != nil {
-			// 2.2 是否使用gologging
+			// 是否使用gologging
 			var enableGologgingError error
 			logger, enableGologgingError = gologging.NewLogger(cfg.ExtraConfig, writers...)
 
 			if enableGologgingError != nil {
-				// 2.3 默认使用基础Log  Level:Debug, Output:stdout, Prefix: ""
+				// 默认使用基础Log  Level:Debug, Output:stdout, Prefix: ""
 				logger, err = logging.NewLogger("DEBUG", os.Stdout, "")
 				if err != nil {
 					return
@@ -65,44 +65,34 @@ func NewExecutor(ctx context.Context) cmd.Executor {
 			logger.Debug("use logstash as logger")
 		}
 
-		//TODO 3.Start Reporter (暂时不做)
-
-		//TODO 4.加载插件 (暂时不做,加了点头)
 		if cfg.Plugin != nil {
 			LoadPlugins(cfg.Plugin.Folder, cfg.Plugin.Pattern, logger)
 		}
 
-		// 5.注册etcd, dns srv,并返回func to register consul
+		// 注册etcd, dns srv,并返回func to register consul
 
 		reg := RegisterSubscriberFactories(ctx, cfg, logger)
-		// 6.创建Metrics监控
+		// 创建Metrics监控
 		metricsController := metrics.New(ctx, cfg.ExtraConfig, logger)
-		//7. 集成influxdb
+		// 集成influxdb （单独使用，为melody-data提供数据）
 		if err := influxdb.Register(ctx, &cfg, metricsController, logger); err != nil {
 			logger.Warning(err)
 		}
-		//TODO 8. 集成opencensus
 
-		// 9. 集成bloomFilter
+		// 集成bloomFilter
 		rejecter, err := bloomfilter.Register(ctx, "melody-bf", cfg, logger, reg)
 		if err != nil {
 			logger.Warning("bloomFilter:", err.Error())
 		}
 
-		// 10. 集成JWT，注册RejecterFactory
+		// 集成JWT，注册RejecterFactory
 		tokenRejecterFactory := jose.ChainedRejecterFactory([]jose.RejecterFactory{
 			jose.RejecterFactoryFunc(func(_ logging.Logger, _ *config.EndpointConfig) jose.Rejecter {
 				return jose.RejecterFunc(rejecter.RejectToken)
 			}),
-			//jose.RejecterFactoryFunc(func(l logging.Logger, cfg *config.EndpointConfig) jose.Rejecter {
-			//	if r := cel.NewRejecter(l, cfg); r != nil {
-			//		return r
-			//	}
-			//	return jose.FixedRejecter(false)
-			//}),
 		})
 
-		//11. Set up melody Router
+		// Set up melody Router
 		routerFactory := router.NewFactory(router.Config{
 			Engine:         NewEngine(cfg, logger, gelfWriter),
 			ProxyFactory:   NewProxyFactory(logger, NewBackendFactoryWithContext(ctx, logger, metricsController), metricsController),
