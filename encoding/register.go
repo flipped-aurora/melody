@@ -23,7 +23,8 @@ func (d *DecoderRegister) Get(s string) DecoderFactory {
 	// return json decoder
 	for _, v := range []string{s, JSON} {
 		if v, ok := d.data.Get(v); ok {
-			if decoderFactory, ok := v.(func(bool) func(io.Reader, *map[string]interface{}) error); ok {
+			decoderFactory, ok := v.(func(bool) func(io.Reader, *map[string]interface{}) error)
+			if ok{
 				return decoderFactory
 			}
 		}
@@ -32,7 +33,7 @@ func (d *DecoderRegister) Get(s string) DecoderFactory {
 	return NewJSONDecoder
 }
 
-func (d *DecoderRegister) Register(name string, factory DecoderFactory) error {
+func (d *DecoderRegister) Register(name string, factory func(bool) func(io.Reader, *map[string]interface{}) error) error {
 	d.data.Register(name, factory)
 	return nil
 }

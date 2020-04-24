@@ -28,16 +28,13 @@ func (x xmlReader) Read(p []byte) (n int, err error) {
 }
 
 func Register() {
-	encoding.Register(XML, NewDecoder())
+	encoding.Register(XML, NewXMLDecoder)
 }
-
-func NewDecoder() encoding.DecoderFactory {
-	return func(isCollection bool) func(io.Reader, *map[string]interface{}) error {
-		if isCollection {
-			return CollectionDecoder()
-		} else {
-			return Decoder()
-		}
+func NewXMLDecoder(isCollection bool) func(io.Reader, *map[string]interface{}) error {
+	if isCollection {
+		return CollectionDecoder()
+	} else {
+		return Decoder()
 	}
 }
 

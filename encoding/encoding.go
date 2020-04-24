@@ -21,6 +21,6 @@ func Get(key string) DecoderFactory {
 	return decoders.Get(key)
 }
 
-func Register(key string, factory DecoderFactory) error {
+func Register(key string, factory func(bool) func(io.Reader, *map[string]interface{}) error) error {
 	return decoders.Register(key, factory)
 }
