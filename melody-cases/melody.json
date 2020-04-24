@@ -1,0 +1,132 @@
+{
+  "version": 1,
+  "output_encoding": "json",
+  "disable_rest": false,
+  "extra_config": {
+	"melody_cors": {
+	  "allow_origins": [
+		"*"
+	  ],
+	  "expose_headers": [
+		"Content-Length"
+	  ],
+	  "max_age": "12h",
+	  "allow_methods": [
+		"GET",
+		"POST"
+	  ],
+	  "allow_headers": [
+		"*"
+	  ],
+	  "allow_credentials": false
+	},
+	"melody_gologging": {
+	  "prefix": "[MELODY Demo]",
+	  "level": "DEBUG",
+	  "format": "default",
+	  "stdout": true
+	}
+  },
+  "name": "Melody Demo",
+  "port": "80",
+  "endpoints": [
+	{
+	  "endpoint": "/app/user/{id}",
+	  "method": "GET",
+	  "output_encoding": "JSON",
+	  "extra_config": {
+		"melody_ratelimit_router": {},
+		"melody_proxy": {
+		  "sequential": true
+		}
+	  },
+	  "backends": [
+		{
+		  "url_pattern": "/profile/{id}",
+		  "method": "GET",
+		  "extra_config": {
+			"melody_ratelimit_proxy": {}
+		  },
+		  "host": [
+			"127.0.0.1:9001"
+		  ],
+		  "encoding": "json",
+		  "blacklist": [
+			"password"
+		  ],
+		  "whitelist": [],
+		  "mapping": {
+			"vip": "is_vip"
+		  },
+		  "is_collection": false,
+		  "disable_host_sanitize": false,
+		  "sd": "static",
+		  "group": "profile_info"
+		},
+		{
+		  "url_pattern": "/role/{resp0_profile_info.id}",
+		  "method": "GET",
+		  "extra_config": {
+			"melody_ratelimit_proxy": {}
+		  },
+		  "host": [
+			"127.0.0.1:9002"
+		  ],
+		  "encoding": "json",
+		  "blacklist": [
+			"role_id"
+		  ],
+		  "whitelist": [],
+		  "mapping": {},
+		  "is_collection": false,
+		  "disable_host_sanitize": false,
+		  "sd": "static",
+		  "group": "role_info"
+		},
+		{
+		  "url_pattern": "/coupon/{resp0_profile_info.id}",
+		  "method": "GET",
+		  "extra_config": {
+			"melody_ratelimit_proxy": {}
+		  },
+		  "host": [
+			"127.0.0.1:9003"
+		  ],
+		  "encoding": "json",
+		  "blacklist": [
+			"id",
+			"uuid"
+		  ],
+		  "whitelist": [],
+		  "mapping": {},
+		  "is_collection": false,
+		  "disable_host_sanitize": false,
+		  "sd": "static",
+		  "group": "coupon_info"
+		},
+		{
+		  "url_pattern": "/finance/{resp0_profile_info.id}",
+		  "method": "GET",
+		  "extra_config": {
+			"melody_ratelimit_proxy": {}
+		  },
+		  "host": [
+			"127.0.0.1:9004"
+		  ],
+		  "encoding": "json",
+		  "blacklist": [
+			"id",
+			"uuid"
+		  ],
+		  "whitelist": [],
+		  "mapping": {},
+		  "is_collection": false,
+		  "disable_host_sanitize": false,
+		  "sd": "static",
+		  "group": "finance_info"
+		}
+	  ],
+	  "concurrent_calls": "2"
+	}
+  ]
+}

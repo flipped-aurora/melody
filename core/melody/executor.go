@@ -78,7 +78,6 @@ func NewExecutor(ctx context.Context) cmd.Executor {
 		if err := influxdb.Register(ctx, &cfg, metricsController, logger); err != nil {
 			logger.Warning(err)
 		}
-
 		// 集成bloomFilter
 		rejecter, err := bloomfilter.Register(ctx, "melody-bf", cfg, logger, reg)
 		if err != nil {
