@@ -1,18 +1,26 @@
-![melody-logo](<https://github.com/granty1/melody/blob/master/docs/img/melody.png>)
+<div align=center>
+<img src="http://picture.zyuhn.top/logo.png" onerror="https://github.com/granty1/melody/blob/master/docs/img/melody.png" width="300px" height="336px"/>
+</div>
+<div align=center>
+<img src="https://img.shields.io/badge/golang-1.12-blue"/>
+<img src="https://github.com/granty1/melody/workflows/Go/badge.svg"/>
+<img src="https://travis-ci.com/granty1/melody.svg?branch=master"/>
+<img src="https://coveralls.io/repos/github/granty1/melody/badge.svg?branch=master"/>
+<img src="https://goreportcard.com/badge/github.com/granty1/melody"/>
+</div>
+
+English | [简体中文](./README-zh_CN.md)
 
 # **Melody API Gateway**
-![Go](https://github.com/granty1/melody/workflows/Go/badge.svg)
-[![Build Status](https://travis-ci.com/granty1/melody.svg?branch=master)](https://travis-ci.com/granty1/melody)
-[![Coverage Status](https://coveralls.io/repos/github/granty1/melody/badge.svg?branch=master)](https://coveralls.io/github/granty1/melody?branch=master)
-[![Go Report Card](https://goreportcard.com/badge/github.com/granty1/melody)](https://goreportcard.com/report/github.com/granty1/melody)
+
+- Build Requirements:  Golang 1.11+
+- Melody Version:  1.0.8
 
 ## Introduction
 
 Melody is a high-performance open source API gateway to help you to sort out your complex api.
 
 If you are building for the web, mobile, or IoT (Internet of Things) you will likely end up needing common functionality to run your actual software. Melody can help by acting as a gateway for microservices requests while providing load balancing, logging, authentication, rate-limiting, transformations, and more through middlewares.
-
-![melody-example](<https://github.com/granty1/melody/blob/master/docs/img/example.png>)
 
 [Documentation](https://granty1.github.io/melody-docs) | [Installation](https://github.com/flipped-aurora/melody/releases) | [Site](https://granty1.github.io/melody-web/) | [Configer](  https://granty1.github.io/melody-config) | [Test API](https://github.com/granty1/gin-gorm-jwt-quick-start)
 
@@ -27,33 +35,7 @@ If you are building for the web, mobile, or IoT (Internet of Things) you will li
 - [Melody Site](https://granty1.github.io/melody-web/):Melody Web Site.
 - [Test API Repository](  https://github.com/granty1/gin-gorm-jwt-quick-start):Using this to quick satrt your golang web application.
 
-## Features
-
-- **CLI**: Control your Melody API Gateway from the command line.
-- **REST API**: Melody can be operated with its RESTful API for maximum flexibility.
-- **Transformations**: Add, remove, or manipulate HTTP requests and responses.
-- **Rate-limiting**: Block and throttle requests based on many variables.
-- **Authentications**: Melody supports JWT and JWK.
-- **Monitoring**: Live monitoring provides key load and performance server metrics.
-- **Service Discovery**: Melody integrates etcd to support service discovery.
-- **Logging**: Log requests and responses to your system.
-- **Syslog**: Logging to System log.
-- **Security**: Bot Monitor, whitelist/blacklist,SSL, etc...
-- **Circuit-Breaker**: Intelligent tracking of unhealthy upstream services.
-- **Forward Proxy**: Make Melody connect to intermediary transparent HTTP proxies.
-- **metrics**:Monitor and statistic system operation data.
-- **influxdb**: Melody integrates with influxDB, writing the data gathered by Metrics to influxDB.
-- **CORS**:Support for cross-domain processing.
-
-For more info about middlewares and integrations, you can visit [Documentation](https://granty1.github.io/melody-docs)
-
-## Requirements
-
-Golang 1.11+
-
-## Getting started
-
-#### Build
+## Build
 
 Linux or Mac :
 
@@ -67,12 +49,12 @@ Windows :
 go build .
 ```
 
-#### Usage:
+## Usage:
 
   melody [command]
 
 
-#### Available Commands:
+## Available Commands:
 
 | command | *description*                   |
 | ------- | ------------------------------- |
@@ -82,7 +64,7 @@ go build .
 | graph   | generate graph of melody server |
 
 
-#### Flags:
+## Flags:
 
 | flag-abbr | flag-full | description             |
 | --------- | --------- | ----------------------- |
@@ -94,7 +76,7 @@ go build .
 
 Clone our project
 
-```
+```shell
 $ git clone https://github.com/flipped-aurora/melody.git
 $ cd melody
 $ go build .
@@ -175,36 +157,24 @@ Use command to run Melody
 melody run -c melody.json
 ```
 
-## Result Show
+## Features
 
-![melody-logo](https://github.com/granty1/melody/blob/master/docs/img/p-1.png)
+- **CLI**: Control your Melody API Gateway from the command line.
+- **REST API**: Melody can be operated with its RESTful API for maximum flexibility.
+- **Transformations**: Add, remove, or manipulate HTTP requests and responses.
+- **Rate-limiting**: Block and throttle requests based on many variables.
+- **Authentications**: Melody supports JWT and JWK.
+- **Monitoring**: Live monitoring provides key load and performance server metrics.
+- **Service Discovery**: Melody integrates etcd to support service discovery.
+- **Logging**: Log requests and responses to your system.
+- **Syslog**: Logging to System log.
+- **Security**: Bot Monitor, whitelist/blacklist,SSL, etc...
+- **Circuit-Breaker**: Intelligent tracking of unhealthy upstream services.
+- **Forward Proxy**: Make Melody connect to intermediary transparent HTTP proxies.
+- **metrics**:Monitor and statistic system operation data.
+- **influxdb**: Melody integrates with influxDB, writing the data gathered by Metrics to influxDB.
+- **CORS**:Support for cross-domain processing.
 
-![melody-logo](https://github.com/granty1/melody/blob/master/docs/img/p-2.png)
+For more info about middlewares and integrations, you can visit [Documentation](https://granty1.github.io/melody-docs)
 
-![melody-logo](https://github.com/granty1/melody/blob/master/docs/img/p-3.png)
-
-## Project Architecture
-
-```
-    ├─bf
-    ├─cmd
-    ├─config
-    ├─core
-    ├─docs
-    ├─encoding
-    ├─logging
-    ├─melody-cases
-    ├─middleware
-    ├─plugin
-    ├─proxy
-    ├─register
-    ├─router
-    ├─sd
-    ├─transport
-    ├─Makefile
-    ├─go.mod
-    ├─go.sum
-    ├─main.go
-    └─melody.json
-```
-
+## 
