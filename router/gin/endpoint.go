@@ -65,7 +65,6 @@ func CustomErrorEndpointHandler(config *config.EndpointConfig, proxy proxy.Proxy
 			}
 		}
 
-
 		// 设置最终代理是否完成校验响应头
 		c.Header(router.HeaderCompleteKey, complete)
 

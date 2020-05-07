@@ -36,9 +36,9 @@ var (
 		Example: "melody run -d -c melody.json",
 	}
 	graphCmd = &cobra.Command{
-		Use:     "graph",
-		Short:   "generate graph of melody server",
-		Long:    `Generate a simple example diagram according to service config
+		Use:   "graph",
+		Short: "generate graph of melody server",
+		Long: `Generate a simple example diagram according to service config
 But your computer needs graphviz, you can install this software by
 
   brew install graphviz

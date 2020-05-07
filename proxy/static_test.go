@@ -5,7 +5,6 @@ import (
 	"errors"
 	"melody/config"
 	"testing"
-
 )
 
 func TestNewStaticDataMiddleware_multipleNext(t *testing.T) {

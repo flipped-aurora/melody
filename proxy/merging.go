@@ -139,7 +139,7 @@ func sequentialMerge(patterns []string, timeout time.Duration, combiner Response
 				}
 				acc.Merge(nil, err)
 				break Loop
-			case response := <- out:
+			case response := <-out:
 				acc.Merge(response, nil)
 				if !response.IsComplete {
 					break Loop
@@ -164,7 +164,7 @@ func parallelMerge(timeout time.Duration, rc ResponseCombiner, next ...Proxy) Pr
 		}
 
 		acc := newIncrementalMergeAccumulator(len(next), rc)
-		for i := 0 ; i < len(next) ; i++ {
+		for i := 0; i < len(next); i++ {
 			select {
 			case resp := <-responses:
 				acc.Merge(resp, nil)
@@ -204,7 +204,7 @@ func (i *incrementalMergeAccumulator) Merge(res *Response, err error) {
 func (i *incrementalMergeAccumulator) Result() (*Response, error) {
 	if i.data == nil {
 		return &Response{
-			Data: map[string]interface{}{},
+			Data:       map[string]interface{}{},
 			IsComplete: false,
 		}, newMergeError(i.errs)
 	}
@@ -229,7 +229,7 @@ func shouldRunSequentialMerger(config config.ExtraConfig) bool {
 	if v, ok := config[Namespace]; ok {
 		if temp, ok := v.(map[string]interface{}); ok {
 			if str, ok := temp[isSequentialKey]; ok {
-				r , ok := str.(bool)
+				r, ok := str.(bool)
 				return r && ok
 			}
 		}
@@ -269,7 +269,7 @@ func combineData(count int, responses []*Response) *Response {
 		}
 	}
 	if nil == resp {
-		return  &Response{
+		return &Response{
 			Data:       map[string]interface{}{},
 			IsComplete: isComplete,
 		}
@@ -279,7 +279,6 @@ func combineData(count int, responses []*Response) *Response {
 }
 
 //TODO 实现自定义combineData，可以根据mergeKey读取
-
 
 func requestPart(ctx context.Context, next Proxy, request *Request, out chan<- *Response, failed chan<- error) {
 	localCtx, cancel := context.WithCancel(ctx)
@@ -300,13 +299,12 @@ func requestPart(ctx context.Context, next Proxy, request *Request, out chan<- *
 
 	select {
 	case out <- resp:
-	case <- ctx.Done():
+	case <-ctx.Done():
 		failed <- ctx.Err()
 	}
 
 	cancel()
 }
-
 
 func newMergeError(errs []error) error {
 	if len(errs) == 0 {

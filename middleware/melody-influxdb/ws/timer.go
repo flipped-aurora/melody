@@ -6,10 +6,10 @@ import (
 )
 
 type TimeControl struct {
-	MinTime      string        `json:"min_time"`
-	MaxTime      string        `json:"max_time"`
-	TimeInterval string        `json:"time_interval"`
-	GroupTime    string        `json:"group_time"`
+	MinTime      string `json:"min_time"`
+	MaxTime      string `json:"max_time"`
+	TimeInterval string `json:"time_interval"`
+	GroupTime    string `json:"group_time"`
 	RefreshTime  time.Duration
 	RefreshParam string `json:"refresh_time"`
 }
@@ -30,11 +30,11 @@ func SetTimeControl(timer TimeControl) {
 	WsTimeControl = timer
 }
 
-var r =  regexp.MustCompile(`([0-9]*)([a-z])`)
+var r = regexp.MustCompile(`([0-9]*)([a-z])`)
 
 const (
 	hour = "15:04"
-	day = "01-02 15:04"
+	day  = "01-02 15:04"
 )
 
 func GetTimeFormat() string {

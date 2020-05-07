@@ -4,7 +4,6 @@ import (
 	"melody/config"
 	"reflect"
 	"testing"
-
 )
 
 func TestEntityFormatterFunc(t *testing.T) {

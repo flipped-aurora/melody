@@ -7,9 +7,9 @@ import (
 )
 
 const (
-	HeaderCompleteResponseValue = http.HeaderCompleteResponseValue
+	HeaderCompleteResponseValue   = http.HeaderCompleteResponseValue
 	HeaderInCompleteResponseValue = http.HeaderIncompleteResponseValue
-	HeaderCompleteKey = http.HeaderCompleteKey
+	HeaderCompleteKey             = http.HeaderCompleteKey
 )
 
 var (
@@ -18,9 +18,9 @@ var (
 	// PassHeaders 默认放行的请求头
 	PassHeaders = http.HeadersToSend
 	// UserAgentHeaderValue 代理的请求头标签值
-	UserAgentHeaderValue = http.UserAgentHeaderValue
-	ErrorInternalError = http.ErrorInternalError
-	DefaultToHTTPError = http.DefaultToHTTPError
+	UserAgentHeaderValue     = http.UserAgentHeaderValue
+	ErrorInternalError       = http.ErrorInternalError
+	DefaultToHTTPError       = http.DefaultToHTTPError
 	InitHTTPDefaultTransport = http.InitHTTPDefaultTransport
 )
 
@@ -37,4 +37,3 @@ type Factory interface {
 	New() Router
 	NewWithContext(context.Context) Router
 }
-

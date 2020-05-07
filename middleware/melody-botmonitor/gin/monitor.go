@@ -4,13 +4,13 @@ import (
 	"errors"
 	"net/http"
 
-	botmonitor "melody/middleware/melody-botmonitor"
-	melody "melody/middleware/melody-botmonitor/melody"
+	"github.com/gin-gonic/gin"
 	"melody/config"
 	"melody/logging"
+	botmonitor "melody/middleware/melody-botmonitor"
+	melody "melody/middleware/melody-botmonitor/melody"
 	"melody/proxy"
 	melodygin "melody/router/gin"
-	"github.com/gin-gonic/gin"
 )
 
 // Register 检查配置，按照需要在gin引擎上注册一个bot检测中间件

@@ -24,7 +24,7 @@ func (d *DecoderRegister) Get(s string) DecoderFactory {
 	for _, v := range []string{s, JSON} {
 		if v, ok := d.data.Get(v); ok {
 			decoderFactory, ok := v.(func(bool) func(io.Reader, *map[string]interface{}) error)
-			if ok{
+			if ok {
 				return decoderFactory
 			}
 		}

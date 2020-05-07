@@ -39,6 +39,3 @@ func (r *combinerRegister) GetResponseCombiner(name string) (ResponseCombiner, b
 func (r *combinerRegister) SetResponseCombiner(name string, rc ResponseCombiner) {
 	r.data.Register(name, rc)
 }
-
-
-

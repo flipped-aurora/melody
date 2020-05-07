@@ -7,12 +7,12 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	melody "melody/middleware/melody-botmonitor/melody"
+	"github.com/gin-gonic/gin"
 	"melody/config"
 	"melody/logging"
+	melody "melody/middleware/melody-botmonitor/melody"
 	"melody/proxy"
 	melodygin "melody/router/gin"
-	"github.com/gin-gonic/gin"
 )
 
 func TestRegister(t *testing.T) {

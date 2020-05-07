@@ -69,4 +69,3 @@ const tmplGraph = `digraph melody { {{ $port := .Port }}
     ":{{ $port }}" -> "{{ .Endpoint }}" [ label="{{ .Method }}"]{{ end }}
 }
 `
-

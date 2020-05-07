@@ -15,10 +15,10 @@ type HTTPResponseParserConfig struct {
 // NoOpHTTPResponseParser 不对http.Response做任何format，直接封装成proxy.Response
 func NoOpHTTPResponseParser(ctx context.Context, resp *http.Response) (*Response, error) {
 	return &Response{
-		Data: map[string]interface{}{},
+		Data:       map[string]interface{}{},
 		IsComplete: true,
 		Io:         NewReadCloserWrapper(ctx, resp.Body),
-		Metadata:   Metadata{
+		Metadata: Metadata{
 			Headers:    resp.Header,
 			StatusCode: resp.StatusCode,
 		},
@@ -26,7 +26,7 @@ func NoOpHTTPResponseParser(ctx context.Context, resp *http.Response) (*Response
 }
 
 func DefaultHTTPResponseParserFactory(cfg HTTPResponseParserConfig) HTTPResponseParser {
-	return func(ctx context.Context, resp *http.Response) (*Response,error) {
+	return func(ctx context.Context, resp *http.Response) (*Response, error) {
 		defer resp.Body.Close()
 
 		var data map[string]interface{}

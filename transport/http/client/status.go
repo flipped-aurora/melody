@@ -8,6 +8,7 @@ import (
 	"melody/config"
 	"net/http"
 )
+
 const Namespace = "melody_http"
 
 var ErrInvalidStatusCode = errors.New("Invalid status code")
@@ -21,7 +22,6 @@ type HTTPResponseError struct {
 	Msg  string `json:"http_body,omitempty"`
 	name string
 }
-
 
 // NoOpHTTPStatusHandler 空实现
 func NoOpHTTPStatusHandler(_ context.Context, resp *http.Response) (*http.Response, error) {
@@ -71,7 +71,6 @@ func DefaultHTTPStatusHandler(ctx context.Context, resp *http.Response) (*http.R
 	return resp, nil
 }
 
-
 // Error returns the error message
 func (r HTTPResponseError) Error() string {
 	return r.Msg
@@ -86,4 +85,3 @@ func (r HTTPResponseError) Name() string {
 func (r HTTPResponseError) StatusCode() int {
 	return r.Code
 }
-

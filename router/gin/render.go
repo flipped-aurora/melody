@@ -15,8 +15,8 @@ import (
 const NEGOTIATE = "negotiate"
 
 var (
-	mutex = &sync.RWMutex{}
-	emptyResponse = gin.H{}
+	mutex          = &sync.RWMutex{}
+	emptyResponse  = gin.H{}
 	renderRegister = map[string]Render{
 		NEGOTIATE:       negotiatedRender,
 		encoding.STRING: stringRender,
@@ -31,7 +31,7 @@ type Render func(*gin.Context, *proxy.Response)
 func getRender(cfg *config.EndpointConfig) Render {
 	defaultRender := jsonRender
 	// 如果只有一个Backends，将该Backends的编码作为响应编码
-	if len(cfg.Backends) == 1{
+	if len(cfg.Backends) == 1 {
 		defaultRender = getWithDefault(cfg.Backends[0].Encoding, defaultRender)
 	}
 
@@ -90,7 +90,6 @@ func stringRender(c *gin.Context, response *proxy.Response) {
 	c.String(status, msg)
 }
 
-
 func yamlRender(c *gin.Context, response *proxy.Response) {
 	status := c.Writer.Status()
 	if response == nil {
@@ -140,4 +139,3 @@ func noopRender(c *gin.Context, response *proxy.Response) {
 	}
 	io.Copy(c.Writer, response.Io)
 }
-

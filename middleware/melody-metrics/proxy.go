@@ -89,4 +89,3 @@ func (rm *ProxyMetrics) Histogram(labels ...string) metrics.Histogram {
 func (rm *ProxyMetrics) Counter(labels ...string) metrics.Counter {
 	return metrics.GetOrRegisterCounter(strings.Join(labels, "."), rm.register)
 }
-

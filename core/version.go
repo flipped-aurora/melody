@@ -14,5 +14,4 @@ var (
 	// MelodyUserAgent setted to backend
 	MelodyUserAgent   = fmt.Sprintf("Melody Version %s", MelodyVersion)
 	MelodyHeaderValue = fmt.Sprintf("Version %s", MelodyVersion)
-
 )

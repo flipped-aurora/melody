@@ -96,9 +96,9 @@ func (wsc WebSocketClient) GetNumMemoryFree() http.HandlerFunc {
 			"times": times,
 			"series": []map[string]interface{}{
 				{
-					"data":   numGCFrees,
-					"name":   "free memory",
-					"type":   "line",
+					"data":      numGCFrees,
+					"name":      "free memory",
+					"type":      "line",
 					"areaStyle": map[string]interface{}{},
 				},
 			},
@@ -124,7 +124,7 @@ func (wsc WebSocketClient) GetSysMemory() http.HandlerFunc {
 		values := result.Series[0].Values
 
 		var times []string
-		var sys, heap, stack, mspan, mcache   []int64
+		var sys, heap, stack, mspan, mcache []int64
 
 		handler.ResultDataHandler(&times, values, GetTimeFormat(), &heap, &mcache, &mspan, &sys, &stack)
 
@@ -133,33 +133,33 @@ func (wsc WebSocketClient) GetSysMemory() http.HandlerFunc {
 			"times": times,
 			"series": []map[string]interface{}{
 				{
-					"data":   sys,
-					"name":   "sys",
-					"type":   "line",
+					"data":      sys,
+					"name":      "sys",
+					"type":      "line",
 					"areaStyle": map[string]interface{}{},
 				},
 				{
-					"data":   heap,
-					"name":   "heap",
-					"type":   "line",
+					"data":      heap,
+					"name":      "heap",
+					"type":      "line",
 					"areaStyle": map[string]interface{}{},
 				},
 				{
-					"data":   stack,
-					"name":   "stack",
-					"type":   "line",
+					"data":      stack,
+					"name":      "stack",
+					"type":      "line",
 					"areaStyle": map[string]interface{}{},
 				},
 				{
-					"data":   mcache,
-					"name":   "mcache",
-					"type":   "line",
+					"data":      mcache,
+					"name":      "mcache",
+					"type":      "line",
 					"areaStyle": map[string]interface{}{},
 				},
 				{
-					"data":   mspan,
-					"name":   "mspan",
-					"type":   "line",
+					"data":      mspan,
+					"name":      "mspan",
+					"type":      "line",
 					"areaStyle": map[string]interface{}{},
 				},
 			},

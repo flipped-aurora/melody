@@ -53,7 +53,7 @@ func EmptyMiddleware(next ...Proxy) Proxy {
 
 type readCloserWrapper struct {
 	ctx context.Context
-	rc io.ReadCloser
+	rc  io.ReadCloser
 }
 
 func (r readCloserWrapper) Read(p []byte) (n int, err error) {
@@ -61,7 +61,7 @@ func (r readCloserWrapper) Read(p []byte) (n int, err error) {
 }
 
 func (r readCloserWrapper) closeWhenCancel() {
-	<- r.ctx.Done()
+	<-r.ctx.Done()
 	r.rc.Close()
 }
 
@@ -75,4 +75,3 @@ func NewReadCloserWrapper(ctx context.Context, reader io.ReadCloser) io.Reader {
 }
 
 func NoopProxy(_ context.Context, _ *Request) (*Response, error) { return nil, nil }
-

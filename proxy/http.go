@@ -65,7 +65,7 @@ func NewHTTPProxyDetailed(remote *config.Backend, re client.HTTPRequestExecutor,
 		}
 
 		// **真正发送请求的地方**
-		resp ,err := re(ctx, requestToBackend)
+		resp, err := re(ctx, requestToBackend)
 		if requestToBackend.Body != nil {
 			requestToBackend.Body.Close()
 		}

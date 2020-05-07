@@ -48,7 +48,7 @@ const (
 	HeaderCompleteResponseValue = "true"
 	// HeaderIncompleteResponseValue 响应不完整时CompleteResponseHeader的值
 	HeaderIncompleteResponseValue = "false"
-	HeaderCompleteKey = "X-Melody-Complete"
+	HeaderCompleteKey             = "X-Melody-Complete"
 )
 
 // ToHTTPError 将错误转换为HTTP状态码

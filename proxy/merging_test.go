@@ -12,7 +12,7 @@ func TestNewMergeDataMiddleware_ok(t *testing.T) {
 	backend := config.Backend{}
 	endpoint := config.EndpointConfig{
 		Backends: []*config.Backend{&backend, &backend},
-		Timeout: time.Duration(timeout) * time.Millisecond,
+		Timeout:  time.Duration(timeout) * time.Millisecond,
 	}
 	mw := NewMergeDataMiddleware(&endpoint)
 	p := mw(
@@ -45,7 +45,7 @@ func TestNewMergeDataMiddleware_partialTimeout(t *testing.T) {
 	backend := config.Backend{Timeout: time.Duration(timeout) * time.Millisecond}
 	endpoint := config.EndpointConfig{
 		Backends: []*config.Backend{&backend, &backend},
-		Timeout: time.Duration(timeout) * time.Millisecond,
+		Timeout:  time.Duration(timeout) * time.Millisecond,
 	}
 	mw := NewMergeDataMiddleware(&endpoint)
 	p := mw(
@@ -78,7 +78,7 @@ func TestNewMergeDataMiddleware_partial(t *testing.T) {
 	backend := config.Backend{Timeout: time.Duration(timeout) * time.Millisecond}
 	endpoint := config.EndpointConfig{
 		Backends: []*config.Backend{&backend, &backend},
-		Timeout: time.Duration(timeout) * time.Millisecond,
+		Timeout:  time.Duration(timeout) * time.Millisecond,
 	}
 	mw := NewMergeDataMiddleware(&endpoint)
 	p := mw(
@@ -150,13 +150,12 @@ func TestNewMergeDataMiddleware_nullResponse(t *testing.T) {
 	}
 }
 
-
 func TestNewMergeDataMiddleware_timeout(t *testing.T) {
 	timeout := 100
 	backend := config.Backend{Timeout: time.Duration(timeout) * time.Millisecond}
 	endpoint := config.EndpointConfig{
 		Backends: []*config.Backend{&backend, &backend},
-		Timeout: time.Duration(timeout) * time.Millisecond,
+		Timeout:  time.Duration(timeout) * time.Millisecond,
 	}
 	mw := NewMergeDataMiddleware(&endpoint)
 	p := mw(
@@ -372,5 +371,3 @@ func TestNewMergeDataMiddleware_sequential(t *testing.T) {
 		}
 	}
 }
-
-

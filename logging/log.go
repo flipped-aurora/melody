@@ -3,10 +3,10 @@ package logging
 import (
 	"fmt"
 	"io"
+	"io/ioutil"
 	"log"
 	"os"
 	"strings"
-	"io/ioutil"
 )
 
 // Logger show logging information with level
