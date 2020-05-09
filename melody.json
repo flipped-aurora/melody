@@ -82,10 +82,11 @@
         {
           "url_pattern": "/roles",
           "encoding": "json",
+          "sd": "etcd",
           "extra_config": {},
           "method": "GET",
           "host": [
-            "http://127.0.0.1:9001"
+            "userService"
           ],
           "disable_host_sanitize": true,
           "group": "roles_info"
@@ -285,7 +286,9 @@
           "alg": "RS256",
           "jwk-url": "http://localhost:9001/private",
           "kid": "melody",
-          "keys-to-sign": ["data"],
+          "keys-to-sign": [
+            "data"
+          ],
           "disable_jwk_security": true
         }
       }
