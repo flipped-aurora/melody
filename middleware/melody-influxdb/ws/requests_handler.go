@@ -307,26 +307,71 @@ time > %s - %s AND time < %s AND "layer"='endpoint' AND "name"='` + path + `'`)
 		}
 
 		return map[string]interface{}{
-			"title": "Requests Pie",
+			"title": "Endpoints Pie",
 			"series": []map[string]interface{}{
 				{
-					"name":     "Endpoint",
-					"type":     "pie",
-					"radius":   "55%",
-					"center":   []string{"50%", "50%"},
-					"data":     totals,
-					"roseType": "radius",
-					"label": map[string]string{
-						"color": "rgba(255, 255, 255, 0.3)",
-					},
-					"labelLine": map[string]interface{}{
-						"lineStyle": map[string]string{
-							"color": "rgba(255, 255, 255, 0.3)",
-						},
-						"smooth":  0.2,
-						"length":  10,
-						"length2": 20,
-					},
+					"name":   "Endpoints",
+					"type":   "pie",
+					"radius": "55%",
+					"center": []string{"50%", "50%"},
+					"data":   totals,
+				},
+			},
+		}, nil
+	})
+}
+
+func (wsc WebSocketClient) GetRequestsBackendsPie(cfg *config.ServiceConfig) http.HandlerFunc {
+	var backends []string
+	set := make(map[string]bool)
+	for _, endpointCfg := range cfg.Endpoints {
+		for _, backend := range endpointCfg.Backends {
+			if _, ok := set[backend.URLPattern]; !ok {
+				backends = append(backends, backend.URLPattern)
+				set[backend.URLPattern] = true
+			}
+		}
+	}
+
+	return wsc.WebSocketHandler(func(request *http.Request, data map[string]interface{}) (i interface{}, err error) {
+		var totals []interface{}
+		for _, path := range backends {
+			cmd := wsc.generateCommandWithSingle(`
+SELECT 
+max("total") AS "max_total"
+FROM 
+"%s"."autogen"."requests" 
+WHERE 
+time > %s - %s AND time < %s AND "layer"='backend' AND "name"='` + path + `'`)
+
+			resu, err := wsc.executeQuery(cmd)
+			if err != nil {
+				return nil, err
+			}
+
+			result := resu[0]
+			if result.Err != "" {
+				return nil, errors.New(result.Err)
+			}
+			values := result.Series[0].Values
+			var times []string
+			var total int64
+			handler.ResultSingleDataHandler(&times, values, GetTimeFormat(), &total)
+			totals = append(totals, map[string]interface{}{
+				"name":  path,
+				"value": total,
+			})
+		}
+
+		return map[string]interface{}{
+			"title": "Backends Pie",
+			"series": []map[string]interface{}{
+				{
+					"name":   "Backends",
+					"type":   "pie",
+					"radius": "55%",
+					"center": []string{"50%", "50%"},
+					"data":   totals,
 				},
 			},
 		}, nil

@@ -30,6 +30,7 @@ func (wsc WebSocketClient) RegisterHandleFunc(cfg *config.ServiceConfig) {
 	http.HandleFunc("/requests/backends", wsc.GetRequestsBackends())
 	http.HandleFunc("/requests/api", wsc.GetRequestsAPI())
 	http.HandleFunc("/requests/endpoints/pie", wsc.GetRequestsEndpointsPie(cfg))
+	http.HandleFunc("/requests/backends/pie", wsc.GetRequestsBackendsPie(cfg))
 
 	http.HandleFunc("/router/direction", wsc.GetRouterDirection())
 }
