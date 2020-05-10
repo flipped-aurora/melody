@@ -126,6 +126,7 @@ func NewRequest(passHeaders []string) func(*gin.Context, []string) *proxy.Reques
 		for i := range queryString {
 			if queryString[i] == passAllQueryParams {
 				query = ctx.Request.URL.Query()
+				break
 			}
 
 			if v, ok := queryValues[queryString[i]]; ok && len(v) > 0 {
