@@ -139,4 +139,5 @@ func (r ginRouter) registerDebugEndpoints() {
 	r.cfg.Engine.GET("/__debug/*param", debugHandler)
 	r.cfg.Engine.POST("/__debug/*param", debugHandler)
 	r.cfg.Engine.PUT("/__debug/*param", debugHandler)
+	r.cfg.Engine.DELETE("/__debug/*param", debugHandler)
 }
