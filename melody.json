@@ -26,6 +26,18 @@
       "data_server_enable": true,
       "data_server_port": ":8001",
       "data_server_query_enable": true
+    },
+    "melody_bloomfilter": {
+      "N": 10000000,
+      "P": 0.0000001,
+      "HashName": "optimal",
+      "TTL": 1500,
+      "port": 9999
+    },
+    "melody_consul": {
+      "address": "127.0.0.1:8500",
+      "name": "Melody",
+      "tags": [""]
     }
   },
   "timeout": "3000ms",
@@ -249,7 +261,7 @@
       "backends": [
         {
           "url_pattern": "/pages",
-          "is_collection": "true",
+          "is_collection": true,
           "mapping": {
             "collection": "list"
           },

@@ -1,5 +1,5 @@
 // Package client implements an rpc client for the BloomFilter, along with Add and Check methods.
-package client
+package main
 
 import (
 	"errors"
