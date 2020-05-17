@@ -7,12 +7,29 @@ import (
 	"time"
 )
 
-type Checker func(field string, data []int64) ([]model.Warning, error)
+type Checker func(endpoint, field string, data int64) error
 
 func newChecker(fields map[string]interface{}) (Checker, error) {
-	fieldsMap := make(map[string]int64)
 	for field, threshold := range fields {
-		if field == "api" {
+		if endpointFields, ok := threshold.(map[string]interface{}); ok {
+			for k, v := range endpointFields {
+				if _, ok := v.(string); !ok {
+					return nil, errors.New("this threshold is not string")
+				}
+				if k == "time" {
+					duration, err := time.ParseDuration(v.(string))
+					if err != nil {
+						return nil, err
+					}
+					endpointFields[k] = duration.Nanoseconds()
+				} else {
+					threshold, err := parseThreshold(v.(string))
+					if err != nil {
+						return nil, err
+					}
+					endpointFields[k] = threshold
+				}
+			}
 			continue
 		}
 
@@ -23,52 +40,54 @@ func newChecker(fields map[string]interface{}) (Checker, error) {
 		if err != nil {
 			return nil, err
 		}
-		fieldsMap[field] = threshold
+		fields[field] = threshold
 	}
 
-	return func(field string, data []int64) ([]model.Warning, error) {
-		warnings := make([]model.Warning, 0)
-		for _, item := range data {
-			if item > fieldsMap[field] {
-				warning := model.Warning{
-					Description: "警告: " + genWarningMessage(field, fields),
-					TaskName:    field + "任务",
-					CurValue:    item,
-					Threshold:   fieldsMap[field],
-					Ctime:       time.Now().UnixNano(),
-					Handled:     0,
-				}
-				warnings = append(warnings, warning)
-				// TODO 通知前端
+	return func(endpoint, field string, data int64) error {
+		fm := fields
+		if endpoint != "" {
+			if _, ok := fields[endpoint]; ok {
+				tmp := fields[endpoint]
+				fm = tmp.(map[string]interface{})
 			}
 		}
-		return warnings, nil
+		if tmp, ok := fm[field]; ok {
+			if data > tmp.(int64) {
+				warning := model.Warning{
+					Id:          model.Id.GetId(),
+					Description: "警告: " + genWarningMessage(field, endpoint),
+					TaskName:    field + "任务",
+					CurValue:    data,
+					Threshold:   tmp.(int64),
+					Ctime:       int64(time.Now().Nanosecond()),
+					Handled:     0,
+				}
+				model.WarningList.Add(warning)
+			}
+		}
+		return nil
 	}, nil
 }
 
-func genWarningMessage(field string, fields map[string]interface{}) string {
+func genWarningMessage(field string, endpoint string) string {
 	msg := "无具体消息"
 	switch field {
-	case "gc_num":
+	case "numgc":
 		msg = "GC次数超过阈值"
-	case "sys_memory":
+	case "sys":
 		msg = "系统内存超过阈值"
-	case "heap_memory":
+	case "heapsys":
 		msg = "堆内存超过阈值"
-	case "stack_memory":
+	case "stacksys":
 		msg = "栈内存超过阈值"
+	case "mcachesys":
+		msg = "内存缓存池超过阈值"
+	case "mspansys":
+		msg = "某对象内存大小超过阈值"
 	case "size":
-		if _, ok := fields["api"].(string); !ok {
-			msg = "某接口请求次数超过阈值"
-		} else {
-			msg = fields["api"].(string) + " 请求次数超过阈值"
-		}
+		msg = endpoint + " 请求次数超过阈值"
 	case "time":
-		if _, ok := fields["api"].(string); !ok {
-			msg = "某接口请求次数超过阈值"
-		} else {
-			msg = fields["api"].(string) + " 请求时间超过阈值"
-		}
+		msg = endpoint + " 请求时间超过阈值"
 	}
 	return msg
 }

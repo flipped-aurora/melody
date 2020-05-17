@@ -42,10 +42,12 @@
       ]
     },
     "melody_alert": {
-      "gc_num": "10",
-      "sys_memory": "1m",
-      "heap_memory": "1m",
-      "stack_memory": "1m"
+      "NumGC": "1",
+      "Sys": "1m",
+      "HeapSys": "1m",
+      "StackSys": "1m",
+      "MCacheSys": "1m",
+      "MSpanSys": "1m"
     }
   },
   "timeout": "3000ms",
@@ -99,6 +101,10 @@
           "jwk-url": "http://localhost:9001/public",
           "issuer": "Melody",
           "disable_jwk_security": true
+        },
+        "melody_alert": {
+          "size": "1m",
+          "time": "1s"
         }
       },
       "output_encoding": "json",
@@ -118,6 +124,10 @@
       "endpoint": "/get-person",
       "method": "GET",
       "extra_config": {
+        "melody_alert": {
+          "size": "1m",
+          "time": "1s"
+        }
       },
       "output_encoding": "json",
       "backends": [

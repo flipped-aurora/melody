@@ -9,24 +9,21 @@ const (
 	namespace = "melody_alert"
 )
 
-func NewAPIChecker(cfg *config.EndpointConfig) (Checker, error) {
+func NewChecker(cfg *config.ServiceConfig) (Checker, error) {
+	// 解析Service
 	m, err := parseConfig(cfg.ExtraConfig)
 	if err != nil {
 		return nil, err
 	}
-	m["api"] = cfg.Endpoint
-	checker, err := newChecker(m)
-	if err != nil {
-		return nil, err
-	}
-	return checker, nil
-}
 
-func NewBootChecker(cfg config.ExtraConfig) (Checker, error) {
-	m, err := parseConfig(cfg)
-	if err != nil {
-		return nil, err
+	// 解析Endpoint
+	for _, endpointConfig := range cfg.Endpoints {
+		endpointM, err := parseConfig(endpointConfig.ExtraConfig)
+		if err == nil {
+			m[endpointConfig.Endpoint] = endpointM
+		}
 	}
+
 	checker, err := newChecker(m)
 	if err != nil {
 		return nil, err

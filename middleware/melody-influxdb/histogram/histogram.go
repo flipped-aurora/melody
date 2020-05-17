@@ -2,6 +2,7 @@ package histogram
 
 import (
 	"melody/logging"
+	alert "melody/middleware/melody-alert"
 	metrics "melody/middleware/melody-metrics"
 	"regexp"
 	"time"
@@ -9,13 +10,13 @@ import (
 	"github.com/influxdata/influxdb/client/v2"
 )
 
-func Points(hostname string, now time.Time, histograms map[string]metrics.HistogramData, logger logging.Logger) []*client.Point {
-	points := latencyPoints(hostname, now, histograms, logger)
-	points = append(points, routerPoints(hostname, now, histograms, logger)...)
-	if p := debugPoint(hostname, now, histograms, logger); p != nil {
+func Points(hostname string, now time.Time, histograms map[string]metrics.HistogramData, logger logging.Logger, checker alert.Checker) []*client.Point {
+	points := latencyPoints(hostname, now, histograms, logger, checker)
+	points = append(points, routerPoints(hostname, now, histograms, logger, checker)...)
+	if p := debugPoint(hostname, now, histograms, logger, checker); p != nil {
 		points = append(points, p)
 	}
-	if p := runtimePoint(hostname, now, histograms, logger); p != nil {
+	if p := runtimePoint(hostname, now, histograms, logger, checker); p != nil {
 		points = append(points, p)
 	}
 	return points
@@ -29,7 +30,7 @@ var (
 	routerRegexp  = regexp.MustCompile(routerPattern)
 )
 
-func latencyPoints(hostname string, now time.Time, histograms map[string]metrics.HistogramData, logger logging.Logger) []*client.Point {
+func latencyPoints(hostname string, now time.Time, histograms map[string]metrics.HistogramData, logger logging.Logger, checker alert.Checker) []*client.Point {
 	res := []*client.Point{}
 	for k, histogram := range histograms {
 		if !latencyRegexp.MatchString(k) {
@@ -59,7 +60,7 @@ func latencyPoints(hostname string, now time.Time, histograms map[string]metrics
 	return res
 }
 
-func routerPoints(hostname string, now time.Time, histograms map[string]metrics.HistogramData, logger logging.Logger) []*client.Point {
+func routerPoints(hostname string, now time.Time, histograms map[string]metrics.HistogramData, logger logging.Logger, checker alert.Checker) []*client.Point {
 	res := []*client.Point{}
 	for k, histogram := range histograms {
 		if !routerRegexp.MatchString(k) {
@@ -82,11 +83,17 @@ func routerPoints(hostname string, now time.Time, histograms map[string]metrics.
 			continue
 		}
 		res = append(res, histogramPoint)
+
+		err = checker(tags["name"], params[1], histogram.Max)
+		if err != nil {
+			logger.Error("creating request counters point:", err.Error())
+			continue
+		}
 	}
 	return res
 }
 
-func debugPoint(hostname string, now time.Time, histograms map[string]metrics.HistogramData, logger logging.Logger) *client.Point {
+func debugPoint(hostname string, now time.Time, histograms map[string]metrics.HistogramData, logger logging.Logger, checker alert.Checker) *client.Point {
 	hd, ok := histograms["melody.service.debug.GCStats.Pause"]
 	if !ok {
 		return nil
@@ -103,7 +110,7 @@ func debugPoint(hostname string, now time.Time, histograms map[string]metrics.Hi
 	return histogramPoint
 }
 
-func runtimePoint(hostname string, now time.Time, histograms map[string]metrics.HistogramData, logger logging.Logger) *client.Point {
+func runtimePoint(hostname string, now time.Time, histograms map[string]metrics.HistogramData, logger logging.Logger, checker alert.Checker) *client.Point {
 	hd, ok := histograms["melody.service.runtime.MemStats.PauseNs"]
 	if !ok {
 		return nil

@@ -7,6 +7,7 @@ import (
 	"github.com/influxdata/influxdb/client/v2"
 	"melody/config"
 	"melody/logging"
+	alert "melody/middleware/melody-alert"
 	"melody/middleware/melody-influxdb/counter"
 	"melody/middleware/melody-influxdb/gauge"
 	"melody/middleware/melody-influxdb/histogram"
@@ -78,7 +79,12 @@ func Register(ctx context.Context, cfg *config.ServiceConfig, metrics *ginmetric
 		clientWrapper.runWebSocketServer(ctx, cfg, logger)
 	}
 
-	go clientWrapper.updateAndSendData(ctx, t.C)
+	checker, err := alert.NewChecker(cfg)
+	if err != nil {
+		return err
+	}
+
+	go clientWrapper.updateAndSendData(ctx, t.C, checker)
 
 	logger.Debug("influx client run success")
 
@@ -153,11 +159,12 @@ func (cw *clientWrapper) newEngine(cfg *config.ServiceConfig) *gin.Engine {
 	return engine
 }
 
-func (cw *clientWrapper) updateAndSendData(ctx context.Context, ticker <-chan time.Time) {
+func (cw *clientWrapper) updateAndSendData(ctx context.Context, ticker <-chan time.Time, checker alert.Checker) {
 	hostname, err := os.Hostname()
 	if err != nil {
 		cw.logger.Error("influx client get hostname err:", err)
 	}
+
 	// 循环挂起，监听时间窗口
 	for {
 		select {
@@ -180,15 +187,15 @@ func (cw *clientWrapper) updateAndSendData(ctx context.Context, ticker <-chan ti
 		})
 		now := time.Unix(0, snapshot.Time)
 
-		for _, p := range counter.Points(hostname, now, snapshot.Counters, cw.logger) {
+		for _, p := range counter.Points(hostname, now, snapshot.Counters, cw.logger, checker) {
 			bp.AddPoint(p)
 		}
 
-		for _, p := range gauge.Points(hostname, now, snapshot.Gauges, cw.logger) {
+		for _, p := range gauge.Points(hostname, now, snapshot.Gauges, cw.logger, checker) {
 			bp.AddPoint(p)
 		}
 
-		for _, p := range histogram.Points(hostname, now, snapshot.Histograms, cw.logger) {
+		for _, p := range histogram.Points(hostname, now, snapshot.Histograms, cw.logger, checker) {
 			bp.AddPoint(p)
 		}
 

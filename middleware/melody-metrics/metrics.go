@@ -92,7 +92,6 @@ func (m *Metrics) processMetrics(ctx context.Context, duration time.Duration, lo
 				metrics.CaptureRuntimeMemStatsOnce(r)
 				m.Router.Aggregate() // 统计 router 的连接情况
 				m.latestSnapshot = m.TakeSnapshot()
-
 			case <-ctx.Done():
 				return
 			}

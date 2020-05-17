@@ -2,12 +2,13 @@ package gauge
 
 import (
 	"melody/logging"
+	alert "melody/middleware/melody-alert"
 	"time"
 
 	"github.com/influxdata/influxdb/client/v2"
 )
 
-func Points(hostname string, now time.Time, counters map[string]int64, logger logging.Logger) []*client.Point {
+func Points(hostname string, now time.Time, counters map[string]int64, logger logging.Logger, checker alert.Checker) []*client.Point {
 	res := make([]*client.Point, 4)
 
 	in := map[string]interface{}{
@@ -61,6 +62,13 @@ func Points(hostname string, now time.Time, counters map[string]int64, logger lo
 		return res
 	}
 	res[3] = runtimePoint
+
+	_ = checker("", "numgc", int64(debug["GCStats.NumGC"].(int)))
+	_ = checker("", "sys", int64(runtime["MemStats.Sys"].(int)))
+	_ = checker("", "heapsys", int64(runtime["MemStats.HeapSys"].(int)))
+	_ = checker("", "stacksys", int64(runtime["MemStats.StackSys"].(int)))
+	_ = checker("", "mcachesys", int64(runtime["MemStats.MCacheSys"].(int)))
+	_ = checker("", "mspansys", int64(runtime["MemStats.MSpanSys"].(int)))
 
 	return res
 }

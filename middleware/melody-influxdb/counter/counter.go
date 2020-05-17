@@ -3,6 +3,7 @@ package counter
 import (
 	"github.com/influxdata/influxdb/client/v2"
 	"melody/logging"
+	alert "melody/middleware/melody-alert"
 	"regexp"
 	"strings"
 	"sync"
@@ -15,10 +16,10 @@ var (
 	mu                = new(sync.Mutex)
 )
 
-func Points(hostname string, now time.Time, counters map[string]int64, logger logging.Logger) []*client.Point {
-	points := requestPoints(hostname, now, counters, logger)
-	points = append(points, responsePoints(hostname, now, counters, logger)...)
-	points = append(points, connectionPoints(hostname, now, counters, logger)...)
+func Points(hostname string, now time.Time, counters map[string]int64, logger logging.Logger, checker alert.Checker) []*client.Point {
+	points := requestPoints(hostname, now, counters, logger, checker)
+	points = append(points, responsePoints(hostname, now, counters, logger, checker)...)
+	points = append(points, connectionPoints(hostname, now, counters, logger, checker)...)
 	return points
 }
 
@@ -30,7 +31,7 @@ var (
 	responseCounterRegexp  = regexp.MustCompile(responseCounterPattern)
 )
 
-func requestPoints(hostname string, now time.Time, counters map[string]int64, logger logging.Logger) []*client.Point {
+func requestPoints(hostname string, now time.Time, counters map[string]int64, logger logging.Logger, checker alert.Checker) []*client.Point {
 	res := []*client.Point{}
 	mu.Lock()
 	for k, count := range counters {
@@ -61,12 +62,20 @@ func requestPoints(hostname string, now time.Time, counters map[string]int64, lo
 			continue
 		}
 		res = append(res, countersPoint)
+
+		if tags["layer"] == "endpoint" && count > 0 {
+			err = checker(tags["name"], "error", count)
+			if err != nil {
+				logger.Error("creating request counters point:", err.Error())
+				continue
+			}
+		}
 	}
 	mu.Unlock()
 	return res
 }
 
-func responsePoints(hostname string, now time.Time, counters map[string]int64, logger logging.Logger) []*client.Point {
+func responsePoints(hostname string, now time.Time, counters map[string]int64, logger logging.Logger, checker alert.Checker) []*client.Point {
 	res := []*client.Point{}
 	mu.Lock()
 	for k, count := range counters {
@@ -100,7 +109,7 @@ func responsePoints(hostname string, now time.Time, counters map[string]int64, l
 	return res
 }
 
-func connectionPoints(hostname string, now time.Time, counters map[string]int64, logger logging.Logger) []*client.Point {
+func connectionPoints(hostname string, now time.Time, counters map[string]int64, logger logging.Logger, checker alert.Checker) []*client.Point {
 	res := make([]*client.Point, 2)
 
 	in := map[string]interface{}{
