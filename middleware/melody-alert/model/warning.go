@@ -21,8 +21,8 @@ var (
 )
 
 type Warnings struct {
-	Warnings []Warning
-	Lock     sync.RWMutex
+	Warnings []Warning    `json:"warnings"`
+	Lock     sync.RWMutex `json:"-"`
 }
 
 func (ws *Warnings) Add(warning Warning) {

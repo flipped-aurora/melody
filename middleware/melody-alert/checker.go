@@ -55,11 +55,11 @@ func newChecker(fields map[string]interface{}) (Checker, error) {
 			if data > tmp.(int64) {
 				warning := model.Warning{
 					Id:          model.Id.GetId(),
-					Description: "警告: " + genWarningMessage(field, endpoint),
+					Description: "警告：" + genWarningMessage(field, endpoint),
 					TaskName:    field + "任务",
 					CurValue:    data,
 					Threshold:   tmp.(int64),
-					Ctime:       int64(time.Now().Nanosecond()),
+					Ctime:       time.Now().UnixNano() / 1e6,
 					Handled:     0,
 				}
 				model.WarningList.Add(warning)
