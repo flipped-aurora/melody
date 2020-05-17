@@ -37,7 +37,15 @@
     "melody_consul": {
       "address": "127.0.0.1:8500",
       "name": "Melody",
-      "tags": [""]
+      "tags": [
+        ""
+      ]
+    },
+    "melody_alert": {
+      "gc_num": "10",
+      "sys_memory": "1m",
+      "heap_memory": "1m",
+      "stack_memory": "1m"
     }
   },
   "timeout": "3000ms",
@@ -48,7 +56,12 @@
     {
       "endpoint": "/user/info/{id}/{name}",
       "method": "GET",
-      "extra_config": {},
+      "extra_config": {
+        "melody_alert": {
+          "size": "1m",
+          "time": "1s"
+        }
+      },
       "output_encoding": "json",
       "concurrent_calls": 10,
       "backends": [
@@ -89,18 +102,14 @@
         }
       },
       "output_encoding": "json",
-      "concurrent_calls": 1,
       "backends": [
         {
           "url_pattern": "/roles",
           "encoding": "json",
-          "sd": "etcd",
-          "extra_config": {},
           "method": "GET",
           "host": [
-            "userService"
+            "http://127.0.0.1:9001"
           ],
-          "disable_host_sanitize": true,
           "group": "roles_info"
         }
       ]

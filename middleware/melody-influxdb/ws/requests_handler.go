@@ -3,7 +3,6 @@ package ws
 import (
 	"errors"
 	"fmt"
-	"melody/config"
 	"melody/middleware/melody-influxdb/ws/handler"
 	"net/http"
 	"strings"
@@ -270,9 +269,9 @@ time(%s) FILL(null)
 	})
 }
 
-func (wsc WebSocketClient) GetRequestsEndpointsPie(cfg *config.ServiceConfig) http.HandlerFunc {
+func (wsc WebSocketClient) GetRequestsEndpointsPie() http.HandlerFunc {
 	var endpoints []string
-	for _, endpointCfg := range cfg.Endpoints {
+	for _, endpointCfg := range wsc.Cfg.Endpoints {
 		endpoints = append(endpoints, endpointCfg.Endpoint)
 	}
 
@@ -321,10 +320,10 @@ time > %s - %s AND time < %s AND "layer"='endpoint' AND "name"='` + path + `'`)
 	})
 }
 
-func (wsc WebSocketClient) GetRequestsBackendsPie(cfg *config.ServiceConfig) http.HandlerFunc {
+func (wsc WebSocketClient) GetRequestsBackendsPie() http.HandlerFunc {
 	var backends []string
 	set := make(map[string]bool)
-	for _, endpointCfg := range cfg.Endpoints {
+	for _, endpointCfg := range wsc.Cfg.Endpoints {
 		for _, backend := range endpointCfg.Backends {
 			if _, ok := set[backend.URLPattern]; !ok {
 				backends = append(backends, backend.URLPattern)

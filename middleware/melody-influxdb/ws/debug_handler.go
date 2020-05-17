@@ -53,13 +53,13 @@ func (wsc WebSocketClient) GetDebugNumGC() http.HandlerFunc {
 	})
 }
 
-func (wsc WebSocketClient) GetDebugFreeTotal() http.HandlerFunc {
+func (wsc WebSocketClient) GetDebugAlloc() http.HandlerFunc {
 	return wsc.WebSocketHandler(func(request *http.Request, data map[string]interface{}) (interface{}, error) {
 		cmd := wsc.generateCommand(`
 SELECT
-sum("GCStats.PauseTotal") AS "sum_GCStats.PauseTotal"
+sum("MemStats.Alloc") AS "sum_MemStats.Alloc"
 FROM
-"%s"."autogen"."debug"
+"%s"."autogen"."runtime"
 WHERE
 time > %s - %s AND time < %s 
 GROUP BY
@@ -75,15 +75,15 @@ time(%s) FILL(null)
 		}
 		values := result.Series[0].Values
 		var times []string
-		var freeTotal []int64
-		handler.ResultDataHandler(&times, values, GetTimeFormat(), &freeTotal)
+		var alloc []int64
+		handler.ResultDataHandler(&times, values, GetTimeFormat(), &alloc)
 		return map[string]interface{}{
-			"title": "debug.FreeTotal",
+			"title": "debug.Alloc",
 			"times": times,
 			"series": []map[string]interface{}{
 				{
-					"data":      freeTotal,
-					"name":      "FreeTotal",
+					"data":      alloc,
+					"name":      "alloc",
 					"type":      "line",
 					"areaStyle": map[string]interface{}{},
 				},

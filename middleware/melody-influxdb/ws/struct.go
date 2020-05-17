@@ -13,11 +13,12 @@ type WebSocketClient struct {
 	Upgrader websocket.Upgrader
 	Logger   logging.Logger
 	DB       string
+	Cfg      *config.ServiceConfig
 }
 
-func (wsc WebSocketClient) RegisterHandleFunc(cfg *config.ServiceConfig) {
+func (wsc WebSocketClient) RegisterHandleFunc() {
 	http.HandleFunc("/debug/num/gc", wsc.GetDebugNumGC())
-	http.HandleFunc("/debug/free-total", wsc.GetDebugFreeTotal())
+	http.HandleFunc("/debug/alloc", wsc.GetDebugAlloc())
 
 	http.HandleFunc("/runtime/num/gc", wsc.GetNumGC())
 	http.HandleFunc("/runtime/num/goroutine", wsc.GetNumGoroutine())
@@ -29,8 +30,8 @@ func (wsc WebSocketClient) RegisterHandleFunc(cfg *config.ServiceConfig) {
 	http.HandleFunc("/requests/endpoints", wsc.GetRequestsEndpoints())
 	http.HandleFunc("/requests/backends", wsc.GetRequestsBackends())
 	http.HandleFunc("/requests/api", wsc.GetRequestsAPI())
-	http.HandleFunc("/requests/endpoints/pie", wsc.GetRequestsEndpointsPie(cfg))
-	http.HandleFunc("/requests/backends/pie", wsc.GetRequestsBackendsPie(cfg))
+	http.HandleFunc("/requests/endpoints/pie", wsc.GetRequestsEndpointsPie())
+	http.HandleFunc("/requests/backends/pie", wsc.GetRequestsBackendsPie())
 
 	http.HandleFunc("/router/direction", wsc.GetRouterDirection())
 	http.HandleFunc("/router/size", wsc.GetRouterSize())

@@ -97,9 +97,10 @@ func (cw *clientWrapper) runWebSocketServer(ctx context.Context, cfg *config.Ser
 		Upgrader: upgrader,
 		Logger:   cw.logger,
 		DB:       cw.config.db,
+		Cfg:      cfg,
 	}
 
-	wsc.RegisterHandleFunc(cfg)
+	wsc.RegisterHandleFunc()
 
 	go func() {
 		u := url.URL{
