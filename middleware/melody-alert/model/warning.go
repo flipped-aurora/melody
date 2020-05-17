@@ -1,7 +1,6 @@
 package model
 
 import (
-	"fmt"
 	"sync"
 )
 
@@ -28,7 +27,6 @@ type Warnings struct {
 func (ws *Warnings) Add(warning Warning) {
 	ws.Lock.Lock()
 	ws.Warnings = append(ws.Warnings, warning)
-	fmt.Printf("%+v\n", warning)
 	ws.Lock.Unlock()
 }
 
