@@ -15,15 +15,25 @@ func (wsc WebSocketClient) GetWarnings() http.HandlerFunc {
 				pageIndex = atoi - 1
 			}
 		}
-		start := pageIndex * 10
-		end := (pageIndex + 1) * 10
 
-		if end > len(model.WarningList.Warnings) {
-			end = len(model.WarningList.Warnings)
+		total := len(model.WarningList.Warnings)
+
+		start := total - (pageIndex+1)*10
+		end := total - pageIndex*10
+
+		if start < 0 {
+			start = 0
 		}
+
+		result := make([]model.Warning, 0)
+
+		for i := end - 1; i >= start; i-- {
+			result = append(result, model.WarningList.Warnings[i])
+		}
+
 		return map[string]interface{}{
-			"warnings": model.WarningList.Warnings[start:end],
-			"total":    len(model.WarningList.Warnings),
+			"warnings": result,
+			"total":    total,
 		}, nil
 	})
 }

@@ -56,7 +56,7 @@ func newChecker(fields map[string]interface{}) (Checker, error) {
 				warning := model.Warning{
 					Id:          model.Id.GetId(),
 					Description: "警告：" + genWarningMessage(field, endpoint),
-					TaskName:    field + "任务",
+					TaskName:    field,
 					CurValue:    data,
 					Threshold:   tmp.(int64),
 					Ctime:       time.Now().UnixNano() / 1e6,
