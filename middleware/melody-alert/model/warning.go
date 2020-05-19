@@ -30,6 +30,16 @@ func (ws *Warnings) Add(warning Warning) {
 	ws.Lock.Unlock()
 }
 
+func (ws *Warnings) ChangeStatus(id int64) {
+	ws.Lock.Lock()
+	if ws.Warnings[id-1].Handled == 0 {
+		ws.Warnings[id-1].Handled = 1
+	} else {
+		ws.Warnings[id-1].Handled = 0
+	}
+	ws.Lock.Unlock()
+}
+
 type IdWorker struct {
 	Id   int64
 	Lock sync.RWMutex

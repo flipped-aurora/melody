@@ -155,6 +155,7 @@ func (cw *clientWrapper) newEngine(cfg *config.ServiceConfig) *gin.Engine {
 	}
 	engine.POST("/time", cw.ModifyTimeControl())
 	engine.POST("/backends", cw.Backends(cfg))
+	engine.POST("/changeStatus", cw.ChangeStatus())
 
 	return engine
 }

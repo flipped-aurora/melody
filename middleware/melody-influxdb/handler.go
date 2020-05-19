@@ -3,6 +3,7 @@ package influxdb
 import (
 	"github.com/gin-gonic/gin"
 	"melody/config"
+	"melody/middleware/melody-alert/model"
 	"melody/middleware/melody-influxdb/refresh"
 	"melody/middleware/melody-influxdb/response"
 	"melody/middleware/melody-influxdb/ws"
@@ -22,6 +23,10 @@ type query struct {
 type AuthConfig struct {
 	Username string `json:"username"`
 	Password string `json:"password"`
+}
+
+type ChangeStatus struct {
+	Id int64 `json:"id"`
 }
 
 func (cw *clientWrapper) Query() gin.HandlerFunc {
@@ -121,6 +126,22 @@ func (cw *clientWrapper) Backends(cfg *config.ServiceConfig) gin.HandlerFunc {
 	}
 	return func(c *gin.Context) {
 		response.Ok(c, http.StatusOK, "", e2b)
+	}
+}
+
+func (cw *clientWrapper) ChangeStatus() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		var changeStatus ChangeStatus
+		err := c.ShouldBind(&changeStatus)
+		if err != nil {
+			cw.logger.Error("parse request body to query object error:", err)
+			response.Ok(c, requestFailCode, "parse request body error", nil)
+			return
+		}
+
+		model.WarningList.ChangeStatus(changeStatus.Id)
+
+		response.Ok(c, http.StatusOK, "modify success", nil)
 	}
 }
 
