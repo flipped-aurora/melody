@@ -37,3 +37,12 @@ func (wsc WebSocketClient) GetWarnings() http.HandlerFunc {
 		}, nil
 	})
 }
+
+func (wsc WebSocketClient) WarningsWatch() http.HandlerFunc {
+	return wsc.WebSocketWatchHandler(func(request *http.Request, data map[string]interface{}) (i interface{}, err error) {
+		warning := data["warning"]
+		return map[string]interface{}{
+			"warning": warning,
+		}, nil
+	})
+}

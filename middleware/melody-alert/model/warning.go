@@ -16,18 +16,28 @@ type Warning struct {
 
 var (
 	Id          = new(IdWorker)
-	WarningList = new(Warnings)
+	WarningList = NewWarningList()
 )
 
 type Warnings struct {
-	Warnings []Warning    `json:"warnings"`
-	Lock     sync.RWMutex `json:"-"`
+	Warnings  []Warning    `json:"warnings"`
+	Lock      sync.RWMutex `json:"-"`
+	WatchChan chan Warning `json:"-"`
+}
+
+func NewWarningList() Warnings {
+	return Warnings{
+		Warnings:  make([]Warning, 0),
+		Lock:      sync.RWMutex{},
+		WatchChan: make(chan Warning),
+	}
 }
 
 func (ws *Warnings) Add(warning Warning) {
 	ws.Lock.Lock()
 	ws.Warnings = append(ws.Warnings, warning)
 	ws.Lock.Unlock()
+	ws.WatchChan <- warning
 }
 
 func (ws *Warnings) ChangeStatus(id int64) {

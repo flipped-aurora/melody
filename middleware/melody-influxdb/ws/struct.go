@@ -38,4 +38,5 @@ func (wsc WebSocketClient) RegisterHandleFunc() {
 	http.HandleFunc("/router/time", wsc.GetRouterTime())
 
 	http.HandleFunc("/warnings", wsc.GetWarnings())
+	http.HandleFunc("/warnings/watch", wsc.WarningsWatch())
 }
