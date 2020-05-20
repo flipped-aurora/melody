@@ -19,6 +19,11 @@ func (wsc WebSocketClient) GetNumGoroutine() http.HandlerFunc {
 		if result.Err != "" {
 			return nil, errors.New(result.Err)
 		}
+		if len(result.Series) == 0 {
+			return map[string]interface{}{
+				"title": "NumGoroutine",
+			}, nil
+		}
 		values := result.Series[0].Values
 
 		var times []string
@@ -53,6 +58,11 @@ func (wsc WebSocketClient) GetNumGC() http.HandlerFunc {
 		if result.Err != "" {
 			return nil, errors.New(result.Err)
 		}
+		if len(result.Series) == 0 {
+			return map[string]interface{}{
+				"title": "NumGC",
+			}, nil
+		}
 		values := result.Series[0].Values
 		var times []string
 		var numGC []int64
@@ -84,6 +94,11 @@ func (wsc WebSocketClient) GetNumMemoryFree() http.HandlerFunc {
 		result := re[0]
 		if result.Err != "" {
 			return nil, errors.New(result.Err)
+		}
+		if len(result.Series) == 0 {
+			return map[string]interface{}{
+				"title": "NumGCFrees",
+			}, nil
 		}
 		values := result.Series[0].Values
 

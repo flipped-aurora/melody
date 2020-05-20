@@ -106,9 +106,9 @@ func parseThreshold(t string) (int64, error) {
 		}
 		switch t[len(t)-1] {
 		case 'k':
-			return i * 1000, nil
+			return i * 1024, nil
 		case 'm':
-			return i * 1000 * 1000, nil
+			return i * 1024 * 1024, nil
 		}
 
 		return 0, errors.New("没有这个单位: " + string(t[len(t)-1]))

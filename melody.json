@@ -42,12 +42,12 @@
       ]
     },
     "melody_alert": {
-      "NumGC": "1",
+      "NumGC": "100",
       "Sys": "1m",
-      "HeapSys": "1m",
-      "StackSys": "1m",
-      "MCacheSys": "1m",
-      "MSpanSys": "1m"
+      "HeapSys": "200m",
+      "StackSys": "200m",
+      "MCacheSys": "200m",
+      "MSpanSys": "200m"
     }
   },
   "timeout": "3000ms",
