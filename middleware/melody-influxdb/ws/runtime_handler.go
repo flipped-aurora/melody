@@ -121,6 +121,11 @@ func (wsc WebSocketClient) GetSysMemory() http.HandlerFunc {
 		if result.Err != "" {
 			return nil, errors.New(result.Err)
 		}
+		if len(result.Series) == 0 {
+			return map[string]interface{}{
+				"title": "Memory",
+			}, nil
+		}
 		values := result.Series[0].Values
 
 		var times []string
