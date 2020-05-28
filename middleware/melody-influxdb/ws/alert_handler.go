@@ -33,7 +33,7 @@ func (wsc WebSocketClient) GetWarnings() http.HandlerFunc {
 
 		return map[string]interface{}{
 			"warnings": result,
-			"total":    total,
+			"total":    len(result),
 		}, nil
 	})
 }

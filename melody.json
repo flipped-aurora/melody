@@ -27,27 +27,14 @@
       "data_server_port": ":8001",
       "data_server_query_enable": true
     },
-    "melody_bloomfilter": {
-      "N": 10000000,
-      "P": 0.0000001,
-      "HashName": "optimal",
-      "TTL": 1500,
-      "port": 9999
-    },
-    "melody_consul": {
-      "address": "127.0.0.1:8500",
-      "name": "Melody",
-      "tags": [
-        ""
-      ]
-    },
     "melody_alert": {
       "NumGC": "100",
-      "Sys": "1m",
-      "HeapSys": "200m",
-      "StackSys": "200m",
-      "MCacheSys": "200m",
-      "MSpanSys": "200m"
+      "NumGoroutine": "100",
+      "Sys": "200m",
+      "HeapSys": "150m",
+      "StackSys": "50m",
+      "MCacheSys": "50m",
+      "MSpanSys": "20m"
     }
   },
   "timeout": "3000ms",
@@ -55,42 +42,6 @@
   "output_encoding": "json",
   "port": 8000,
   "endpoints": [
-    {
-      "endpoint": "/user/info/{id}/{name}",
-      "method": "GET",
-      "extra_config": {
-        "melody_alert": {
-          "size": "1m",
-          "time": "1s"
-        }
-      },
-      "output_encoding": "json",
-      "concurrent_calls": 10,
-      "backends": [
-        {
-          "url_pattern": "/roles",
-          "encoding": "json",
-          "extra_config": {},
-          "method": "GET",
-          "host": [
-            "127.0.0.1:9001"
-          ],
-          "disable_host_sanitize": false,
-          "group": "roles_info"
-        },
-        {
-          "url_pattern": "/person/{id}/{name}",
-          "encoding": "json",
-          "extra_config": {},
-          "method": "GET",
-          "host": [
-            "127.0.0.1:9001"
-          ],
-          "disable_host_sanitize": false,
-          "group": "person_info"
-        }
-      ]
-    },
     {
       "endpoint": "/roles",
       "method": "GET",
@@ -144,138 +95,6 @@
       ]
     },
     {
-      "endpoint": "/findone/{name}",
-      "method": "GET",
-      "extra_config": {
-        "melody_proxy": {
-          "sequential": true
-        }
-      },
-      "output_encoding": "json",
-      "concurrent_calls": 1,
-      "backends": [
-        {
-          "url_pattern": "/user/{name}",
-          "group": "base_info",
-          "encoding": "json",
-          "sd": "static",
-          "extra_config": {},
-          "method": "GET",
-          "mapping": {
-            "name": "user_name"
-          },
-          "blacklist": [
-            "id"
-          ],
-          "host": [
-            "127.0.0.1:9001"
-          ]
-        },
-        {
-          "url_pattern": "/role/{resp0_base_info.role_id}",
-          "encoding": "json",
-          "sd": "static",
-          "extra_config": {},
-          "method": "GET",
-          "group": "role_info",
-          "host": [
-            "127.0.0.1:9001"
-          ]
-        }
-      ]
-    },
-    {
-      "endpoint": "/static",
-      "method": "GET",
-      "extra_config": {
-        "melody_proxy": {
-          "sequential": true,
-          "static": {
-            "strategy": [
-              "success"
-            ],
-            "data": {
-              "static": [
-                {
-                  "static1": 1
-                },
-                {
-                  "static2": true
-                },
-                {
-                  "static3": "hello"
-                }
-              ]
-            }
-          }
-        }
-      },
-      "output_encoding": "json",
-      "concurrent_calls": 1,
-      "backends": [
-        {
-          "url_pattern": "roles",
-          "encoding": "json",
-          "sd": "static",
-          "extra_config": {
-            "melody_proxy": {
-              "flatmap_filter": [
-                {
-                  "type": "move",
-                  "args": [
-                    "data.0.ID",
-                    "data.0.role_id"
-                  ]
-                },
-                {
-                  "type": "move",
-                  "args": [
-                    "data.0.CreatedAt",
-                    "data.0.create_at"
-                  ]
-                },
-                {
-                  "type": "del",
-                  "args": [
-                    "data.1.roleName"
-                  ]
-                }
-              ]
-            }
-          },
-          "group": "roles",
-          "method": "GET",
-          "host": [
-            "127.0.0.1:9001"
-          ]
-        },
-        {
-          "url_pattern": "/role/static",
-          "encoding": "json",
-          "sd": "static",
-          "extra_config": {},
-          "method": "GET",
-          "group": "static_data",
-          "host": [
-            "127.0.0.1:9001"
-          ]
-        }
-      ]
-    },
-    {
-      "endpoint": "/newpage",
-      "concurrent_calls": 5,
-      "method": "post",
-      "backends": [
-        {
-          "url_pattern": "/page",
-          "host": [
-            "http://127.0.0.1:9001"
-          ]
-        }
-      ]
-    },
-    {
       "endpoint": "/list",
       "backends": [
         {
@@ -286,17 +105,6 @@
           },
           "host": [
             "http://127.0.0.1:9001"
-          ]
-        }
-      ]
-    },
-    {
-      "endpoint": "/ping",
-      "backends": [
-        {
-          "url_pattern": "/__debug/bar",
-          "host": [
-            "127.0.0.1:9001"
           ]
         }
       ]

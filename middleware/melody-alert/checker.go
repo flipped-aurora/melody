@@ -74,6 +74,8 @@ func genWarningMessage(field string, endpoint string) string {
 	switch field {
 	case "numgc":
 		msg = "GC次数超过阈值"
+	case "numgoroutine":
+		msg = "Goroutine数量超过阈值"
 	case "sys":
 		msg = "系统内存超过阈值"
 	case "heapsys":

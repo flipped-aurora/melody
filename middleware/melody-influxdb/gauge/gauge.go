@@ -64,6 +64,7 @@ func Points(hostname string, now time.Time, counters map[string]int64, logger lo
 	res[3] = runtimePoint
 
 	_ = checker("", "numgc", int64(debug["GCStats.NumGC"].(int)))
+	_ = checker("", "numgoroutine", int64(runtime["NumGoroutine"].(int)))
 	_ = checker("", "sys", int64(runtime["MemStats.Sys"].(int)))
 	_ = checker("", "heapsys", int64(runtime["MemStats.HeapSys"].(int)))
 	_ = checker("", "stacksys", int64(runtime["MemStats.StackSys"].(int)))

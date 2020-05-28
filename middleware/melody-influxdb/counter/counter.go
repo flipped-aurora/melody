@@ -62,14 +62,6 @@ func requestPoints(hostname string, now time.Time, counters map[string]int64, lo
 			continue
 		}
 		res = append(res, countersPoint)
-
-		if tags["layer"] == "endpoint" && count > 0 {
-			err = checker(tags["name"], "error", count)
-			if err != nil {
-				logger.Error("creating request counters point:", err.Error())
-				continue
-			}
-		}
 	}
 	mu.Unlock()
 	return res
