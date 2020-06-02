@@ -28,12 +28,6 @@ func main() {
 					"method": "get",
 					"active": true,
 				},
-				{
-					"tag":    "user modify",
-					"path":   "/user/modify",
-					"method": "post",
-					"active": true,
-				},
 			},
 		})
 	})

@@ -81,7 +81,7 @@ func Register(ctx context.Context, cfg *config.ServiceConfig, metrics *ginmetric
 
 	checker, err := alert.NewChecker(cfg)
 	if err != nil {
-		return err
+		logger.Error(err)
 	}
 
 	go clientWrapper.updateAndSendData(ctx, t.C, checker)
