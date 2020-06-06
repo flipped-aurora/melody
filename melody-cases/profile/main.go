@@ -2,13 +2,13 @@ package main
 
 import (
 	"fmt"
-	"github.com/gin-gonic/gin"
 	"net/http"
+
+	"github.com/gin-gonic/gin"
 )
 
 func main() {
 	profileEngine := gin.Default()
-
 	profileEngine.GET("/profile/:id", func(context *gin.Context) {
 		id := context.Param("id")
 		context.JSON(http.StatusOK, map[string]interface{}{

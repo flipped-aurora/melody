@@ -31,7 +31,7 @@ func JSONCollectionDecoder() Decoder {
 		if err := d.Decode(&collection); err != nil {
 			return err
 		}
-		*i = map[string]interface{}{"collection": collection}
+		*i = map[string]interface{}{"list": collection}
 		return nil
 	}
 }
