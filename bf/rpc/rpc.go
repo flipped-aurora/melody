@@ -32,6 +32,8 @@ func (b *BloomFilter) Close() {
 	}
 }
 
+// New 初始化了 df 这个变量，并且返回一个新的 bf
+// 如果想使用 bf 请使用 Get 方法
 func New(ctx context.Context, cfg Config) *BloomFilter {
 	if bf != nil {
 		bf.Close()
@@ -39,17 +41,16 @@ func New(ctx context.Context, cfg Config) *BloomFilter {
 
 	bf = rotate.New(ctx, cfg.Config)
 
-	return new(BloomFilter) // TODO why use Get
+	return new(BloomFilter)
 }
 
 // Add 函数的 input
-// TODO why
+// 使用二维数组可以批量 Add
 type AddInput struct {
 	Elems [][]byte
 }
 
 // Add 函数的 output
-// TODO why
 type AddOutput struct {
 	Count int
 }
