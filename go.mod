@@ -11,11 +11,9 @@ require (
 	github.com/coreos/go-semver v0.3.0 // indirect
 	github.com/coreos/go-systemd v0.0.0-20190719114852-fd7a80b32e1f // indirect
 	github.com/devopsfaith/flatmap v0.0.0-20190628155411-90b768d6668b
-	github.com/gin-gonic/gin v1.5.0
+	github.com/gin-gonic/gin v1.7.0
 	github.com/go-contrib/uuid v1.2.0
-	github.com/go-playground/universal-translator v0.17.0 // indirect
 	github.com/golang/groupcache v0.0.0-20200121045136-8c9f03a8e57e // indirect
-	github.com/golang/protobuf v1.3.3 // indirect
 	github.com/google/martian v2.1.0+incompatible
 	github.com/google/uuid v1.1.1 // indirect
 	github.com/gorilla/websocket v1.4.2
@@ -29,7 +27,6 @@ require (
 	github.com/influxdata/platform v0.0.0-20190117200541-d500d3cf5589 // indirect
 	github.com/juju/ratelimit v1.0.1
 	github.com/konsorten/go-windows-terminal-sequences v1.0.2 // indirect
-	github.com/leodido/go-urn v1.2.0 // indirect
 	github.com/miekg/dns v1.1.27 // indirect
 	github.com/mmcdole/gofeed v1.0.0-beta2
 	github.com/mmcdole/goxpp v0.0.0-20181012175147-0068e33feabf // indirect
@@ -61,7 +58,6 @@ require (
 	go.etcd.io/bbolt v1.3.3 // indirect
 	go.opencensus.io v0.22.3
 	go.uber.org/zap v1.13.0 // indirect
-	golang.org/x/crypto v0.0.0-20200221231518-2aa609cf4a9d // indirect
 	golang.org/x/lint v0.0.0-20191125180803-fdd1cda4f05f // indirect
 	golang.org/x/net v0.0.0-20200222125558-5a598a2470a0 // indirect
 	golang.org/x/sys v0.0.0-20200219091948-cb0a6d8edb6c // indirect
@@ -70,7 +66,6 @@ require (
 	google.golang.org/genproto v0.0.0-20191216164720-4f79533eabd1 // indirect
 	google.golang.org/grpc v1.26.0 // indirect
 	gopkg.in/Graylog2/go-gelf.v2 v2.0.0-20191017102106-1550ee647df0
-	gopkg.in/go-playground/validator.v9 v9.31.0 // indirect
 	gopkg.in/ini.v1 v1.51.1 // indirect
 	gopkg.in/square/go-jose.v2 v2.4.1
 	sigs.k8s.io/yaml v1.1.0 // indirect
